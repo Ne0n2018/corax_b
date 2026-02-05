@@ -1,3 +1,12 @@
 import 'dotenv/config';
-declare const _default: import("@prisma/config").PrismaConfigInternal;
-export default _default;
+import { defineConfig, env } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  migrations: {
+    path: 'prisma/migrations',
+  },
+  datasource: {
+    url: env('POSTGRES_URI'), // ← теперь правильно
+  },
+});

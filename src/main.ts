@@ -8,7 +8,7 @@ import { Redis } from 'ioredis';
 import session from 'express-session';
 import ms from './libs/common/utils/ms.util';
 import parseBoolean from './libs/common/utils/parseBoolean.util';
-import { RedisStore } from 'connect-redis';
+import RedisStore from 'connect-redis';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -37,6 +37,7 @@ async function bootstrap() {
       store: new RedisStore({
         client: redis,
         prefix: config.getOrThrow<string>('SESSION_FOLDER'),
+        ttl: ms(config.getOrThrow<string>('SESSION_MAX_AGE')),
       }),
     }),
   );

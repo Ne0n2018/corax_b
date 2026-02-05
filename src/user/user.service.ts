@@ -25,7 +25,7 @@ export class UserService {
     return user;
   }
   public async findByEmail(email: string) {
-    const user = await this.prismaService.user.findFirst({
+    return this.prismaService.user.findFirst({
       where: {
         email,
       },
@@ -33,7 +33,6 @@ export class UserService {
         accounts: true,
       },
     });
-    return user;
   }
   public async create(
     email: string,
