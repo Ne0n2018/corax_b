@@ -42,9 +42,9 @@ model Account {
   type     String
   provider String
 
-  refresToken String? @map("refresh_token")
-  accessToken String? @map("access_token")
-  expiresAt   Int     @map("expires_at")
+  refreshToken String? @map("refresh_token")
+  accessToken  String? @map("access_token")
+  expiresAt    Int     @map("expires_at")
 
   user   User?   @relation(fields: [userId], references: [id])
   userId String? @map("user_id")

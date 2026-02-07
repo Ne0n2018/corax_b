@@ -7,7 +7,7 @@ import { Authorization } from '../auth/decorators/auth.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @Get('profile')
-  @Authorization('SPORTS')
+  @Authorization()
   @HttpCode(HttpStatus.OK)
   public async getProfile(@Authorized('id') userId: string) {
     return await this.userService.findById(userId);

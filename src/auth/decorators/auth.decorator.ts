@@ -6,7 +6,6 @@ import { RolesGuard } from '../guards/roles.guard';
 
 export function Authorization(...roles: UserRole[]) {
   if (roles.length > 0) {
-    // @ts-ignore
     return applyDecorators(Roles(...roles), UseGuards(AuthGuard, RolesGuard));
   }
 
