@@ -15,6 +15,7 @@ import { verify } from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { ProviderService } from './provider/provider.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { EmailConfirmationService } from './email-confirmation/email-confirmation.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly providerService: ProviderService,
     private readonly prismaService: PrismaService,
+    private readonly confirmationService: EmailConfirmationService,
   ) {}
   public async register(req: Request, dto: RegisterDto) {
     const isExists = await this.userService.findByEmail(dto.email);
@@ -39,7 +41,13 @@ export class AuthService {
       AuthMetod.CREDENTIALS,
       false,
     );
-    return await this.saveSession(req, newUser);
+
+    await this.confirmationService.sendVerificationToken(newUser);
+
+    return {
+      message:
+        'Вы успешно зарегистрировались.Пожалуйста, потвердите ваш email. Сообщение было отправлено на ваш почтовый адрес',
+    };
   }
   public async login(req: Request, dto: LoginDto) {
     const user = await this.userService.findByEmail(dto.email);
@@ -52,6 +60,14 @@ export class AuthService {
         'Неверный пароль,пожалуйста попробуйте еще раз или восстановите пароль,если забыли его',
       );
     }
+
+    if (!user.isVerified) {
+      await this.confirmationService.sendVerificationToken(user);
+      throw new UnauthorizedException(
+        'Ваш email не потвержден. Пожалуйста, проверьте вашу почту  и подтвердите адрес',
+      );
+    }
+
     return this.saveSession(req, user);
   }
   public async extractProfileFromCode(
@@ -63,7 +79,7 @@ export class AuthService {
     const profile = await providerInstance.findUserByCode(code);
     const account = await this.prismaService.account.findFirst({
       where: {
-        id: profile.id,
+        providerAccountId: profile.id,
         provider: profile.provider,
       },
     });
@@ -90,6 +106,7 @@ export class AuthService {
           userId: user.id,
           type: 'oauth',
           provider: profile.provider,
+          providerAccountId: profile.id,
           accessToken: profile.access_token,
           refreshToken: profile.refresh_token,
           expiresAt: profile.expires_in,
@@ -113,7 +130,7 @@ export class AuthService {
       });
     });
   }
-  private async saveSession(req: Request, user: User) {
+  public async saveSession(req: Request, user: User) {
     return new Promise((resolve, reject) => {
       req.session.userId = user.id;
 

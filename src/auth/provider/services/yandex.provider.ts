@@ -18,27 +18,33 @@ interface YandexProfile {
   real_name?: string;
   sex?: 'male' | 'female' | null;
   default_phone?: { id: number; number: string };
-  access_token: string;
-  refresh_token?: string;
 }
 
 export class YandexProvider extends BaseOAuthService {
-  public constructor(options: TypesProviderOptions) {
+  constructor(options: TypesProviderOptions) {
     super({
       name: 'yandex',
       authorize_url: 'https://oauth.yandex.ru/authorize',
       access_url: 'https://oauth.yandex.ru/token',
-      profile_url: 'https://oauth.yandex.ru/info?format=json',
+      profile_url: 'https://login.yandex.ru/info', // Fixed URL
       scopes: options.scopes,
       client_id: options.client_id,
       client_secret: options.client_secret,
     });
   }
 
-  public async extractUserInfo(data: YandexProfile): Promise<TypeUserInfo> {
-    return super.extractUserInfo({
-      email: data.emails[0],
-      name: data.display_name,
-    });
+  protected getProfileHeaders(accessToken: string): Record<string, string> {
+    return { Authorization: `OAuth ${accessToken}` }; // Yandex uses 'OAuth' not 'Bearer'
+  }
+
+  protected async extractUserInfo(data: YandexProfile): Promise<TypeUserInfo> {
+    return {
+      id: data.id,
+      email: data.default_email,
+      name:
+        `${data.first_name || ''} ${data.last_name || ''}`.trim() ||
+        data.display_name,
+      provider: this.name,
+    };
   }
 }

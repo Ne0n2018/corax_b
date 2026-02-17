@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import type { TypeBaseProviderOptions } from './types/base-provider.options.types';
@@ -9,82 +10,116 @@ import type { TypeUserInfo } from './types/user-info.types';
 @Injectable()
 export class BaseOAuthService {
   private BASE_URL: string;
-  public constructor(private readonly options: TypeBaseProviderOptions) {}
 
-  protected extractUserInfo(data: any): Promise<TypeUserInfo> {
+  constructor(protected readonly options: TypeBaseProviderOptions) {}
+
+  protected async extractUserInfo(data: any): Promise<TypeUserInfo> {
     return {
       ...data,
       provider: this.options.name,
     };
   }
 
-  public getAuthUrl() {
+  public getAuthUrl(): string {
     const query = new URLSearchParams({
       response_type: 'code',
       client_id: this.options.client_id,
       redirect_uri: this.getRedirectUrl(),
       scope: (this.options.scopes ?? []).join(' '),
-      access_type: 'offline',
-      prompt: 'select_account',
     });
 
-    return `${this.options.authorize_url}?${query}`;
+    return `${this.options.authorize_url}?${query.toString()}`;
   }
 
-  // @ts-ignore
   public async findUserByCode(code: string): Promise<TypeUserInfo> {
-    const client_id = this.options.client_id;
-    const client_secret = this.options.client_secret;
+    if (!code) throw new BadRequestException('Authorization code is required');
+
     const tokenQuery = new URLSearchParams({
-      client_id,
-      client_secret,
+      client_id: this.options.client_id,
+      client_secret: this.options.client_secret,
       code,
       redirect_uri: this.getRedirectUrl(),
       grant_type: 'authorization_code',
     });
 
-    const tokenRequest = await fetch(this.options.access_url, {
-      method: 'POST',
-      body: tokenQuery,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
-      },
-    });
-
-    const tokens = await tokenRequest.json();
-
-    if (!tokens.access_token) {
-      throw new BadRequestException(
-        `Нет токенов с ${this.options.access_url}. Убедитесь,что код авторизации действителен`,
-      );
-
-      const userRequest = await fetch(this.options.profile_url, {
+    let tokens;
+    try {
+      const tokenRequest = await fetch(this.options.access_url, {
+        method: 'POST',
+        body: tokenQuery,
         headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
         },
       });
 
-      if (!userRequest.ok) {
-        throw new UnauthorizedException(
-          `Не удалось получить пользователя с ${this.options.profile_url}. Проверьте правильность токена доступа`,
+      if (!tokenRequest.ok) {
+        const errorText = await tokenRequest.text(); // Get text for debugging
+        throw new InternalServerErrorException(
+          `Token request failed. Status: ${tokenRequest.status}. Response: ${errorText}`,
         );
       }
 
-      const user = await userRequest.json();
-      const userData = await this.extractUserInfo(user);
-
-      return {
-        ...userData,
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_in: tokens.expires_at || tokens.expires_in,
-        provider: this.options.name,
-      };
+      tokens = await tokenRequest.json();
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Token fetch error: ${error.message}`,
+      );
     }
+
+    if (!tokens.access_token) {
+      throw new BadRequestException(
+        `No access token from ${this.options.access_url}. Ensure code is valid.`,
+      );
+    }
+
+    let user;
+    try {
+      const userRequest = await fetch(this.options.profile_url, {
+        headers: this.getProfileHeaders(tokens.access_token), // Override for provider-specific
+      });
+
+      if (!userRequest.ok) {
+        const errorText = await userRequest.text();
+        throw new UnauthorizedException(
+          `Profile fetch failed. Status: ${userRequest.status}. Response: ${errorText}`,
+        );
+      }
+
+      const contentType = userRequest.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        const text = await userRequest.text();
+        throw new InternalServerErrorException(
+          `Profile response not JSON. Content-Type: ${contentType}. Response: ${text.substring(0, 100)}...`,
+        );
+      }
+
+      user = await userRequest.json();
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Profile request failed: ${error.message}`,
+      );
+    }
+
+    const userData = await this.extractUserInfo(user);
+
+    const expiresIn = tokens.expires_in;
+
+    return {
+      ...userData,
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expires_in: expiresIn,
+      provider: this.options.name,
+    };
   }
 
-  public getRedirectUrl() {
+  protected getProfileHeaders(accessToken: string): Record<string, string> {
+    // Default Bearer; override in subclasses if needed (e.g., Yandex uses OAuth)
+    return { Authorization: `Bearer ${accessToken}` };
+  }
+
+  public getRedirectUrl(): string {
     return `${this.BASE_URL}/auth/oauth/callback/${this.options.name}`;
   }
 

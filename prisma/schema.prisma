@@ -39,8 +39,9 @@ model User {
 model Account {
   id String @id @default(uuid())
 
-  type     String
-  provider String
+  type              String
+  provider          String
+  providerAccountId String? @map("provider_account_id")
 
   refreshToken String? @map("refresh_token")
   accessToken  String? @map("access_token")

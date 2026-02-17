@@ -2,7 +2,7 @@ import { BaseOAuthService } from './base-oauth.services';
 import type { TypesProviderOptions } from './types/provider-options.types';
 import type { TypeUserInfo } from './types/user-info.types';
 
-interface GoogleProfile extends Record<string, any> {
+interface GoogleProfile {
   aud: string;
   azp: string;
   email: string;
@@ -19,15 +19,13 @@ interface GoogleProfile extends Record<string, any> {
   nbf?: number;
   picture: string;
   sub: string;
-  access_token: string;
-  refresh_token?: string;
 }
 
 export class GoogleProvider extends BaseOAuthService {
-  public constructor(options: TypesProviderOptions) {
+  constructor(options: TypesProviderOptions) {
     super({
       name: 'google',
-      authorize_url: 'https://accounts.google.com/0/oauth2/v2/auth',
+      authorize_url: 'https://accounts.google.com/o/oauth2/v2/auth', // Fixed typo: 'o' not '0'
       access_url: 'https://oauth2.googleapis.com/token',
       profile_url: 'https://www.googleapis.com/oauth2/v3/userinfo',
       scopes: options.scopes,
@@ -36,10 +34,12 @@ export class GoogleProvider extends BaseOAuthService {
     });
   }
 
-  public async extractUserInfo(data: GoogleProfile): Promise<TypeUserInfo> {
-    return super.extractUserInfo({
+  protected async extractUserInfo(data: GoogleProfile): Promise<TypeUserInfo> {
+    return {
+      id: data.sub, // Map Google's 'sub' to 'id'
       email: data.email,
       name: data.name,
-    });
+      provider: this.name,
+    };
   }
 }
