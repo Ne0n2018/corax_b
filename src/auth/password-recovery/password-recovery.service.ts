@@ -45,7 +45,7 @@ export class PasswordRecoveryService {
 
     await this.resendService.sendMail(
       existingUser.email,
-      'подтвержедение почты',
+      'Восстановление пароля',
       ResetPasswordTemplate(params),
     );
 

@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { hash } from 'argon2';
 import { AuthMetod } from '../generated/prisma/enums';
+import { UpdateUserDto } from './dto/updateUserDto';
 
 @Injectable()
 export class UserService {
@@ -48,6 +49,16 @@ export class UserService {
         displayName,
         metod,
         isVerified,
+      },
+    });
+  }
+  public async update(id: string, data: UpdateUserDto) {
+    return this.prismaService.user.update({
+      where: {
+        id,
+      },
+      data: {
+        displayName: data.name,
       },
     });
   }
