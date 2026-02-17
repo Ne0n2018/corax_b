@@ -12,9 +12,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# OS generated files
+# OS
 .DS_Store
-Thumbs.db
 
 # Tests
 /coverage
@@ -29,42 +28,31 @@ Thumbs.db
 .settings/
 *.sublime-workspace
 
-# VSCode
+# IDE - VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dotenv environment variables
+# dotenv environment variable files
 .env
 .env.development.local
 .env.test.local
 .env.production.local
 .env.local
 
-# temp and runtime files
+# temp directory
 .temp
 .tmp
+
+# Runtime data
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# Diagnostic reports
+# Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Prisma generated files (миграции, клиент и временные файлы)
-prisma/migrations/               # ← Не коммитим сами миграции
-prisma/dev.db                    # ← Локальная dev база (если используете sqlite)
-prisma/dev.db-journal
-prisma/dev.db-shm
-prisma/dev.db-wal
-prisma/migrations/.migration_lock
-
-# Prisma client (генерируется заново при npx prisma generate)
-src/generated/prisma/            # ← или prisma/generated/ — в зависимости от вашего пути
-prisma/generated/
-
-# Prisma studio / временные файлы
-.prisma/
+./src/prisma/generated/

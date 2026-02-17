@@ -3,8 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { hash } from 'argon2';
 import { AuthMetod } from '../generated/prisma/enums';
-import { UpdateUserDTO } from './dto/updateUser.dto';
-import { User } from '../generated/prisma/client';
 
 @Injectable()
 export class UserService {
@@ -50,23 +48,6 @@ export class UserService {
         displayName,
         metod,
         isVerified,
-      },
-    });
-  }
-
-  public async update(email: string, data: UpdateUserDTO) {
-    const currentUser: User = await this.findByEmail(email);
-    if (!currentUser) {
-      throw new NotFoundException(
-        'Не удалось найти пользователя. Пожалуйста проверьте правильность введенной почты',
-      );
-    }
-    return this.prismaService.user.update({
-      where: {
-        id: currentUser.id,
-      },
-      data: {
-        displayName: data.name,
       },
     });
   }
