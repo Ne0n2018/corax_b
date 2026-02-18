@@ -9,6 +9,7 @@ import session from 'express-session';
 import ms from './libs/common/utils/ms.util';
 import parseBoolean from './libs/common/utils/parseBoolean.util';
 import RedisStore from 'connect-redis';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -46,6 +47,24 @@ async function bootstrap() {
     credentials: true,
     exposeHeaders: ['set-cookie'],
   });
+
+  const configSwagger = new DocumentBuilder()
+    .setTitle('Corax API')
+    .setDescription('API для магазина спортивного питания Corax')
+    .setVersion('1.0.0')
+    .addCookieAuth(
+      config.getOrThrow('SESSION_NAME'), // Имя вашего session cookie (по умолчанию в express-session)
+      {
+        type: 'apiKey',
+        in: 'cookie',
+        description:
+          'Session cookie (устанавливается после /auth/login). Получите его через логин и передавайте в запросах.',
+      },
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, configSwagger);
+  SwaggerModule.setup('api', app, document);
   await app.listen(config.getOrThrow<number>('APPLICATION_PORT'));
 }
 bootstrap();
