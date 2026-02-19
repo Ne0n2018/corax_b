@@ -1,5 +1,5 @@
 {
-  "name": "untitled1",
+  "name": "corax_b",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -29,6 +29,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.1.13",
+    "@nestjs/swagger": "^11.2.6",
     "@nestlab/google-recaptcha": "^3.11.0",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
@@ -45,6 +46,7 @@
     "express-session": "^1.19.0",
     "ioredis": "^5.9.2",
     "multer": "^2.0.2",
+    "nest-winston": "^1.10.2",
     "nestjs-resend": "^1.1.0",
     "pg": "^8.18.0",
     "postcss": "^8.5.6",
@@ -54,7 +56,8 @@
     "reflect-metadata": "^0.2.2",
     "resend": "^6.9.1",
     "rxjs": "^7.8.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -91,7 +94,8 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript-eslint": "^8.20.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "jest": {
     "moduleFileExtensions": [

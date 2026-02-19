@@ -33,13 +33,11 @@ export class PrismaService
 
   async onModuleInit(): Promise<void> {
     await this.$connect();
-    console.log('✅ Prisma connected successfully');
   }
 
   async onModuleDestroy(): Promise<void> {
     await this.$disconnect();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-    await this.pool.end(); // важно закрыть пул соединений
-    console.log('✅ Prisma disconnected');
+    await this.pool.end(); // важно закрыть пул соединений;
   }
 }
