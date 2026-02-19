@@ -3,13 +3,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import session from 'express-session';
 import ms from './libs/common/utils/ms.util';
 import parseBoolean from './libs/common/utils/parseBoolean.util';
 import RedisStore from 'connect-redis';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +24,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.use(
     session({
       secret: config.getOrThrow<string>('SESSION_SECRET'),
@@ -65,6 +69,14 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('api', app, document);
+
   await app.listen(config.getOrThrow<number>('APPLICATION_PORT'));
+
+  Logger.log(
+    `сервер запущен по адресу ${config.getOrThrow('APPLICATION_URL')}`,
+  );
+  Logger.log(
+    `сваггер запущен по адресу ${config.getOrThrow('APPLICATION_URL')}/api`,
+  );
 }
 bootstrap();

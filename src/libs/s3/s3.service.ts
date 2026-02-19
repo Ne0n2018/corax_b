@@ -14,25 +14,20 @@ export class S3Service implements OnModuleInit {
     this.bucket = this.configService.getOrThrow('S3_BUCKET_NAME');
   }
 
-  // Auto-configure on startup
   async onModuleInit() {
     await this.configurePublicBucket();
   }
 
-  // Configure bucket for public access (run once)
   async configurePublicBucket(): Promise<void> {
     try {
-      // Create bucket if not exists (supported, page 22)
       try {
         await this.s3.headBucket({ Bucket: this.bucket });
       } catch (error) {
         if (error.statusCode === 404) {
           await this.s3.createBucket({ Bucket: this.bucket });
-          console.log('Bucket created');
         }
       }
 
-      // Set Bucket Policy for public read (supported, page 65)
       const policy = {
         Version: '2012-10-17',
         Statement: [
@@ -50,15 +45,12 @@ export class S3Service implements OnModuleInit {
         Bucket: this.bucket,
         Policy: JSON.stringify(policy),
       });
-
-      console.log('Bucket configured for public access');
     } catch (error) {
       console.error('Full error:', error);
       throw new BadRequestException(`Bucket config failed: ${error.message}`);
     }
   }
 
-  // Upload image with public access
   async uploadImage(
     key: string,
     body: Buffer,
@@ -74,11 +66,11 @@ export class S3Service implements OnModuleInit {
         Key: key,
         Body: body,
         ContentType: contentType,
-        ACL: 'public-read', // Public access (supported, page 15)
+        ACL: 'public-read',
       });
 
       const endpoint = this.configService.getOrThrow('S3_ENDPOINT');
-      return `${endpoint}/${this.bucket}/${key}`; // Permanent public URL
+      return `${endpoint}/${this.bucket}/${key}`;
     } catch (error) {
       throw new BadRequestException(`Upload failed: ${error.message}`);
     }

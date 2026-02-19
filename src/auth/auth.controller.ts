@@ -51,8 +51,8 @@ export class AuthController {
     type: RegisterDto,
   })
   @ApiOperation({ summary: 'регестрация пользователя' })
-  public async register(@Req() req: Request, @Body() data: RegisterDto) {
-    return this.authService.register(req, data);
+  public async register(@Body() data: RegisterDto) {
+    return this.authService.register(data);
   }
 
   @Post('login')
