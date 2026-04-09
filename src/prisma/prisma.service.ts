@@ -23,7 +23,6 @@ export class PrismaService
 
     super({
       adapter,
-      // опционально: логирование
       log: ['query', 'info', 'warn', 'error'],
     });
 
@@ -38,6 +37,6 @@ export class PrismaService
   async onModuleDestroy(): Promise<void> {
     await this.$disconnect();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-    await this.pool.end(); // важно закрыть пул соединений;
+    await this.pool.end();
   }
 }
