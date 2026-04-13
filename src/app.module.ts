@@ -11,6 +11,10 @@ import { S3Module } from './libs/s3/s3.module';
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module';
 import winston from 'winston';
 import { WinstonModule } from 'nest-winston';
+import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
+import { ManufacturerModule } from './provider/manufacturer.module';
+import { AdminModule } from './admin/admin.module';
 import 'winston-daily-rotate-file';
 
 @Module({
@@ -56,11 +60,15 @@ import 'winston-daily-rotate-file';
     PrismaModule,
     AuthModule,
     UserModule,
+    ManufacturerModule,
     ProviderModule,
     MailModule,
     EmailConfirmationModule,
     S3Module,
     PasswordRecoveryModule,
+    CategoryModule,
+    ProductModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

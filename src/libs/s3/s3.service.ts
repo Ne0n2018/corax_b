@@ -75,4 +75,35 @@ export class S3Service implements OnModuleInit {
       throw new BadRequestException(`Upload failed: ${error.message}`);
     }
   }
+
+  async deleteImage(key: string): Promise<void> {
+    if (!key) {
+      throw new BadRequestException('Key is required for deletion');
+    }
+
+    try {
+      await this.s3.deleteObject({
+        Bucket: this.bucket,
+        Key: key,
+      });
+    } catch (error) {
+      throw new BadRequestException(`Delete failed: ${error.message}`);
+    }
+  }
+
+  async deleteByUrl(imageUrl: string | null | undefined): Promise<void> {
+    if (!imageUrl) return;
+
+    try {
+      const key = imageUrl.split(`/${this.bucket}/`).pop();
+      if (key) {
+        await this.deleteImage(key);
+      }
+    } catch (error) {
+      console.warn(
+        `Не удалось удалить старое изображение ${imageUrl}:`,
+        error.message,
+      );
+    }
+  }
 }

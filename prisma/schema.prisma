@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider     = "prisma-client" // Required
+  provider     = "prisma-client"
   output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
@@ -65,6 +65,103 @@ model Token {
   experesIn DateTime  @map("experes_in")
 
   @@map("tokens")
+}
+
+model Category {
+  id          String        @id @default(uuid())
+  name        String
+  SubCategory SubCategory[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("categorys")
+}
+
+model SubCategory {
+  id   String @id @default(uuid())
+  name String
+
+  catagory   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String    @map("category_id")
+  Product    Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Provider {
+  id          String    @id @default(uuid())
+  name        String
+  imageUrl    String    @map("image_url")
+  description String
+  products    Product[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+}
+
+model Product {
+  id               String                  @id @default(uuid())
+  name             String
+  imageUrl         String                  @map("image_url")
+  shortDescription String                  @map("short_description")
+  description      String
+  advantages       String
+  structure        String
+  formRelease      String                  @map("form_release")
+  defaultPrice     Float                   @map("default_price")
+  subCategory      SubCategory             @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId    String                  @map("sub_category_id")
+  Provider         Provider                @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId       String                  @map("provider_id")
+  characteristic   ProductCharacteristic[]
+  Taste            Taste[]
+  Size             Size[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model ProductCharacteristic {
+  id        String  @id @default(uuid())
+  name      String
+  value     String
+  productId String  @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updateAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([name, productId])
+  @@map("product_characteristic")
+}
+
+model Taste {
+  id    String @id @default(uuid())
+  name  String
+  price Float
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tastes")
+}
+
+model Size {
+  id    String @id @default(uuid())
+  name  String
+  price Float
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @map("product_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 enum UserRole {

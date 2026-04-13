@@ -32,3 +32,38 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Token = Prisma.TokenModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model SubCategory
+ * 
+ */
+export type SubCategory = Prisma.SubCategoryModel
+/**
+ * Model Provider
+ * 
+ */
+export type Provider = Prisma.ProviderModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model ProductCharacteristic
+ * 
+ */
+export type ProductCharacteristic = Prisma.ProductCharacteristicModel
+/**
+ * Model Taste
+ * 
+ */
+export type Taste = Prisma.TasteModel
+/**
+ * Model Size
+ * 
+ */
+export type Size = Prisma.SizeModel
