@@ -15,6 +15,7 @@ import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import { ManufacturerModule } from './provider/manufacturer.module';
 import { AdminModule } from './admin/admin.module';
+import { CartModule } from './cart/cart.module';
 import 'winston-daily-rotate-file';
 
 @Module({
@@ -69,6 +70,7 @@ import 'winston-daily-rotate-file';
     CategoryModule,
     ProductModule,
     AdminModule,
+    CartModule,
   ],
 })
 export class AppModule {}
