@@ -29,6 +29,7 @@ model User {
   metod AuthMetod
 
   accounts Account[]
+  Cart     Cart?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -118,8 +119,9 @@ model Product {
   Taste            Taste[]
   Size             Size[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  ProductItem ProductItem[]
 
   @@map("products")
 }
@@ -162,6 +164,55 @@ model Size {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model ProductItem {
+  id String @id @default(uuid())
+
+  price     Float
+  taste     String
+  size      String
+  CartItem  CartItem[]
+  product   Product    @relation(fields: [productId], references: [id])
+  productId String    @map("product_id")
+  createdAt DateTime  @default(now()) @map("created_At")
+  updatedAt DateTime  @updatedAt @map("updatetd_At")
+
+  @@unique([productId, taste, size])
+  @@map("product_item")
+}
+
+model CartItem {
+  id String @id @default(uuid())
+
+  quantity Int @default(1)
+
+  productItem   ProductItem @relation(fields: [productItemId], references: [id], onDelete: Cascade)
+  productItemId String      @map("product_item_id")
+  cart          Cart        @relation(fields: [cartId], references: [id])
+  cartId        String      @map("cart_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([productItemId, cartId])
+  @@map("cart_item")
+}
+
+model Cart {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  CartItem CartItem[]
+
+  totalAmount Float @map("total_amount")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId])
 }
 
 enum UserRole {
