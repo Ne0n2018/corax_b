@@ -102,3 +102,13 @@ export type CartItem = Prisma.CartItemModel
  * 
  */
 export type Cart = Prisma.CartModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel

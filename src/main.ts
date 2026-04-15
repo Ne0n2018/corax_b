@@ -1,23 +1,30 @@
 import './polyfills';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { Redis } from 'ioredis';
-import session from 'express-session';
-import ms from './libs/common/utils/ms.util';
-import parseBoolean from './libs/common/utils/parseBoolean.util';
-import RedisStore from 'connect-redis';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { join } from 'path';
+import { SESSION_MIDDLEWARE } from './session/session.provider';
+import type { RequestHandler } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const config = app.get(ConfigService);
-  const redis = new Redis(config.getOrThrow('REDIS_URI'));
+  const isProd = config.get('NODE_ENV') === 'production';
+
+  // В dev раздаём ws-test.html по адресу http://localhost:4000/ws-test.html
+  // Регистрируем ДО всех middleware и фильтров, иначе глобальный HttpExceptionFilter
+  // перехватит 404 раньше, чем express.static успеет отдать файл
+  if (!isProd) {
+    app.useStaticAssets(join(process.cwd()), { index: false });
+  }
+
   app.use(cookieParser(config.getOrThrow('COOKIES_SECRET')));
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,29 +36,15 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.use(
-    session({
-      secret: config.getOrThrow<string>('SESSION_SECRET'),
-      name: config.getOrThrow<string>('SESSION_NAME'),
-      resave: true,
-      saveUninitialized: false,
-      cookie: {
-        domain: config.getOrThrow<string>('SESSION_DOMAIN'),
-        maxAge: ms(config.getOrThrow<string>('SESSION_MAX_AGE')),
-        httpOnly: parseBoolean(config.getOrThrow<string>('SESSION_HTTP_ONLY')),
-        secure: parseBoolean(config.getOrThrow<string>('SESSION_SECURE')),
-        sameSite: 'lax',
-      },
-      store: new RedisStore({
-        client: redis,
-        prefix: config.getOrThrow<string>('SESSION_FOLDER'),
-        ttl: ms(config.getOrThrow<string>('SESSION_MAX_AGE')),
-      }),
-    }),
-  );
+
+  // Берём session middleware из DI-контейнера (создан в SessionModule)
+  const sessionMiddleware = app.get<RequestHandler>(SESSION_MIDDLEWARE);
+  app.use(sessionMiddleware);
+
   app.enableCors({
     origin: config.getOrThrow<string>('ALLOWED_ORIGIN'),
     credentials: true,
+    // @ts-ignore
     exposeHeaders: ['set-cookie'],
   });
 
@@ -59,15 +52,12 @@ async function bootstrap() {
     .setTitle('Corax API')
     .setDescription('API для магазина спортивного питания Corax')
     .setVersion('1.0.0')
-    .addCookieAuth(
-      config.getOrThrow('SESSION_NAME'), // Имя вашего session cookie (по умолчанию в express-session)
-      {
-        type: 'apiKey',
-        in: 'cookie',
-        description:
-          'Session cookie (устанавливается после /auth/login). Получите его через логин и передавайте в запросах.',
-      },
-    )
+    .addCookieAuth(config.getOrThrow('SESSION_NAME'), {
+      type: 'apiKey',
+      in: 'cookie',
+      description:
+        'Session cookie (устанавливается после /auth/login). Получите его через логин и передавайте в запросах.',
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, configSwagger);

@@ -30,6 +30,7 @@ model User {
 
   accounts Account[]
   Cart     Cart?
+  Order    Order[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -174,9 +175,9 @@ model ProductItem {
   size      String
   CartItem  CartItem[]
   product   Product    @relation(fields: [productId], references: [id])
-  productId String    @map("product_id")
-  createdAt DateTime  @default(now()) @map("created_At")
-  updatedAt DateTime  @updatedAt @map("updatetd_At")
+  productId String     @map("product_id")
+  createdAt DateTime   @default(now()) @map("created_At")
+  updatedAt DateTime   @updatedAt @map("updatetd_At")
 
   @@unique([productId, taste, size])
   @@map("product_item")
@@ -213,6 +214,73 @@ model Cart {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([userId])
+}
+
+model Order {
+  id        String @id @default(uuid())
+  orderCode Int    @unique @map("order_code")
+
+  deliveryType DeliveryType @map("delivery_type")
+  address      String?
+  paymentType  PaymentType  @map("payment_type")
+  status       OrderStatus  @default(PENDING)
+  totalAmount  Float        @map("total_amount")
+
+  bepaidToken String? @map("bepaid_token")
+  bepaidUid   String? @map("bepaid_uid")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  productItemId String @map("product_item_id")
+
+  productName String @map("product_name")
+  imageUrl    String @map("image_url")
+  taste       String
+  size        String
+  price       Float
+  quantity    Int
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String @map("order_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("order_items")
+}
+
+enum DeliveryType {
+  PICKUP
+  DELIVERY
+  BELMAIL
+  EUROMAIL
+}
+
+enum PaymentType {
+  ONLINE
+  CASH
+  CARD
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 enum UserRole {
