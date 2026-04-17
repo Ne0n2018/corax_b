@@ -71,5 +71,8 @@ async function bootstrap() {
   Logger.log(
     `сваггер запущен по адресу ${config.getOrThrow('APPLICATION_URL')}/api`,
   );
+  Logger.log(
+    `тестирование сокета запущено по адресу ${config.getOrThrow('APPLICATION_URL')}/ws-test.html`,
+  );
 }
 bootstrap();

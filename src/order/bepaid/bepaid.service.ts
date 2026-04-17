@@ -31,14 +31,18 @@ export class BePaidService {
     description: string,
   ): Promise<BePaidCheckoutResult> {
     const shopId = this.configService.getOrThrow<string>('BEPAID_SHOP_ID');
-    const secretKey = this.configService.getOrThrow<string>('BEPAID_SECRET_KEY');
-    const appUrl = this.configService.getOrThrow<string>('APPLICATION_URL');
+    const secretKey =
+      this.configService.getOrThrow<string>('BEPAID_SECRET_KEY');
+    const appUrl = this.configService.getOrThrow<string>('BEPAID_CALLBACK_URL');
+    const clientUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
     const isTest = this.configService.get<string>('NODE_ENV') !== 'production';
 
     // bePaid принимает сумму в копейках (целое число)
-    const amountInCents = Math.round(amount * 100);
+    const amountInCents = Math.round((amount * 100) / 2);
 
-    const credentials = Buffer.from(`${shopId}:${secretKey}`).toString('base64');
+    const credentials = Buffer.from(`${shopId}:${secretKey}`).toString(
+      'base64',
+    );
 
     const payload = {
       checkout: {
@@ -46,9 +50,9 @@ export class BePaidService {
         transaction_type: 'payment',
         attempts: 3,
         settings: {
-          success_url: `${appUrl}/orders/${orderId}/success`,
-          fail_url: `${appUrl}/orders/${orderId}/fail`,
-          cancel_url: `${appUrl}/orders/${orderId}/cancel`,
+          success_url: `${clientUrl}/orders/${orderId}/success`,
+          fail_url: `${clientUrl}/orders/${orderId}/fail`,
+          cancel_url: `${clientUrl}/orders/${orderId}/cancel`,
           notification_url: `${appUrl}/order/webhook/bepaid`,
           language: 'ru',
           customer_fields: {

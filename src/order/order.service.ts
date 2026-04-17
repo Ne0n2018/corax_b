@@ -4,6 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
 import { UserService } from '../user/user.service';
@@ -24,6 +25,7 @@ export class OrderService {
     private readonly userService: UserService,
     private readonly bepaidService: BePaidService,
     private readonly mailService: MailService,
+    private readonly configService: ConfigService,
   ) {}
 
   // ─── Приватные утилиты ──────────────────────────────────────────────────────
@@ -229,8 +231,7 @@ export class OrderService {
     }
 
     // Не обрабатываем тестовые транзакции в продакшене и наоборот
-    const isProduction =
-      this.prismaService['configService']?.get('NODE_ENV') === 'production';
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
     if (isProduction && transaction.test) {
       this.logger.warn('bePaid webhook: ignoring test transaction in production');
       return;
