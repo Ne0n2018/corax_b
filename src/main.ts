@@ -65,14 +65,23 @@ async function bootstrap() {
 
   await app.listen(config.getOrThrow<number>('APPLICATION_PORT'));
 
+  const appUrl = config.getOrThrow('APPLICATION_URL');
   Logger.log(
-    `сервер запущен по адресу ${config.getOrThrow('APPLICATION_URL')}`,
+    `сервер запущен по адресу ${appUrl}`,
   );
   Logger.log(
-    `сваггер запущен по адресу ${config.getOrThrow('APPLICATION_URL')}/api`,
+    `сваггер запущен по адресу ${appUrl}/api`,
   );
   Logger.log(
-    `тестирование сокета запущено по адресу ${config.getOrThrow('APPLICATION_URL')}/ws-test.html`,
+    `тестирование сокета запущено по адресу ${appUrl}/ws-test.html`,
+  );
+  Logger.log(
+    `метрики Prometheus доступны по адресу ${appUrl}/metrics`,
+  );
+  // Construct Grafana URL by replacing port in APPLICATION_URL with 3000
+  const grafanaUrl = appUrl.replace(/:(\d+)$/, ':3000').replace(/:(\d+)\//, ':3000/');
+  Logger.log(
+    `Grafana доступна по адресу ${grafanaUrl} (логин: ${process.env.GRAFANA_ADMIN_USER || 'admin'}, пароль: ${process.env.GRAFANA_ADMIN_PASSWORD || 'admin'})`,
   );
 }
 bootstrap();
