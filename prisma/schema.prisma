@@ -123,6 +123,7 @@ model Product {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
   ProductItem ProductItem[]
+  orderItems OrderItem[]
 
   @@map("products")
 }
@@ -244,6 +245,8 @@ model OrderItem {
   id String @id @default(uuid())
 
   productItemId String @map("product_item_id")
+  productId     String @map("product_id")
+  product       Product  @relation(fields: [productId], references: [id])
 
   productName String @map("product_name")
   imageUrl    String @map("image_url")

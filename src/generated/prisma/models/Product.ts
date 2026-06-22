@@ -286,6 +286,7 @@ export type ProductWhereInput = {
   Taste?: Prisma.TasteListRelationFilter
   Size?: Prisma.SizeListRelationFilter
   ProductItem?: Prisma.ProductItemListRelationFilter
+  orderItems?: Prisma.OrderItemListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -308,6 +309,7 @@ export type ProductOrderByWithRelationInput = {
   Taste?: Prisma.TasteOrderByRelationAggregateInput
   Size?: Prisma.SizeOrderByRelationAggregateInput
   ProductItem?: Prisma.ProductItemOrderByRelationAggregateInput
+  orderItems?: Prisma.OrderItemOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -333,6 +335,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   Taste?: Prisma.TasteListRelationFilter
   Size?: Prisma.SizeListRelationFilter
   ProductItem?: Prisma.ProductItemListRelationFilter
+  orderItems?: Prisma.OrderItemListRelationFilter
 }, "id">
 
 export type ProductOrderByWithAggregationInput = {
@@ -393,6 +396,7 @@ export type ProductCreateInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -413,6 +417,7 @@ export type ProductUncheckedCreateInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -433,6 +438,7 @@ export type ProductUpdateInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -453,6 +459,7 @@ export type ProductUncheckedUpdateInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -720,6 +727,20 @@ export type ProductUpdateOneRequiredWithoutProductItemNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutProductItemInput, Prisma.ProductUpdateWithoutProductItemInput>, Prisma.ProductUncheckedUpdateWithoutProductItemInput>
 }
 
+export type ProductCreateNestedOneWithoutOrderItemsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutOrderItemsInput, Prisma.ProductUncheckedCreateWithoutOrderItemsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutOrderItemsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutOrderItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutOrderItemsInput, Prisma.ProductUncheckedCreateWithoutOrderItemsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutOrderItemsInput
+  upsert?: Prisma.ProductUpsertWithoutOrderItemsInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutOrderItemsInput, Prisma.ProductUpdateWithoutOrderItemsInput>, Prisma.ProductUncheckedUpdateWithoutOrderItemsInput>
+}
+
 export type ProductCreateWithoutSubCategoryInput = {
   id?: string
   name: string
@@ -737,6 +758,7 @@ export type ProductCreateWithoutSubCategoryInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutSubCategoryInput = {
@@ -756,6 +778,7 @@ export type ProductUncheckedCreateWithoutSubCategoryInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutSubCategoryInput = {
@@ -820,6 +843,7 @@ export type ProductCreateWithoutProviderInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutProviderInput = {
@@ -839,6 +863,7 @@ export type ProductUncheckedCreateWithoutProviderInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutProviderInput = {
@@ -884,6 +909,7 @@ export type ProductCreateWithoutCharacteristicInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutCharacteristicInput = {
@@ -903,6 +929,7 @@ export type ProductUncheckedCreateWithoutCharacteristicInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutCharacteristicInput = {
@@ -938,6 +965,7 @@ export type ProductUpdateWithoutCharacteristicInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutCharacteristicInput = {
@@ -957,6 +985,7 @@ export type ProductUncheckedUpdateWithoutCharacteristicInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutTasteInput = {
@@ -976,6 +1005,7 @@ export type ProductCreateWithoutTasteInput = {
   characteristic?: Prisma.ProductCharacteristicCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutTasteInput = {
@@ -995,6 +1025,7 @@ export type ProductUncheckedCreateWithoutTasteInput = {
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutTasteInput = {
@@ -1030,6 +1061,7 @@ export type ProductUpdateWithoutTasteInput = {
   characteristic?: Prisma.ProductCharacteristicUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutTasteInput = {
@@ -1049,6 +1081,7 @@ export type ProductUncheckedUpdateWithoutTasteInput = {
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutSizeInput = {
@@ -1068,6 +1101,7 @@ export type ProductCreateWithoutSizeInput = {
   characteristic?: Prisma.ProductCharacteristicCreateNestedManyWithoutProductInput
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutSizeInput = {
@@ -1087,6 +1121,7 @@ export type ProductUncheckedCreateWithoutSizeInput = {
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutSizeInput = {
@@ -1122,6 +1157,7 @@ export type ProductUpdateWithoutSizeInput = {
   characteristic?: Prisma.ProductCharacteristicUpdateManyWithoutProductNestedInput
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutSizeInput = {
@@ -1141,6 +1177,7 @@ export type ProductUncheckedUpdateWithoutSizeInput = {
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutProductItemInput = {
@@ -1160,6 +1197,7 @@ export type ProductCreateWithoutProductItemInput = {
   characteristic?: Prisma.ProductCharacteristicCreateNestedManyWithoutProductInput
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutProductItemInput = {
@@ -1179,6 +1217,7 @@ export type ProductUncheckedCreateWithoutProductItemInput = {
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutProductItemInput = {
@@ -1214,6 +1253,7 @@ export type ProductUpdateWithoutProductItemInput = {
   characteristic?: Prisma.ProductCharacteristicUpdateManyWithoutProductNestedInput
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutProductItemInput = {
@@ -1233,6 +1273,103 @@ export type ProductUncheckedUpdateWithoutProductItemInput = {
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutOrderItemsInput = {
+  id?: string
+  name: string
+  imageUrl: string
+  shortDescription: string
+  description: string
+  advantages: string
+  structure: string
+  formRelease: string
+  defaultPrice: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
+  Provider: Prisma.ProviderCreateNestedOneWithoutProductsInput
+  characteristic?: Prisma.ProductCharacteristicCreateNestedManyWithoutProductInput
+  Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
+  Size?: Prisma.SizeCreateNestedManyWithoutProductInput
+  ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutOrderItemsInput = {
+  id?: string
+  name: string
+  imageUrl: string
+  shortDescription: string
+  description: string
+  advantages: string
+  structure: string
+  formRelease: string
+  defaultPrice: number
+  subCategoryId: string
+  providerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
+  Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
+  Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
+  ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutOrderItemsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutOrderItemsInput, Prisma.ProductUncheckedCreateWithoutOrderItemsInput>
+}
+
+export type ProductUpsertWithoutOrderItemsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutOrderItemsInput, Prisma.ProductUncheckedUpdateWithoutOrderItemsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutOrderItemsInput, Prisma.ProductUncheckedCreateWithoutOrderItemsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutOrderItemsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutOrderItemsInput, Prisma.ProductUncheckedUpdateWithoutOrderItemsInput>
+}
+
+export type ProductUpdateWithoutOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  advantages?: Prisma.StringFieldUpdateOperationsInput | string
+  structure?: Prisma.StringFieldUpdateOperationsInput | string
+  formRelease?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
+  Provider?: Prisma.ProviderUpdateOneRequiredWithoutProductsNestedInput
+  characteristic?: Prisma.ProductCharacteristicUpdateManyWithoutProductNestedInput
+  Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
+  Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
+  ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  advantages?: Prisma.StringFieldUpdateOperationsInput | string
+  structure?: Prisma.StringFieldUpdateOperationsInput | string
+  formRelease?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
+  Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
+  Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
+  ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManySubCategoryInput = {
@@ -1267,6 +1404,7 @@ export type ProductUpdateWithoutSubCategoryInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutSubCategoryInput = {
@@ -1286,6 +1424,7 @@ export type ProductUncheckedUpdateWithoutSubCategoryInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutSubCategoryInput = {
@@ -1335,6 +1474,7 @@ export type ProductUpdateWithoutProviderInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutProviderInput = {
@@ -1354,6 +1494,7 @@ export type ProductUncheckedUpdateWithoutProviderInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutProviderInput = {
@@ -1381,6 +1522,7 @@ export type ProductCountOutputType = {
   Taste: number
   Size: number
   ProductItem: number
+  orderItems: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1388,6 +1530,7 @@ export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   Taste?: boolean | ProductCountOutputTypeCountTasteArgs
   Size?: boolean | ProductCountOutputTypeCountSizeArgs
   ProductItem?: boolean | ProductCountOutputTypeCountProductItemArgs
+  orderItems?: boolean | ProductCountOutputTypeCountOrderItemsArgs
 }
 
 /**
@@ -1428,6 +1571,13 @@ export type ProductCountOutputTypeCountProductItemArgs<ExtArgs extends runtime.T
   where?: Prisma.ProductItemWhereInput
 }
 
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderItemWhereInput
+}
+
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1449,6 +1599,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   Taste?: boolean | Prisma.Product$TasteArgs<ExtArgs>
   Size?: boolean | Prisma.Product$SizeArgs<ExtArgs>
   ProductItem?: boolean | Prisma.Product$ProductItemArgs<ExtArgs>
+  orderItems?: boolean | Prisma.Product$orderItemsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -1512,6 +1663,7 @@ export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   Taste?: boolean | Prisma.Product$TasteArgs<ExtArgs>
   Size?: boolean | Prisma.Product$SizeArgs<ExtArgs>
   ProductItem?: boolean | Prisma.Product$ProductItemArgs<ExtArgs>
+  orderItems?: boolean | Prisma.Product$orderItemsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1532,6 +1684,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     Taste: Prisma.$TastePayload<ExtArgs>[]
     Size: Prisma.$SizePayload<ExtArgs>[]
     ProductItem: Prisma.$ProductItemPayload<ExtArgs>[]
+    orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1947,6 +2100,7 @@ export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.
   Taste<T extends Prisma.Product$TasteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$TasteArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TastePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   Size<T extends Prisma.Product$SizeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$SizeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SizePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ProductItem<T extends Prisma.Product$ProductItemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$ProductItemArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orderItems<T extends Prisma.Product$orderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2478,6 +2632,30 @@ export type Product$ProductItemArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.ProductItemScalarFieldEnum | Prisma.ProductItemScalarFieldEnum[]
+}
+
+/**
+ * Product.orderItems
+ */
+export type Product$orderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderItem
+   */
+  select?: Prisma.OrderItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderItem
+   */
+  omit?: Prisma.OrderItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderItemInclude<ExtArgs> | null
+  where?: Prisma.OrderItemWhereInput
+  orderBy?: Prisma.OrderItemOrderByWithRelationInput | Prisma.OrderItemOrderByWithRelationInput[]
+  cursor?: Prisma.OrderItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderItemScalarFieldEnum | Prisma.OrderItemScalarFieldEnum[]
 }
 
 /**

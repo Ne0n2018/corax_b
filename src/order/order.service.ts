@@ -81,6 +81,7 @@ export class OrderService {
         items: {
           create: cart.CartItem.map((item) => ({
             productItemId: item.productItem.id,
+            productId: item.productItem.product.id,
             productName: item.productItem.product.name,
             imageUrl: item.productItem.product.imageUrl,
             taste: item.productItem.taste,
