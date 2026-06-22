@@ -10,6 +10,7 @@ import { CartService } from '../cart/cart.service';
 import { UserService } from '../user/user.service';
 import { BePaidService } from './bepaid/bepaid.service';
 import { MailService } from '../libs/mail/mail.service';
+import { MetricsService } from '../metrics/metrics.service';
 import { CreateOrderDto, DeliveryType, PaymentType } from './dto/create-order.dto';
 import type { BePaidWebhookDto } from './dto/bepaid-webhook.dto';
 import * as React from 'react';
@@ -26,6 +27,7 @@ export class OrderService {
     private readonly bepaidService: BePaidService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   // ─── Приватные утилиты ──────────────────────────────────────────────────────
@@ -97,12 +99,13 @@ export class OrderService {
     // 6. Очищаем корзину
     await this.cartService.clearCart(userId);
 
-    // 7. Для CASH/CARD — сразу отправляем подтверждение.
-    //    Для ONLINE — письмо уйдёт после подтверждения оплаты через webhook.
+    // 7. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
+    //    Для ONLINE — письмо и метрика продаж уйдут после подтверждения оплаты через webhook.
     if (paymentType !== PaymentType.ONLINE) {
       this.sendOrderConfirmEmail(user, order).catch((err) =>
         this.logger.error(`Не удалось отправить письмо для заказа ${order.id}: ${err.message}`),
       );
+      this.recordProductSales(order);
     }
 
     // 8. Для онлайн-оплаты — создаём платёжную сессию bePaid
@@ -262,13 +265,14 @@ export class OrderService {
         `Order ${order.id}: ${order.status} → ${newStatus} (bePaid uid: ${transaction.uid})`,
       );
 
-      // После успешной оплаты отправляем подтверждение заказа
+      // После успешной оплаты отправляем подтверждение заказа и учитываем продажу
       if (newStatus === 'PAID') {
         this.sendOrderConfirmEmail(order.user, order).catch((err) =>
           this.logger.error(
             `Не удалось отправить письмо после оплаты заказа ${order.id}: ${err.message}`,
           ),
         );
+        this.recordProductSales(order);
       }
     }
   }
@@ -297,6 +301,16 @@ export class OrderService {
         })),
       }),
     );
+  }
+
+  /**
+   * Учитывает продажи товаров в метриках Prometheus (текущий месяц).
+   * Вызывается при подтверждении заказа: сразу для CASH/CARD, по webhook для ONLINE.
+   */
+  private recordProductSales(order: { items: { productId: string; quantity: number }[] }) {
+    for (const item of order.items) {
+      this.metricsService.incrementProductSale(item.productId, item.quantity);
+    }
   }
 
   /**

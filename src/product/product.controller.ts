@@ -8,15 +8,18 @@ import {
 } from '@nestjs/swagger';
 
 import { ProductService } from './product.service';
-
 import { ProductFilterDto } from './dto/product.filter.dto';
 import { plainToInstance } from 'class-transformer';
 import { ProductResponseDto } from './dto/response/product.response.dto';
+import { MetricsService } from '../metrics/metrics.service';
 
 @ApiTags('Product')
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly metricsService: MetricsService,
+  ) {}
 
   @Get()
   @ApiQuery({ name: 'name', required: false })
@@ -42,6 +45,7 @@ export class ProductController {
   })
   public async findById(@Param('id') id: string) {
     const product = await this.productService.getById(id);
+    this.metricsService.incrementProductView(id);
     return plainToInstance(ProductResponseDto, product);
   }
 }

@@ -1,7 +1,6 @@
 version: '3.7'
 
 services:
-
   db:
     container_name: postgres
     image: postgres:15.2
@@ -28,8 +27,44 @@ services:
     networks:
       - backend
 
+  Prometheus:
+    container_name: Prometheus
+    image: prom/prometheus:latest
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - backend
+  Grafana:
+    container_name: Grafana
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - Prometheus
+    networks:
+      - backend
+
 volumes:
   postgres_data:
   redis_data:
+  prometheus_data:
+  grafana_data:
 networks:
   backend:
