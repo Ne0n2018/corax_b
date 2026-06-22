@@ -9,6 +9,37 @@
 * 🟢 You can import this file directly.
 */
 
+export const DeliveryType = {
+  PICKUP: 'PICKUP',
+  DELIVERY: 'DELIVERY',
+  BELMAIL: 'BELMAIL',
+  EUROMAIL: 'EUROMAIL'
+} as const
+
+export type DeliveryType = (typeof DeliveryType)[keyof typeof DeliveryType]
+
+
+export const PaymentType = {
+  ONLINE: 'ONLINE',
+  CASH: 'CASH',
+  CARD: 'CARD'
+} as const
+
+export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
 export const UserRole = {
   REGULAR: 'REGULAR',
   ADMIN: 'ADMIN',
