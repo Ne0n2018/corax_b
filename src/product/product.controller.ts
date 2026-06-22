@@ -45,7 +45,7 @@ export class ProductController {
   })
   public async findById(@Param('id') id: string) {
     const product = await this.productService.getById(id);
-    this.metricsService.incrementProductView(id);
+    this.metricsService.incrementProductView(product.name);
     return plainToInstance(ProductResponseDto, product);
   }
 }

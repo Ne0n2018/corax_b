@@ -305,11 +305,19 @@ export class OrderService {
 
   /**
    * Учитывает продажи товаров в метриках Prometheus (текущий месяц).
+   * Записывает название товара и купленные опции (вкус/размер).
    * Вызывается при подтверждении заказа: сразу для CASH/CARD, по webhook для ONLINE.
    */
-  private recordProductSales(order: { items: { productId: string; quantity: number }[] }) {
+  private recordProductSales(order: {
+    items: { productName: string; taste: string; size: string; quantity: number }[];
+  }) {
     for (const item of order.items) {
-      this.metricsService.incrementProductSale(item.productId, item.quantity);
+      this.metricsService.incrementProductSale(
+        item.productName,
+        item.taste,
+        item.size,
+        item.quantity,
+      );
     }
   }
 

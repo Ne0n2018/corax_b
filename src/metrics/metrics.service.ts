@@ -17,40 +17,52 @@ export class MetricsService {
     // Enable default metrics (CPU, memory, etc.)
     collectDefaultMetrics({ register: this.register });
 
-    // Initialize gauges for product views and sales (current month)
+    // Gauge for product views (current month), labeled by human-readable product name
     this.productViewsGauge = new Gauge({
       name: 'product_views_current_month',
       help: 'Current month product views',
-      labelNames: ['product_id'],
+      labelNames: ['product_name'],
       registers: [this.register],
     });
 
+    // Gauge for product sales (current month), labeled by product name and the
+    // purchased variant options (taste, size) so the admin sees what was bought
     this.productSalesGauge = new Gauge({
       name: 'product_sales_current_month',
       help: 'Current month product sales',
-      labelNames: ['product_id'],
+      labelNames: ['product_name', 'taste', 'size'],
       registers: [this.register],
     });
   }
 
   /**
    * Increment the view count for a product.
-   * @param productId The ID of the product
+   * @param productName The human-readable name of the product
    */
-  incrementProductView(productId: string): void {
-    this.productViewsGauge.inc({ product_id: productId });
-    this.logger.debug(`Incremented view for product ${productId}`);
+  incrementProductView(productName: string): void {
+    this.productViewsGauge.inc({ product_name: productName });
+    this.logger.debug(`Incremented view for product "${productName}"`);
   }
 
   /**
-   * Increment the sale count for a product.
-   * @param productId The ID of the product
-   * @param quantity The quantity sold (default: 1)
+   * Increment the sale count for a product variant.
+   * @param productName The human-readable name of the product
+   * @param taste       The purchased taste option (or '-' if none)
+   * @param size        The purchased size option (or '-' if none)
+   * @param quantity    The quantity sold (default: 1)
    */
-  incrementProductSale(productId: string, quantity: number = 1): void {
-    this.productSalesGauge.inc({ product_id: productId }, quantity);
+  incrementProductSale(
+    productName: string,
+    taste: string,
+    size: string,
+    quantity: number = 1,
+  ): void {
+    this.productSalesGauge.inc(
+      { product_name: productName, taste: taste || '-', size: size || '-' },
+      quantity,
+    );
     this.logger.debug(
-      `Incremented sale for product ${productId} by ${quantity}`,
+      `Incremented sale for product "${productName}" (${taste || '-'}/${size || '-'}) by ${quantity}`,
     );
   }
 
