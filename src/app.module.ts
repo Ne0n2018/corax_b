@@ -9,12 +9,12 @@ import { MailModule } from './libs/mail/mail.module';
 import { EmailConfirmationModule } from './auth/email-confirmation/email-confirmation.module';
 import { S3Module } from './libs/s3/s3.module';
 import { PasswordRecoveryModule } from './auth/password-recovery/password-recovery.module';
-import winston from 'winston';
+import * as winston from 'winston';
 import { WinstonModule } from 'nest-winston';
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import { ManufacturerModule } from './provider/manufacturer.module';
-import { AdminModule } from './admin/admin.module';
+// import { AdminModule } from './admin/admin.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
 import { SessionModule } from './session/session.module';
@@ -71,7 +71,6 @@ import 'winston-daily-rotate-file';
     PasswordRecoveryModule,
     CategoryModule,
     ProductModule,
-    AdminModule,
     CartModule,
     OrderModule,
     SessionModule,
