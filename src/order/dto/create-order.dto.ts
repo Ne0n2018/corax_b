@@ -64,4 +64,14 @@ export class CreateOrderDto {
     example: PaymentType.ONLINE,
   })
   paymentType: PaymentType;
+
+  @IsOptional()
+  @IsString({ message: 'Промокод должен быть строкой' })
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Промокод для применения скидки',
+    example: 'SUMMER2024',
+  })
+  promoCode?: string;
 }

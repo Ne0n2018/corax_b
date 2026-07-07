@@ -11,6 +11,7 @@ import { UserService } from '../user/user.service';
 import { BePaidService } from './bepaid/bepaid.service';
 import { MailService } from '../libs/mail/mail.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { PromoCodeService } from './promo/promo-code.service';
 import { PromotionService } from '../promotion/promotion.service';
 import type { Prisma } from '../generated/prisma/client';
 import { CreateOrderDto, DeliveryType, PaymentType } from './dto/create-order.dto';
@@ -30,6 +31,7 @@ export class OrderService {
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
     private readonly metricsService: MetricsService,
+    private readonly promoCodeService: PromoCodeService,
     private readonly promotionService: PromotionService,
   ) {}
 
@@ -48,7 +50,7 @@ export class OrderService {
    * Возвращает заказ и URL оплаты (только для ONLINE).
    */
   async createOrder(userId: string, dto: CreateOrderDto) {
-    const { deliveryType, address, paymentType } = dto;
+    const { deliveryType, address, paymentType, promoCode } = dto;
 
     // 1. Проверка: при доставке адрес обязателен
     if (deliveryType === DeliveryType.DELIVERY && !address?.trim()) {
@@ -69,20 +71,41 @@ export class OrderService {
     // 3. Получаем данные пользователя (email для bePaid)
     const user = await this.userService.findById(userId);
 
-    // 4. Применяем активные акции: скидка автоматически вычитается из суммы.
-    //    bePaid получит уже сумму со скидкой (order.totalAmount).
-    const discount = await this.promotionService.calculateDiscount(cart, {
-      id: userId,
-    });
-    const discountedTotal = Math.max(
-      0,
-      round2(cart.totalAmount - discount.totalDiscount),
+    // 4. Считаем скидки по акциям (promotion service)
+    const promotionResult = await this.promotionService.calculateDiscount(
+      cart as any,
+      { id: userId },
     );
+    const promotionsDiscount = promotionResult.totalDiscount || 0;
 
-    // 5. Генерируем уникальный 6-значный цифровой код заказа
+    const subtotalAmount = cart.totalAmount;
+    const subtotalAfterPromotions = round2(Math.max(0, subtotalAmount - promotionsDiscount));
+
+    // 5. Рассчитываем скидку по промокоду (если передан) на сумму уже после акций
+    let promoDiscount = 0;
+    let appliedPromoCode: string | null = null;
+    if (promoCode) {
+      const productIds = cart.CartItem.map((item) => item.productItem.product.id);
+      const validation = await this.promoCodeService.validateAndCalculateDiscount(
+        promoCode,
+        subtotalAfterPromotions,
+        productIds,
+      );
+
+      if (!validation.isValid) {
+        throw new BadRequestException(validation.error || 'Ошибка применения промокода');
+      }
+      promoDiscount = validation.discountAmount ?? 0;
+      if (promoDiscount > 0) appliedPromoCode = promoCode.trim().toUpperCase();
+    }
+
+    const totalDiscount = round2(Math.min(subtotalAmount, promotionsDiscount + promoDiscount));
+    const totalAmount = Math.max(0, round2(subtotalAmount - totalDiscount));
+
+    // 6. Генерируем уникальный 6-значный цифровой код заказа
     const orderCode = await this.generateUniqueOrderCode();
 
-    // 6. Создаём заказ и его позиции в одной транзакции
+    // 7. Создаём заказ и его позиции в одной транзакции
     const order = await this.prismaService.order.create({
       data: {
         userId,
@@ -90,9 +113,11 @@ export class OrderService {
         deliveryType,
         address: address?.trim() ?? null,
         paymentType,
-        totalAmount: discountedTotal,
-        discountAmount: discount.totalDiscount,
-        appliedPromotions: discount.breakdown as unknown as Prisma.InputJsonValue,
+        subtotalAmount,
+        discountAmount: totalDiscount,
+        totalAmount,
+        promoCode: appliedPromoCode,
+        appliedPromotions: promotionResult.breakdown as unknown as Prisma.InputJsonValue,
         // ONLINE → PENDING (ждём оплату), CASH/CARD → PROCESSING (уже можно собирать)
         status: paymentType === PaymentType.ONLINE ? 'PENDING' : 'PROCESSING',
         items: {
@@ -111,13 +136,16 @@ export class OrderService {
       include: this.getOrderInclude(),
     });
 
-    // 7. Очищаем корзину
+    // 8. Фиксируем использование промокода
+    if (appliedPromoCode) {
+      await this.promoCodeService.recordPromoCodeUsage(appliedPromoCode);
+    }
+
+    // 9. Очищаем корзину
     await this.cartService.clearCart(userId);
 
-    // 8. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
-    //    Для ONLINE — письмо и метрика продаж уйдут после подтверждения оплаты через webhook.
-    //    order.create с include из getOrderInclude() не выводит items на уровне типов
-    //    (особенность Prisma 7), но в рантайме позиции там есть — приводим тип.
+    // 10. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
+    //     Для ONLINE — письмо и метрика продаж уйдут после подтверждения оплаты через webhook.
     const orderWithItems = order as unknown as OrderWithItems;
     if (paymentType !== PaymentType.ONLINE) {
       this.sendOrderConfirmEmail(user, orderWithItems).catch((err) =>
@@ -126,7 +154,7 @@ export class OrderService {
       this.recordProductSales(orderWithItems);
     }
 
-    // 9. Для онлайн-оплаты — создаём платёжную сессию bePaid
+    // 11. Для онлайн-оплаты — создаём платёжную сессию bePaid
     let redirectUrl: string | null = null;
 
     if (paymentType === PaymentType.ONLINE) {
