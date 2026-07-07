@@ -12,6 +12,8 @@ import { BePaidService } from './bepaid/bepaid.service';
 import { MailService } from '../libs/mail/mail.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PromoCodeService } from './promo/promo-code.service';
+import { PromotionService } from '../promotion/promotion.service';
+import type { Prisma } from '../generated/prisma/client';
 import { CreateOrderDto, DeliveryType, PaymentType } from './dto/create-order.dto';
 import type { BePaidWebhookDto } from './dto/bepaid-webhook.dto';
 import * as React from 'react';
@@ -30,6 +32,7 @@ export class OrderService {
     private readonly configService: ConfigService,
     private readonly metricsService: MetricsService,
     private readonly promoCodeService: PromoCodeService,
+    private readonly promotionService: PromotionService,
   ) {}
 
   // ─── Приватные утилиты ──────────────────────────────────────────────────────
@@ -68,33 +71,41 @@ export class OrderService {
     // 3. Получаем данные пользователя (email для bePaid)
     const user = await this.userService.findById(userId);
 
-    // 4. Генерируем уникальный 6-значный цифровой код заказа
-    const orderCode = await this.generateUniqueOrderCode();
+    // 4. Считаем скидки по акциям (promotion service)
+    const promotionResult = await this.promotionService.calculateDiscount(
+      cart as any,
+      { id: userId },
+    );
+    const promotionsDiscount = promotionResult.totalDiscount || 0;
 
-    // 5. Рассчитываем скидку по промокоду
     const subtotalAmount = cart.totalAmount;
-    let discountAmount = 0;
-    let appliedPromoCode = null;
+    const subtotalAfterPromotions = round2(Math.max(0, subtotalAmount - promotionsDiscount));
 
+    // 5. Рассчитываем скидку по промокоду (если передан) на сумму уже после акций
+    let promoDiscount = 0;
+    let appliedPromoCode: string | null = null;
     if (promoCode) {
-      const productIds = cart.CartItem.map(item => item.productItem.product.id);
+      const productIds = cart.CartItem.map((item) => item.productItem.product.id);
       const validation = await this.promoCodeService.validateAndCalculateDiscount(
         promoCode,
-        subtotalAmount,
+        subtotalAfterPromotions,
         productIds,
       );
 
-      if (validation.isValid && validation.discountAmount) {
-        discountAmount = validation.discountAmount;
-        appliedPromoCode = promoCode.trim().toUpperCase();
-      } else if (!validation.isValid) {
+      if (!validation.isValid) {
         throw new BadRequestException(validation.error || 'Ошибка применения промокода');
       }
+      promoDiscount = validation.discountAmount ?? 0;
+      if (promoDiscount > 0) appliedPromoCode = promoCode.trim().toUpperCase();
     }
 
-    const totalAmount = Math.max(0, subtotalAmount - discountAmount);
+    const totalDiscount = round2(Math.min(subtotalAmount, promotionsDiscount + promoDiscount));
+    const totalAmount = Math.max(0, round2(subtotalAmount - totalDiscount));
 
-    // 6. Создаём заказ и его позиции в одной транзакции
+    // 6. Генерируем уникальный 6-значный цифровой код заказа
+    const orderCode = await this.generateUniqueOrderCode();
+
+    // 7. Создаём заказ и его позиции в одной транзакции
     const order = await this.prismaService.order.create({
       data: {
         userId,
@@ -103,9 +114,10 @@ export class OrderService {
         address: address?.trim() ?? null,
         paymentType,
         subtotalAmount,
-        discountAmount,
+        discountAmount: totalDiscount,
         totalAmount,
         promoCode: appliedPromoCode,
+        appliedPromotions: promotionResult.breakdown as unknown as Prisma.InputJsonValue,
         // ONLINE → PENDING (ждём оплату), CASH/CARD → PROCESSING (уже можно собирать)
         status: paymentType === PaymentType.ONLINE ? 'PENDING' : 'PROCESSING',
         items: {
@@ -124,24 +136,25 @@ export class OrderService {
       include: this.getOrderInclude(),
     });
 
-    // 7. Фиксируем использование промокода
+    // 8. Фиксируем использование промокода
     if (appliedPromoCode) {
       await this.promoCodeService.recordPromoCodeUsage(appliedPromoCode);
     }
 
-    // 8. Очищаем корзину
+    // 9. Очищаем корзину
     await this.cartService.clearCart(userId);
 
-    // 9. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
-    //    Для ONLINE — письмо и метрика продаж уйдут после подтверждения оплаты через webhook.
+    // 10. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
+    //     Для ONLINE — письмо и метрика продаж уйдут после подтверждения оплаты через webhook.
+    const orderWithItems = order as unknown as OrderWithItems;
     if (paymentType !== PaymentType.ONLINE) {
-      this.sendOrderConfirmEmail(user, order).catch((err) =>
+      this.sendOrderConfirmEmail(user, orderWithItems).catch((err) =>
         this.logger.error(`Не удалось отправить письмо для заказа ${order.id}: ${err.message}`),
       );
-      this.recordProductSales(order);
+      this.recordProductSales(orderWithItems);
     }
 
-    // 10. Для онлайн-оплаты — создаём платёжную сессию bePaid
+    // 11. Для онлайн-оплаты — создаём платёжную сессию bePaid
     let redirectUrl: string | null = null;
 
     if (paymentType === PaymentType.ONLINE) {
@@ -315,7 +328,7 @@ export class OrderService {
    */
   private async sendOrderConfirmEmail(
     user: { email: string; displayName: string },
-    order: { id: string; orderCode: number; deliveryType: string; address: string | null; items: { productName: string; taste: string; size: string; quantity: number }[] },
+    order: OrderWithItems,
   ) {
     await this.mailService.sendMail(
       user.email,
@@ -341,9 +354,7 @@ export class OrderService {
    * Записывает название товара и купленные опции (вкус/размер).
    * Вызывается при подтверждении заказа: сразу для CASH/CARD, по webhook для ONLINE.
    */
-  private recordProductSales(order: {
-    items: { productName: string; taste: string; size: string; quantity: number }[];
-  }) {
+  private recordProductSales(order: OrderWithItems) {
     for (const item of order.items) {
       this.metricsService.incrementProductSale(
         item.productName,
@@ -371,3 +382,22 @@ export class OrderService {
     throw new Error('Не удалось сгенерировать уникальный код заказа');
   }
 }
+
+/** Округление до копеек, чтобы избежать накопления float-погрешности. */
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
+ * Минимальная форма заказа с позициями, нужная для письма и метрик продаж.
+ * В рантайме Prisma возвращает позиции через include, но на уровне типов
+ * order.create не выводит relations при include из getOrderInclude() —
+ * поэтому в местах вызова используется приведение к этому типу.
+ */
+type OrderWithItems = {
+  id: string;
+  orderCode: number;
+  deliveryType: string;
+  address: string | null;
+  items: { productName: string; taste: string; size: string; quantity: number }[];
+};

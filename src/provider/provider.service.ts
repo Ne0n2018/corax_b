@@ -4,7 +4,7 @@ import { ProviderCreateDto } from './dto/provider.create.dto';
 import { S3Service } from '../libs/s3/s3.service';
 import { ProviderUpdateDto } from './dto/provider.update.dto';
 import { ProviderFilterDto } from './dto/provider.filter.dto';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class ProviderService {
@@ -23,7 +23,7 @@ export class ProviderService {
         mode: 'insensitive',
       };
     }
-    const [providers, total] = await Promise.all([
+    const [providers] = await Promise.all([
       this.prismaService.provider.findMany({
         where,
         orderBy: { createdAt: 'desc' },

@@ -58,6 +58,12 @@ export class OrderResponseDto {
   @ApiProperty({ type: Number })
   totalAmount: number;
 
+  @ApiProperty({ type: Number, description: 'Сумма применённой скидки' })
+  discountAmount: number;
+
+  @Exclude()
+  appliedPromotions: unknown;
+
   @Exclude()
   userId: string;
 

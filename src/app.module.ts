@@ -14,9 +14,10 @@ import { WinstonModule } from 'nest-winston';
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import { ManufacturerModule } from './provider/manufacturer.module';
-// import { AdminModule } from './admin/admin.module';
+import { AdminModule } from './admin/admin.module';
 import { CartModule } from './cart/cart.module';
 import { OrderModule } from './order/order.module';
+import { PromotionModule } from './promotion/promotion.module';
 import { SessionModule } from './session/session.module';
 import { MetricsModule } from './metrics/metrics.module';
 import 'winston-daily-rotate-file';
@@ -57,6 +58,28 @@ import 'winston-daily-rotate-file';
               ),
               level: 'info',
             }),
+            new winston.transports.DailyRotateFile({
+              filename: 'logs/error-%DATE%.log',
+              datePattern: 'YYYY-MM-DD',
+              zippedArchive: true,
+              maxSize: '20m',
+              maxFiles: '30d',
+              format: winston.format.combine(
+                winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                winston.format.errors({ stack: true }),
+                winston.format.printf(
+                  ({ timestamp, level, message, context, stack, ...meta }) => {
+                    const ctx = context ? `[${context}]` : '';
+                    const metaStr = Object.keys(meta).length
+                      ? ` | meta: ${JSON.stringify(meta)}`
+                      : '';
+                    const stackStr = stack ? `\n${stack}` : '';
+                    return `${timestamp} [${level.toUpperCase()}] ${ctx} ${message}${metaStr}${stackStr}`;
+                  },
+                ),
+              ),
+              level: 'error',
+            }),
           ],
         };
       },
@@ -74,8 +97,10 @@ import 'winston-daily-rotate-file';
     ProductModule,
     CartModule,
     OrderModule,
+    PromotionModule,
     SessionModule,
     MetricsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

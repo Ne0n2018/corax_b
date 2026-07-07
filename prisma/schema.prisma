@@ -123,7 +123,7 @@ model Product {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
   ProductItem ProductItem[]
-  orderItems OrderItem[]
+  orderItems  OrderItem[]
 
   @@map("products")
 }
@@ -247,17 +247,18 @@ model Order {
   id        String @id @default(uuid())
   orderCode Int    @unique @map("order_code")
 
-  deliveryType DeliveryType @map("delivery_type")
-  address      String?
-  paymentType  PaymentType  @map("payment_type")
-  status       OrderStatus  @default(PENDING)
-  
-  subtotalAmount Float @map("subtotal_amount")
-  discountAmount Float @default(0) @map("discount_amount")
-  totalAmount    Float @map("total_amount")
-  
-  promoCode  String? @map("promo_code")  // Используемый промокод
-  
+  deliveryType      DeliveryType @map("delivery_type")
+  address           String?
+  paymentType       PaymentType  @map("payment_type")
+  status            OrderStatus  @default(PENDING)
+
+  subtotalAmount    Float        @map("subtotal_amount")
+  discountAmount    Float        @default(0) @map("discount_amount")
+  totalAmount       Float        @map("total_amount")
+
+  promoCode         String?      @map("promo_code")  // Используемый промокод
+  appliedPromotions Json?        @map("applied_promotions")
+
   bepaidToken String? @map("bepaid_token")
   bepaidUid   String? @map("bepaid_uid")
 
@@ -275,9 +276,9 @@ model Order {
 model OrderItem {
   id String @id @default(uuid())
 
-  productItemId String @map("product_item_id")
-  productId     String @map("product_id")
-  product       Product  @relation(fields: [productId], references: [id])
+  productItemId String  @map("product_item_id")
+  productId     String  @map("product_id")
+  product       Product @relation(fields: [productId], references: [id])
 
   productName String @map("product_name")
   imageUrl    String @map("image_url")
@@ -339,4 +340,34 @@ enum EnumToken {
   VERIFICATION
   TWO_FACTOR
   PASSWORD_RESET
+}
+
+enum PromotionType {
+  FIRST_ORDER
+  BUY_X_GET_Y
+  POPULAR
+}
+
+enum DiscountMethod {
+  PERCENT
+  FIXED
+}
+
+model Promotion {
+  id             String         @id @default(uuid())
+  name           String
+  imageUrl       String         @map("image_url")
+  description    String
+  type           PromotionType
+  discountMethod DiscountMethod @map("discount_method")
+  discountValue  Float          @map("discount_value")
+  buyQuantity    Int?           @map("buy_quantity")
+  getQuantity    Int?           @map("get_quantity")
+  popularTopN    Int?           @map("popular_top_n")
+  active         Boolean        @default(true)
+  expiresAt      DateTime?      @map("expires_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@map("promotions")
 }
