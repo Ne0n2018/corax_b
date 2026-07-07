@@ -6,7 +6,7 @@ import { ProductCreateDto } from './dto/product.create.dto';
 import { ProductUpdateDto } from './dto/product.update.dto';
 import { ProviderService } from '../provider/provider.service';
 import { ProductFilterDto } from './dto/product.filter.dto';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -137,7 +137,7 @@ export class ProductService {
       };
     }
 
-    const [products, total] = await Promise.all([
+    const [products] = await Promise.all([
       this.prismaService.product.findMany({
         where,
         skip,
@@ -173,15 +173,12 @@ export class ProductService {
       name,
       description,
       subCategoryId,
-      size,
       shortDescription,
-      characteristic,
       defaultPrice,
       formRelease,
       structure,
       advantages,
       providerId,
-      taste,
     } = dto;
     const existingProduct = await this.findById(id);
     const updateData: any = {};

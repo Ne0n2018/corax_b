@@ -1,0 +1,3 @@
+# Автоматически нормализуем переводы строк для shell-скриптов в LF
+*.sh text eol=lf
+docker-entrypoint.sh text eol=lf

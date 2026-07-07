@@ -92,3 +92,8 @@ export type Order = Prisma.OrderModel
  * 
  */
 export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Promotion
+ * 
+ */
+export type Promotion = Prisma.PromotionModel

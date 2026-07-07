@@ -4,7 +4,7 @@ import { CreateCategoryDto } from './dto/category.create.dto';
 import { SubCategoryCreateDto } from './dto/subCategory.create.dto';
 import { CategoryUpdateDto } from './dto/category.update.dto';
 import { SubCategoryUpdateDto } from './dto/subCategory.update.dto';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '../generated/prisma/client';
 import { SubCategoryFilterDto } from './dto/filter/subCategory.filter.dto';
 import { CategoryFilterDto } from './dto/filter/category.filter.dto';
 
@@ -73,7 +73,7 @@ export class CategoryService {
       };
     }
 
-    const [subCategories, total] = await Promise.all([
+    const [subCategories] = await Promise.all([
       this.prismaService.subCategory.findMany({
         where,
         skip,

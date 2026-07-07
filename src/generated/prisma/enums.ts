@@ -65,3 +65,20 @@ export const EnumToken = {
 } as const
 
 export type EnumToken = (typeof EnumToken)[keyof typeof EnumToken]
+
+
+export const PromotionType = {
+  FIRST_ORDER: 'FIRST_ORDER',
+  BUY_X_GET_Y: 'BUY_X_GET_Y',
+  POPULAR: 'POPULAR'
+} as const
+
+export type PromotionType = (typeof PromotionType)[keyof typeof PromotionType]
+
+
+export const DiscountMethod = {
+  PERCENT: 'PERCENT',
+  FIXED: 'FIXED'
+} as const
+
+export type DiscountMethod = (typeof DiscountMethod)[keyof typeof DiscountMethod]

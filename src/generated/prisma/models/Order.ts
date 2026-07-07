@@ -29,11 +29,13 @@ export type AggregateOrder = {
 export type OrderAvgAggregateOutputType = {
   orderCode: number | null
   totalAmount: number | null
+  discountAmount: number | null
 }
 
 export type OrderSumAggregateOutputType = {
   orderCode: number | null
   totalAmount: number | null
+  discountAmount: number | null
 }
 
 export type OrderMinAggregateOutputType = {
@@ -44,6 +46,7 @@ export type OrderMinAggregateOutputType = {
   paymentType: $Enums.PaymentType | null
   status: $Enums.OrderStatus | null
   totalAmount: number | null
+  discountAmount: number | null
   bepaidToken: string | null
   bepaidUid: string | null
   userId: string | null
@@ -59,6 +62,7 @@ export type OrderMaxAggregateOutputType = {
   paymentType: $Enums.PaymentType | null
   status: $Enums.OrderStatus | null
   totalAmount: number | null
+  discountAmount: number | null
   bepaidToken: string | null
   bepaidUid: string | null
   userId: string | null
@@ -74,6 +78,8 @@ export type OrderCountAggregateOutputType = {
   paymentType: number
   status: number
   totalAmount: number
+  discountAmount: number
+  appliedPromotions: number
   bepaidToken: number
   bepaidUid: number
   userId: number
@@ -86,11 +92,13 @@ export type OrderCountAggregateOutputType = {
 export type OrderAvgAggregateInputType = {
   orderCode?: true
   totalAmount?: true
+  discountAmount?: true
 }
 
 export type OrderSumAggregateInputType = {
   orderCode?: true
   totalAmount?: true
+  discountAmount?: true
 }
 
 export type OrderMinAggregateInputType = {
@@ -101,6 +109,7 @@ export type OrderMinAggregateInputType = {
   paymentType?: true
   status?: true
   totalAmount?: true
+  discountAmount?: true
   bepaidToken?: true
   bepaidUid?: true
   userId?: true
@@ -116,6 +125,7 @@ export type OrderMaxAggregateInputType = {
   paymentType?: true
   status?: true
   totalAmount?: true
+  discountAmount?: true
   bepaidToken?: true
   bepaidUid?: true
   userId?: true
@@ -131,6 +141,8 @@ export type OrderCountAggregateInputType = {
   paymentType?: true
   status?: true
   totalAmount?: true
+  discountAmount?: true
+  appliedPromotions?: true
   bepaidToken?: true
   bepaidUid?: true
   userId?: true
@@ -233,6 +245,8 @@ export type OrderGroupByOutputType = {
   paymentType: $Enums.PaymentType
   status: $Enums.OrderStatus
   totalAmount: number
+  discountAmount: number
+  appliedPromotions: runtime.JsonValue | null
   bepaidToken: string | null
   bepaidUid: string | null
   userId: string
@@ -271,6 +285,8 @@ export type OrderWhereInput = {
   paymentType?: Prisma.EnumPaymentTypeFilter<"Order"> | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFilter<"Order"> | number
+  discountAmount?: Prisma.FloatFilter<"Order"> | number
+  appliedPromotions?: Prisma.JsonNullableFilter<"Order">
   bepaidToken?: Prisma.StringNullableFilter<"Order"> | string | null
   bepaidUid?: Prisma.StringNullableFilter<"Order"> | string | null
   userId?: Prisma.StringFilter<"Order"> | string
@@ -288,6 +304,8 @@ export type OrderOrderByWithRelationInput = {
   paymentType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  appliedPromotions?: Prisma.SortOrderInput | Prisma.SortOrder
   bepaidToken?: Prisma.SortOrderInput | Prisma.SortOrder
   bepaidUid?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -308,6 +326,8 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   paymentType?: Prisma.EnumPaymentTypeFilter<"Order"> | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFilter<"Order"> | number
+  discountAmount?: Prisma.FloatFilter<"Order"> | number
+  appliedPromotions?: Prisma.JsonNullableFilter<"Order">
   bepaidToken?: Prisma.StringNullableFilter<"Order"> | string | null
   bepaidUid?: Prisma.StringNullableFilter<"Order"> | string | null
   userId?: Prisma.StringFilter<"Order"> | string
@@ -325,6 +345,8 @@ export type OrderOrderByWithAggregationInput = {
   paymentType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  appliedPromotions?: Prisma.SortOrderInput | Prisma.SortOrder
   bepaidToken?: Prisma.SortOrderInput | Prisma.SortOrder
   bepaidUid?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -348,6 +370,8 @@ export type OrderScalarWhereWithAggregatesInput = {
   paymentType?: Prisma.EnumPaymentTypeWithAggregatesFilter<"Order"> | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
   totalAmount?: Prisma.FloatWithAggregatesFilter<"Order"> | number
+  discountAmount?: Prisma.FloatWithAggregatesFilter<"Order"> | number
+  appliedPromotions?: Prisma.JsonNullableWithAggregatesFilter<"Order">
   bepaidToken?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   bepaidUid?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   userId?: Prisma.StringWithAggregatesFilter<"Order"> | string
@@ -363,6 +387,8 @@ export type OrderCreateInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   createdAt?: Date | string
@@ -379,6 +405,8 @@ export type OrderUncheckedCreateInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   userId: string
@@ -395,6 +423,8 @@ export type OrderUpdateInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -411,6 +441,8 @@ export type OrderUncheckedUpdateInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -427,6 +459,8 @@ export type OrderCreateManyInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   userId: string
@@ -442,6 +476,8 @@ export type OrderUpdateManyMutationInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -456,6 +492,8 @@ export type OrderUncheckedUpdateManyInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -481,6 +519,8 @@ export type OrderCountOrderByAggregateInput = {
   paymentType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  appliedPromotions?: Prisma.SortOrder
   bepaidToken?: Prisma.SortOrder
   bepaidUid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -491,6 +531,7 @@ export type OrderCountOrderByAggregateInput = {
 export type OrderAvgOrderByAggregateInput = {
   orderCode?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
 }
 
 export type OrderMaxOrderByAggregateInput = {
@@ -501,6 +542,7 @@ export type OrderMaxOrderByAggregateInput = {
   paymentType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   bepaidToken?: Prisma.SortOrder
   bepaidUid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -516,6 +558,7 @@ export type OrderMinOrderByAggregateInput = {
   paymentType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
   bepaidToken?: Prisma.SortOrder
   bepaidUid?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -526,6 +569,7 @@ export type OrderMinOrderByAggregateInput = {
 export type OrderSumOrderByAggregateInput = {
   orderCode?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
 }
 
 export type OrderScalarRelationFilter = {
@@ -609,6 +653,8 @@ export type OrderCreateWithoutUserInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   createdAt?: Date | string
@@ -624,6 +670,8 @@ export type OrderUncheckedCreateWithoutUserInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   createdAt?: Date | string
@@ -668,6 +716,8 @@ export type OrderScalarWhereInput = {
   paymentType?: Prisma.EnumPaymentTypeFilter<"Order"> | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFilter<"Order"> | number
+  discountAmount?: Prisma.FloatFilter<"Order"> | number
+  appliedPromotions?: Prisma.JsonNullableFilter<"Order">
   bepaidToken?: Prisma.StringNullableFilter<"Order"> | string | null
   bepaidUid?: Prisma.StringNullableFilter<"Order"> | string | null
   userId?: Prisma.StringFilter<"Order"> | string
@@ -683,6 +733,8 @@ export type OrderCreateWithoutItemsInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   createdAt?: Date | string
@@ -698,6 +750,8 @@ export type OrderUncheckedCreateWithoutItemsInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   userId: string
@@ -729,6 +783,8 @@ export type OrderUpdateWithoutItemsInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -744,6 +800,8 @@ export type OrderUncheckedUpdateWithoutItemsInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -759,6 +817,8 @@ export type OrderCreateManyUserInput = {
   paymentType: $Enums.PaymentType
   status?: $Enums.OrderStatus
   totalAmount: number
+  discountAmount?: number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: string | null
   bepaidUid?: string | null
   createdAt?: Date | string
@@ -773,6 +833,8 @@ export type OrderUpdateWithoutUserInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -788,6 +850,8 @@ export type OrderUncheckedUpdateWithoutUserInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -803,6 +867,8 @@ export type OrderUncheckedUpdateManyWithoutUserInput = {
   paymentType?: Prisma.EnumPaymentTypeFieldUpdateOperationsInput | $Enums.PaymentType
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   totalAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  discountAmount?: Prisma.FloatFieldUpdateOperationsInput | number
+  appliedPromotions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bepaidToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   bepaidUid?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -848,6 +914,8 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   paymentType?: boolean
   status?: boolean
   totalAmount?: boolean
+  discountAmount?: boolean
+  appliedPromotions?: boolean
   bepaidToken?: boolean
   bepaidUid?: boolean
   userId?: boolean
@@ -866,6 +934,8 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   paymentType?: boolean
   status?: boolean
   totalAmount?: boolean
+  discountAmount?: boolean
+  appliedPromotions?: boolean
   bepaidToken?: boolean
   bepaidUid?: boolean
   userId?: boolean
@@ -882,6 +952,8 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   paymentType?: boolean
   status?: boolean
   totalAmount?: boolean
+  discountAmount?: boolean
+  appliedPromotions?: boolean
   bepaidToken?: boolean
   bepaidUid?: boolean
   userId?: boolean
@@ -898,6 +970,8 @@ export type OrderSelectScalar = {
   paymentType?: boolean
   status?: boolean
   totalAmount?: boolean
+  discountAmount?: boolean
+  appliedPromotions?: boolean
   bepaidToken?: boolean
   bepaidUid?: boolean
   userId?: boolean
@@ -905,7 +979,7 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderCode" | "deliveryType" | "address" | "paymentType" | "status" | "totalAmount" | "bepaidToken" | "bepaidUid" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderCode" | "deliveryType" | "address" | "paymentType" | "status" | "totalAmount" | "discountAmount" | "appliedPromotions" | "bepaidToken" | "bepaidUid" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Order$itemsArgs<ExtArgs>
@@ -932,6 +1006,8 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     paymentType: $Enums.PaymentType
     status: $Enums.OrderStatus
     totalAmount: number
+    discountAmount: number
+    appliedPromotions: runtime.JsonValue | null
     bepaidToken: string | null
     bepaidUid: string | null
     userId: string
@@ -1369,6 +1445,8 @@ export interface OrderFieldRefs {
   readonly paymentType: Prisma.FieldRef<"Order", 'PaymentType'>
   readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>
   readonly totalAmount: Prisma.FieldRef<"Order", 'Float'>
+  readonly discountAmount: Prisma.FieldRef<"Order", 'Float'>
+  readonly appliedPromotions: Prisma.FieldRef<"Order", 'Json'>
   readonly bepaidToken: Prisma.FieldRef<"Order", 'String'>
   readonly bepaidUid: Prisma.FieldRef<"Order", 'String'>
   readonly userId: Prisma.FieldRef<"Order", 'String'>
