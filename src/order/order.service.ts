@@ -11,6 +11,7 @@ import { UserService } from '../user/user.service';
 import { BePaidService } from './bepaid/bepaid.service';
 import { MailService } from '../libs/mail/mail.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { PromoCodeService } from './promo/promo-code.service';
 import { CreateOrderDto, DeliveryType, PaymentType } from './dto/create-order.dto';
 import type { BePaidWebhookDto } from './dto/bepaid-webhook.dto';
 import * as React from 'react';
@@ -28,6 +29,7 @@ export class OrderService {
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
     private readonly metricsService: MetricsService,
+    private readonly promoCodeService: PromoCodeService,
   ) {}
 
   // ─── Приватные утилиты ──────────────────────────────────────────────────────
@@ -45,7 +47,7 @@ export class OrderService {
    * Возвращает заказ и URL оплаты (только для ONLINE).
    */
   async createOrder(userId: string, dto: CreateOrderDto) {
-    const { deliveryType, address, paymentType } = dto;
+    const { deliveryType, address, paymentType, promoCode } = dto;
 
     // 1. Проверка: при доставке адрес обязателен
     if (deliveryType === DeliveryType.DELIVERY && !address?.trim()) {
@@ -69,7 +71,30 @@ export class OrderService {
     // 4. Генерируем уникальный 6-значный цифровой код заказа
     const orderCode = await this.generateUniqueOrderCode();
 
-    // 5. Создаём заказ и его позиции в одной транзакции
+    // 5. Рассчитываем скидку по промокоду
+    const subtotalAmount = cart.totalAmount;
+    let discountAmount = 0;
+    let appliedPromoCode = null;
+
+    if (promoCode) {
+      const productIds = cart.CartItem.map(item => item.productItem.product.id);
+      const validation = await this.promoCodeService.validateAndCalculateDiscount(
+        promoCode,
+        subtotalAmount,
+        productIds,
+      );
+
+      if (validation.isValid && validation.discountAmount) {
+        discountAmount = validation.discountAmount;
+        appliedPromoCode = promoCode.trim().toUpperCase();
+      } else if (!validation.isValid) {
+        throw new BadRequestException(validation.error || 'Ошибка применения промокода');
+      }
+    }
+
+    const totalAmount = Math.max(0, subtotalAmount - discountAmount);
+
+    // 6. Создаём заказ и его позиции в одной транзакции
     const order = await this.prismaService.order.create({
       data: {
         userId,
@@ -77,7 +102,10 @@ export class OrderService {
         deliveryType,
         address: address?.trim() ?? null,
         paymentType,
-        totalAmount: cart.totalAmount,
+        subtotalAmount,
+        discountAmount,
+        totalAmount,
+        promoCode: appliedPromoCode,
         // ONLINE → PENDING (ждём оплату), CASH/CARD → PROCESSING (уже можно собирать)
         status: paymentType === PaymentType.ONLINE ? 'PENDING' : 'PROCESSING',
         items: {
@@ -96,10 +124,15 @@ export class OrderService {
       include: this.getOrderInclude(),
     });
 
-    // 6. Очищаем корзину
+    // 7. Фиксируем использование промокода
+    if (appliedPromoCode) {
+      await this.promoCodeService.recordPromoCodeUsage(appliedPromoCode);
+    }
+
+    // 8. Очищаем корзину
     await this.cartService.clearCart(userId);
 
-    // 7. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
+    // 9. Для CASH/CARD — сразу отправляем подтверждение и учитываем продажу.
     //    Для ONLINE — письмо и метрика продаж уйдут после подтверждения оплаты через webhook.
     if (paymentType !== PaymentType.ONLINE) {
       this.sendOrderConfirmEmail(user, order).catch((err) =>
@@ -108,7 +141,7 @@ export class OrderService {
       this.recordProductSales(order);
     }
 
-    // 8. Для онлайн-оплаты — создаём платёжную сессию bePaid
+    // 10. Для онлайн-оплаты — создаём платёжную сессию bePaid
     let redirectUrl: string | null = null;
 
     if (paymentType === PaymentType.ONLINE) {

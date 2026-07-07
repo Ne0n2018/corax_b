@@ -217,6 +217,32 @@ model Cart {
   @@unique([userId])
 }
 
+model PromoCode {
+  id          String @id @default(uuid())
+  code        String @unique
+  description String?
+  
+  type        DiscountType // PERCENT, FIXED, BOGO (Buy One Get One)
+  value       Float        // Процент скидки (0-100) или фиксированная сумма
+  
+  isActive    Boolean @default(true)
+  maxUses     Int?    // null = неограниченное
+  currentUses Int     @default(0)
+  
+  validFrom   DateTime @map("valid_from")
+  validUntil  DateTime @map("valid_until")
+  
+  minOrderAmount Float? @map("min_order_amount") // Минимальная сумма заказа
+  maxDiscount Float?    @map("max_discount")     // Максимальная скидка
+  
+  applicableProducts String? @map("applicable_products") // JSON array of product IDs, null = all products
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@map("promo_codes")
+}
+
 model Order {
   id        String @id @default(uuid())
   orderCode Int    @unique @map("order_code")
@@ -225,8 +251,13 @@ model Order {
   address      String?
   paymentType  PaymentType  @map("payment_type")
   status       OrderStatus  @default(PENDING)
-  totalAmount  Float        @map("total_amount")
-
+  
+  subtotalAmount Float @map("subtotal_amount")
+  discountAmount Float @default(0) @map("discount_amount")
+  totalAmount    Float @map("total_amount")
+  
+  promoCode  String? @map("promo_code")  // Используемый промокод
+  
   bepaidToken String? @map("bepaid_token")
   bepaidUid   String? @map("bepaid_uid")
 
@@ -284,6 +315,12 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum DiscountType {
+  PERCENT     // Процент скидки (value = 10 означает 10%)
+  FIXED       // Фиксированная сумма (value = 100 означает 100 рублей)
+  BOGO        // Buy One Get One (два товара по цене одного)
 }
 
 enum UserRole {
