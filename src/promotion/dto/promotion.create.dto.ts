@@ -16,7 +16,11 @@ import { DiscountMethod, PromotionType } from '../../generated/prisma/enums';
 export class PromotionCreateDto {
   @IsString({ message: 'Название акции должно быть строкой' })
   @IsNotEmpty({ message: 'Название акции не должно быть пустым' })
-  @ApiProperty({ type: String, description: 'Название акции', example: 'Скидка на первый заказ' })
+  @ApiProperty({
+    type: String,
+    description: 'Название акции',
+    example: 'Скидка на первый заказ',
+  })
   name: string;
 
   @IsString({ message: 'Описание акции должно быть строкой' })
@@ -24,7 +28,9 @@ export class PromotionCreateDto {
   @ApiProperty({ type: String, description: 'Описание акции' })
   description: string;
 
-  @IsEnum(PromotionType, { message: 'Укажите тип акции: FIRST_ORDER, BUY_X_GET_Y, POPULAR' })
+  @IsEnum(PromotionType, {
+    message: 'Укажите тип акции: FIRST_ORDER, BUY_X_GET_Y, POPULAR',
+  })
   @IsNotEmpty()
   @ApiProperty({
     enum: PromotionType,
@@ -34,11 +40,14 @@ export class PromotionCreateDto {
   })
   type: PromotionType;
 
-  @IsEnum(DiscountMethod, { message: 'Укажите метод скидки: PERCENT или FIXED' })
+  @IsEnum(DiscountMethod, {
+    message: 'Укажите метод скидки: PERCENT или FIXED',
+  })
   @IsNotEmpty()
   @ApiProperty({
     enum: DiscountMethod,
-    description: 'Метод расчёта скидки: PERCENT — проценты (0–100), FIXED — фиксированная сумма BYN',
+    description:
+      'Метод расчёта скидки: PERCENT — проценты (0–100), FIXED — фиксированная сумма BYN',
     example: DiscountMethod.PERCENT,
   })
   discountMethod: DiscountMethod;
@@ -49,7 +58,8 @@ export class PromotionCreateDto {
   @IsNotEmpty()
   @ApiProperty({
     type: Number,
-    description: 'Значение скидки: для PERCENT — 0–100, для FIXED — сумма в BYN',
+    description:
+      'Значение скидки: для PERCENT — 0–100, для FIXED — сумма в BYN',
     example: 10,
   })
   discountValue: number;
@@ -61,7 +71,8 @@ export class PromotionCreateDto {
   @ApiProperty({
     type: Number,
     required: false,
-    description: 'BUY_X_GET_Y: сколько купить (X). Обязательно для типа BUY_X_GET_Y',
+    description:
+      'BUY_X_GET_Y: сколько купить (X). Обязательно для типа BUY_X_GET_Y',
     example: 2,
   })
   buyQuantity?: number;
@@ -73,7 +84,8 @@ export class PromotionCreateDto {
   @ApiProperty({
     type: Number,
     required: false,
-    description: 'BUY_X_GET_Y: сколько получить бесплатно (Y). Обязательно для типа BUY_X_GET_Y',
+    description:
+      'BUY_X_GET_Y: сколько получить бесплатно (Y). Обязательно для типа BUY_X_GET_Y',
     example: 1,
   })
   getQuantity?: number;
@@ -85,14 +97,19 @@ export class PromotionCreateDto {
   @ApiProperty({
     type: Number,
     required: false,
-    description: 'POPULAR: топ-N самых покупаемых товаров, на которые действует скидка. Обязательно для типа POPULAR',
+    description:
+      'POPULAR: топ-N самых покупаемых товаров, на которые действует скидка. Обязательно для типа POPULAR',
     example: 5,
   })
   popularTopN?: number;
 
   @IsOptional()
   @IsBooleanString({ message: 'active должно быть "true" или "false"' })
-  @ApiProperty({ type: String, required: false, description: 'Активна ли акция ("true"/"false"), по умолчанию true' })
+  @ApiProperty({
+    type: 'boolean',
+    required: false,
+    description: 'Активна ли акция ("true"/"false"), по умолчанию true',
+  })
   active?: string;
 
   @IsOptional()
@@ -101,7 +118,8 @@ export class PromotionCreateDto {
   @ApiProperty({
     type: Date,
     required: false,
-    description: 'Дата истечения акции. null = бессрочно. Датой начала считается createdAt',
+    description:
+      'Дата истечения акции. null = бессрочно. Датой начала считается createdAt',
     example: '2026-12-31T23:59:59.000Z',
   })
   expiresAt?: Date;

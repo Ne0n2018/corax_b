@@ -40,6 +40,15 @@ export const OrderStatus = {
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 
+export const DiscountType = {
+  PERCENT: 'PERCENT',
+  FIXED: 'FIXED',
+  BOGO: 'BOGO'
+} as const
+
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
+
+
 export const UserRole = {
   REGULAR: 'REGULAR',
   ADMIN: 'ADMIN',

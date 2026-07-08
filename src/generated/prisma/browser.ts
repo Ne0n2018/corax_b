@@ -83,6 +83,11 @@ export type CartItem = Prisma.CartItemModel
  */
 export type Cart = Prisma.CartModel
 /**
+ * Model PromoCode
+ * 
+ */
+export type PromoCode = Prisma.PromoCodeModel
+/**
  * Model Order
  * 
  */

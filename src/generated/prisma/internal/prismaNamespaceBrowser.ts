@@ -64,6 +64,7 @@ export const ModelName = {
   ProductItem: 'ProductItem',
   CartItem: 'CartItem',
   Cart: 'Cart',
+  PromoCode: 'PromoCode',
   Order: 'Order',
   OrderItem: 'OrderItem',
   Promotion: 'Promotion'
@@ -252,6 +253,27 @@ export const CartScalarFieldEnum = {
 export type CartScalarFieldEnum = (typeof CartScalarFieldEnum)[keyof typeof CartScalarFieldEnum]
 
 
+export const PromoCodeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description',
+  type: 'type',
+  value: 'value',
+  isActive: 'isActive',
+  maxUses: 'maxUses',
+  currentUses: 'currentUses',
+  validFrom: 'validFrom',
+  validUntil: 'validUntil',
+  minOrderAmount: 'minOrderAmount',
+  maxDiscount: 'maxDiscount',
+  applicableProducts: 'applicableProducts',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PromoCodeScalarFieldEnum = (typeof PromoCodeScalarFieldEnum)[keyof typeof PromoCodeScalarFieldEnum]
+
+
 export const OrderScalarFieldEnum = {
   id: 'id',
   orderCode: 'orderCode',
@@ -259,8 +281,10 @@ export const OrderScalarFieldEnum = {
   address: 'address',
   paymentType: 'paymentType',
   status: 'status',
-  totalAmount: 'totalAmount',
+  subtotalAmount: 'subtotalAmount',
   discountAmount: 'discountAmount',
+  totalAmount: 'totalAmount',
+  promoCode: 'promoCode',
   appliedPromotions: 'appliedPromotions',
   bepaidToken: 'bepaidToken',
   bepaidUid: 'bepaidUid',

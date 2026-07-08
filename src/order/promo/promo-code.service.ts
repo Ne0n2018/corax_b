@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreatePromoDto } from './dto/create.promo.dto';
+import { UpdatePromoDto } from './dto/update.promo.dto';
 
 export interface PromoCodeValidationResult {
   isValid: boolean;
@@ -65,10 +67,7 @@ export class PromoCodeService {
     }
 
     // Проверка минимальной суммы заказа
-    if (
-      promoCode.minOrderAmount &&
-      orderSubtotal < promoCode.minOrderAmount
-    ) {
+    if (promoCode.minOrderAmount && orderSubtotal < promoCode.minOrderAmount) {
       return {
         isValid: false,
         error: `Минимальная сумма заказа: ${promoCode.minOrderAmount} руб.`,
@@ -142,18 +141,7 @@ export class PromoCodeService {
   /**
    * Создать новый промокод (для администратора).
    */
-  async createPromoCode(data: {
-    code: string;
-    description?: string;
-    type: 'PERCENT' | 'FIXED' | 'BOGO';
-    value: number;
-    validFrom: Date;
-    validUntil: Date;
-    maxUses?: number;
-    minOrderAmount?: number;
-    maxDiscount?: number;
-    applicableProducts?: string[];
-  }) {
+  async createPromoCode(data: CreatePromoDto) {
     return this.prismaService.promoCode.create({
       data: {
         code: data.code.toUpperCase(),
@@ -179,5 +167,43 @@ export class PromoCodeService {
     return this.prismaService.promoCode.findUnique({
       where: { code: code.toUpperCase() },
     });
+  }
+
+  async updatePromoCode(data: UpdatePromoDto, id: string) {
+    const promoCode = await this.prismaService.promoCode.findUnique({
+      where: { id },
+    });
+    if (!promoCode) {
+      throw new NotFoundException('Промокод не найден');
+    }
+    return this.prismaService.promoCode.update({
+      where: { id },
+      data: {
+        code: data.code.toUpperCase(),
+        description: data.description,
+        type: data.type,
+        value: data.value,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        maxUses: data.maxUses,
+        minOrderAmount: data.minOrderAmount,
+        maxDiscount: data.maxDiscount,
+        applicableProducts: data.applicableProducts
+          ? JSON.stringify(data.applicableProducts)
+          : null,
+      },
+    });
+  }
+
+  async deletePromoCode(id: string) {
+    const promoCode = await this.prismaService.promoCode.findUnique({
+      where: { id },
+    });
+
+    if (!promoCode) {
+      throw new NotFoundException('промокод не найден');
+    }
+
+    return this.prismaService.promoCode.delete({ where: { id } });
   }
 }
