@@ -199,7 +199,7 @@ export type TasteGroupByOutputType = {
   _max: TasteMaxAggregateOutputType | null
 }
 
-type GetTasteGroupByPayload<T extends TasteGroupByArgs> = Prisma.PrismaPromise<
+export type GetTasteGroupByPayload<T extends TasteGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TasteGroupByOutputType, T['by']> &
       {
@@ -1201,6 +1201,11 @@ export type TasteFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Skip the first `n` Tastes.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Tastes.
+   */
   distinct?: Prisma.TasteScalarFieldEnum | Prisma.TasteScalarFieldEnum[]
 }
 

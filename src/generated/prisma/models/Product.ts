@@ -248,7 +248,7 @@ export type ProductGroupByOutputType = {
   _max: ProductMaxAggregateOutputType | null
 }
 
-type GetProductGroupByPayload<T extends ProductGroupByArgs> = Prisma.PrismaPromise<
+export type GetProductGroupByPayload<T extends ProductGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProductGroupByOutputType, T['by']> &
       {
@@ -287,6 +287,8 @@ export type ProductWhereInput = {
   Size?: Prisma.SizeListRelationFilter
   ProductItem?: Prisma.ProductItemListRelationFilter
   orderItems?: Prisma.OrderItemListRelationFilter
+  favorites?: Prisma.FavoriteListRelationFilter
+  comparisons?: Prisma.ComparisonListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -310,6 +312,8 @@ export type ProductOrderByWithRelationInput = {
   Size?: Prisma.SizeOrderByRelationAggregateInput
   ProductItem?: Prisma.ProductItemOrderByRelationAggregateInput
   orderItems?: Prisma.OrderItemOrderByRelationAggregateInput
+  favorites?: Prisma.FavoriteOrderByRelationAggregateInput
+  comparisons?: Prisma.ComparisonOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -336,6 +340,8 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   Size?: Prisma.SizeListRelationFilter
   ProductItem?: Prisma.ProductItemListRelationFilter
   orderItems?: Prisma.OrderItemListRelationFilter
+  favorites?: Prisma.FavoriteListRelationFilter
+  comparisons?: Prisma.ComparisonListRelationFilter
 }, "id">
 
 export type ProductOrderByWithAggregationInput = {
@@ -397,6 +403,8 @@ export type ProductCreateInput = {
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -418,6 +426,8 @@ export type ProductUncheckedCreateInput = {
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -439,6 +449,8 @@ export type ProductUpdateInput = {
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -460,6 +472,8 @@ export type ProductUncheckedUpdateInput = {
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -741,6 +755,34 @@ export type ProductUpdateOneRequiredWithoutOrderItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutOrderItemsInput, Prisma.ProductUpdateWithoutOrderItemsInput>, Prisma.ProductUncheckedUpdateWithoutOrderItemsInput>
 }
 
+export type ProductCreateNestedOneWithoutFavoritesInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutFavoritesInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutFavoritesNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutFavoritesInput
+  upsert?: Prisma.ProductUpsertWithoutFavoritesInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutFavoritesInput, Prisma.ProductUpdateWithoutFavoritesInput>, Prisma.ProductUncheckedUpdateWithoutFavoritesInput>
+}
+
+export type ProductCreateNestedOneWithoutComparisonsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutComparisonsInput, Prisma.ProductUncheckedCreateWithoutComparisonsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutComparisonsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutComparisonsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutComparisonsInput, Prisma.ProductUncheckedCreateWithoutComparisonsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutComparisonsInput
+  upsert?: Prisma.ProductUpsertWithoutComparisonsInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutComparisonsInput, Prisma.ProductUpdateWithoutComparisonsInput>, Prisma.ProductUncheckedUpdateWithoutComparisonsInput>
+}
+
 export type ProductCreateWithoutSubCategoryInput = {
   id?: string
   name: string
@@ -759,6 +801,8 @@ export type ProductCreateWithoutSubCategoryInput = {
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutSubCategoryInput = {
@@ -779,6 +823,8 @@ export type ProductUncheckedCreateWithoutSubCategoryInput = {
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutSubCategoryInput = {
@@ -844,6 +890,8 @@ export type ProductCreateWithoutProviderInput = {
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutProviderInput = {
@@ -864,6 +912,8 @@ export type ProductUncheckedCreateWithoutProviderInput = {
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutProviderInput = {
@@ -910,6 +960,8 @@ export type ProductCreateWithoutCharacteristicInput = {
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutCharacteristicInput = {
@@ -930,6 +982,8 @@ export type ProductUncheckedCreateWithoutCharacteristicInput = {
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutCharacteristicInput = {
@@ -966,6 +1020,8 @@ export type ProductUpdateWithoutCharacteristicInput = {
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutCharacteristicInput = {
@@ -986,6 +1042,8 @@ export type ProductUncheckedUpdateWithoutCharacteristicInput = {
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutTasteInput = {
@@ -1006,6 +1064,8 @@ export type ProductCreateWithoutTasteInput = {
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutTasteInput = {
@@ -1026,6 +1086,8 @@ export type ProductUncheckedCreateWithoutTasteInput = {
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutTasteInput = {
@@ -1062,6 +1124,8 @@ export type ProductUpdateWithoutTasteInput = {
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutTasteInput = {
@@ -1082,6 +1146,8 @@ export type ProductUncheckedUpdateWithoutTasteInput = {
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutSizeInput = {
@@ -1102,6 +1168,8 @@ export type ProductCreateWithoutSizeInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutSizeInput = {
@@ -1122,6 +1190,8 @@ export type ProductUncheckedCreateWithoutSizeInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutSizeInput = {
@@ -1158,6 +1228,8 @@ export type ProductUpdateWithoutSizeInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutSizeInput = {
@@ -1178,6 +1250,8 @@ export type ProductUncheckedUpdateWithoutSizeInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutProductItemInput = {
@@ -1198,6 +1272,8 @@ export type ProductCreateWithoutProductItemInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutProductItemInput = {
@@ -1218,6 +1294,8 @@ export type ProductUncheckedCreateWithoutProductItemInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutProductItemInput = {
@@ -1254,6 +1332,8 @@ export type ProductUpdateWithoutProductItemInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutProductItemInput = {
@@ -1274,6 +1354,8 @@ export type ProductUncheckedUpdateWithoutProductItemInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutOrderItemsInput = {
@@ -1294,6 +1376,8 @@ export type ProductCreateWithoutOrderItemsInput = {
   Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutOrderItemsInput = {
@@ -1314,6 +1398,8 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
   Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
   ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutOrderItemsInput = {
@@ -1350,6 +1436,8 @@ export type ProductUpdateWithoutOrderItemsInput = {
   Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutOrderItemsInput = {
@@ -1370,6 +1458,216 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutFavoritesInput = {
+  id?: string
+  name: string
+  imageUrl: string
+  shortDescription: string
+  description: string
+  advantages: string
+  structure: string
+  formRelease: string
+  defaultPrice: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
+  Provider: Prisma.ProviderCreateNestedOneWithoutProductsInput
+  characteristic?: Prisma.ProductCharacteristicCreateNestedManyWithoutProductInput
+  Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
+  Size?: Prisma.SizeCreateNestedManyWithoutProductInput
+  ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutFavoritesInput = {
+  id?: string
+  name: string
+  imageUrl: string
+  shortDescription: string
+  description: string
+  advantages: string
+  structure: string
+  formRelease: string
+  defaultPrice: number
+  subCategoryId: string
+  providerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
+  Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
+  Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
+  ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  comparisons?: Prisma.ComparisonUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutFavoritesInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+}
+
+export type ProductUpsertWithoutFavoritesInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutFavoritesInput, Prisma.ProductUncheckedUpdateWithoutFavoritesInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutFavoritesInput, Prisma.ProductUncheckedCreateWithoutFavoritesInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutFavoritesInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutFavoritesInput, Prisma.ProductUncheckedUpdateWithoutFavoritesInput>
+}
+
+export type ProductUpdateWithoutFavoritesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  advantages?: Prisma.StringFieldUpdateOperationsInput | string
+  structure?: Prisma.StringFieldUpdateOperationsInput | string
+  formRelease?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
+  Provider?: Prisma.ProviderUpdateOneRequiredWithoutProductsNestedInput
+  characteristic?: Prisma.ProductCharacteristicUpdateManyWithoutProductNestedInput
+  Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
+  Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
+  ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutFavoritesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  advantages?: Prisma.StringFieldUpdateOperationsInput | string
+  structure?: Prisma.StringFieldUpdateOperationsInput | string
+  formRelease?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
+  Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
+  Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
+  ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
+}
+
+export type ProductCreateWithoutComparisonsInput = {
+  id?: string
+  name: string
+  imageUrl: string
+  shortDescription: string
+  description: string
+  advantages: string
+  structure: string
+  formRelease: string
+  defaultPrice: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
+  Provider: Prisma.ProviderCreateNestedOneWithoutProductsInput
+  characteristic?: Prisma.ProductCharacteristicCreateNestedManyWithoutProductInput
+  Taste?: Prisma.TasteCreateNestedManyWithoutProductInput
+  Size?: Prisma.SizeCreateNestedManyWithoutProductInput
+  ProductItem?: Prisma.ProductItemCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutProductInput
+}
+
+export type ProductUncheckedCreateWithoutComparisonsInput = {
+  id?: string
+  name: string
+  imageUrl: string
+  shortDescription: string
+  description: string
+  advantages: string
+  structure: string
+  formRelease: string
+  defaultPrice: number
+  subCategoryId: string
+  providerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
+  Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
+  Size?: Prisma.SizeUncheckedCreateNestedManyWithoutProductInput
+  ProductItem?: Prisma.ProductItemUncheckedCreateNestedManyWithoutProductInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutProductInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutProductInput
+}
+
+export type ProductCreateOrConnectWithoutComparisonsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutComparisonsInput, Prisma.ProductUncheckedCreateWithoutComparisonsInput>
+}
+
+export type ProductUpsertWithoutComparisonsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutComparisonsInput, Prisma.ProductUncheckedUpdateWithoutComparisonsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutComparisonsInput, Prisma.ProductUncheckedCreateWithoutComparisonsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutComparisonsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutComparisonsInput, Prisma.ProductUncheckedUpdateWithoutComparisonsInput>
+}
+
+export type ProductUpdateWithoutComparisonsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  advantages?: Prisma.StringFieldUpdateOperationsInput | string
+  structure?: Prisma.StringFieldUpdateOperationsInput | string
+  formRelease?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
+  Provider?: Prisma.ProviderUpdateOneRequiredWithoutProductsNestedInput
+  characteristic?: Prisma.ProductCharacteristicUpdateManyWithoutProductNestedInput
+  Taste?: Prisma.TasteUpdateManyWithoutProductNestedInput
+  Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
+  ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutComparisonsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  advantages?: Prisma.StringFieldUpdateOperationsInput | string
+  structure?: Prisma.StringFieldUpdateOperationsInput | string
+  formRelease?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
+  Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
+  Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
+  ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManySubCategoryInput = {
@@ -1405,6 +1703,8 @@ export type ProductUpdateWithoutSubCategoryInput = {
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutSubCategoryInput = {
@@ -1425,6 +1725,8 @@ export type ProductUncheckedUpdateWithoutSubCategoryInput = {
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutSubCategoryInput = {
@@ -1475,6 +1777,8 @@ export type ProductUpdateWithoutProviderInput = {
   Size?: Prisma.SizeUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutProviderInput = {
@@ -1495,6 +1799,8 @@ export type ProductUncheckedUpdateWithoutProviderInput = {
   Size?: Prisma.SizeUncheckedUpdateManyWithoutProductNestedInput
   ProductItem?: Prisma.ProductItemUncheckedUpdateManyWithoutProductNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutProductNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutProductNestedInput
+  comparisons?: Prisma.ComparisonUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutProviderInput = {
@@ -1523,6 +1829,8 @@ export type ProductCountOutputType = {
   Size: number
   ProductItem: number
   orderItems: number
+  favorites: number
+  comparisons: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1531,6 +1839,8 @@ export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   Size?: boolean | ProductCountOutputTypeCountSizeArgs
   ProductItem?: boolean | ProductCountOutputTypeCountProductItemArgs
   orderItems?: boolean | ProductCountOutputTypeCountOrderItemsArgs
+  favorites?: boolean | ProductCountOutputTypeCountFavoritesArgs
+  comparisons?: boolean | ProductCountOutputTypeCountComparisonsArgs
 }
 
 /**
@@ -1578,6 +1888,20 @@ export type ProductCountOutputTypeCountOrderItemsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.OrderItemWhereInput
 }
 
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountFavoritesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FavoriteWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountComparisonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ComparisonWhereInput
+}
+
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1600,6 +1924,8 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   Size?: boolean | Prisma.Product$SizeArgs<ExtArgs>
   ProductItem?: boolean | Prisma.Product$ProductItemArgs<ExtArgs>
   orderItems?: boolean | Prisma.Product$orderItemsArgs<ExtArgs>
+  favorites?: boolean | Prisma.Product$favoritesArgs<ExtArgs>
+  comparisons?: boolean | Prisma.Product$comparisonsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -1664,6 +1990,8 @@ export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   Size?: boolean | Prisma.Product$SizeArgs<ExtArgs>
   ProductItem?: boolean | Prisma.Product$ProductItemArgs<ExtArgs>
   orderItems?: boolean | Prisma.Product$orderItemsArgs<ExtArgs>
+  favorites?: boolean | Prisma.Product$favoritesArgs<ExtArgs>
+  comparisons?: boolean | Prisma.Product$comparisonsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1685,6 +2013,8 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     Size: Prisma.$SizePayload<ExtArgs>[]
     ProductItem: Prisma.$ProductItemPayload<ExtArgs>[]
     orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
+    favorites: Prisma.$FavoritePayload<ExtArgs>[]
+    comparisons: Prisma.$ComparisonPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2101,6 +2431,8 @@ export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.
   Size<T extends Prisma.Product$SizeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$SizeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SizePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ProductItem<T extends Prisma.Product$ProductItemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$ProductItemArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orderItems<T extends Prisma.Product$orderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  favorites<T extends Prisma.Product$favoritesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comparisons<T extends Prisma.Product$comparisonsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$comparisonsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ComparisonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2339,6 +2671,11 @@ export type ProductFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Skip the first `n` Products.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Products.
+   */
   distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
 }
 
@@ -2656,6 +2993,54 @@ export type Product$orderItemsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.OrderItemScalarFieldEnum | Prisma.OrderItemScalarFieldEnum[]
+}
+
+/**
+ * Product.favorites
+ */
+export type Product$favoritesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Favorite
+   */
+  select?: Prisma.FavoriteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Favorite
+   */
+  omit?: Prisma.FavoriteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FavoriteInclude<ExtArgs> | null
+  where?: Prisma.FavoriteWhereInput
+  orderBy?: Prisma.FavoriteOrderByWithRelationInput | Prisma.FavoriteOrderByWithRelationInput[]
+  cursor?: Prisma.FavoriteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FavoriteScalarFieldEnum | Prisma.FavoriteScalarFieldEnum[]
+}
+
+/**
+ * Product.comparisons
+ */
+export type Product$comparisonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Comparison
+   */
+  select?: Prisma.ComparisonSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Comparison
+   */
+  omit?: Prisma.ComparisonOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ComparisonInclude<ExtArgs> | null
+  where?: Prisma.ComparisonWhereInput
+  orderBy?: Prisma.ComparisonOrderByWithRelationInput | Prisma.ComparisonOrderByWithRelationInput[]
+  cursor?: Prisma.ComparisonWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ComparisonScalarFieldEnum | Prisma.ComparisonScalarFieldEnum[]
 }
 
 /**

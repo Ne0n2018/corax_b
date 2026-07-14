@@ -91,3 +91,13 @@ export const DiscountMethod = {
 } as const
 
 export type DiscountMethod = (typeof DiscountMethod)[keyof typeof DiscountMethod]
+
+
+export const NotificationType = {
+  DISCOUNT: 'DISCOUNT',
+  PROMO: 'PROMO',
+  ORDER_DECORATED: 'ORDER_DECORATED',
+  ORDER_RECEIVED: 'ORDER_RECEIVED'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

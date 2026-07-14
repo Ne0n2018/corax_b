@@ -20,6 +20,10 @@ import { OrderModule } from './order/order.module';
 import { PromotionModule } from './promotion/promotion.module';
 import { SessionModule } from './session/session.module';
 import { MetricsModule } from './metrics/metrics.module';
+import { FavoriteModule } from './favorite/favorite.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { NotificationsGateway } from './notifications/notifications.gateway';
+import { ComparisonModule } from './comparison/comparison.module';
 import 'winston-daily-rotate-file';
 
 @Module({
@@ -101,6 +105,10 @@ import 'winston-daily-rotate-file';
     SessionModule,
     MetricsModule,
     AdminModule,
+    NotificationsModule,
+    FavoriteModule,
+    ComparisonModule,
   ],
+  providers: [NotificationsGateway],
 })
 export class AppModule {}

@@ -102,3 +102,18 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type Promotion = Prisma.PromotionModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
+ * Model Favorite
+ * 
+ */
+export type Favorite = Prisma.FavoriteModel
+/**
+ * Model Comparison
+ * 
+ */
+export type Comparison = Prisma.ComparisonModel

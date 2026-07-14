@@ -32,8 +32,11 @@ model User {
   Cart     Cart?
   Order    Order[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  notifications Notification[]
+  favorites     Favorite[]
+  comparisons   Comparison[]
 
   @@map("users")
 }
@@ -124,6 +127,8 @@ model Product {
   updatedAt   DateTime      @updatedAt @map("updated_at")
   ProductItem ProductItem[]
   orderItems  OrderItem[]
+  favorites   Favorite[]
+  comparisons Comparison[]
 
   @@map("products")
 }
@@ -218,28 +223,28 @@ model Cart {
 }
 
 model PromoCode {
-  id          String @id @default(uuid())
-  code        String @unique
+  id          String  @id @default(uuid())
+  code        String  @unique
   description String?
-  
-  type        DiscountType // PERCENT, FIXED, BOGO (Buy One Get One)
-  value       Float        // Процент скидки (0-100) или фиксированная сумма
-  
+
+  type  DiscountType // PERCENT, FIXED, BOGO (Buy One Get One)
+  value Float // Процент скидки (0-100) или фиксированная сумма
+
   isActive    Boolean @default(true)
-  maxUses     Int?    // null = неограниченное
+  maxUses     Int? // null = неограниченное
   currentUses Int     @default(0)
-  
-  validFrom   DateTime @map("valid_from")
-  validUntil  DateTime @map("valid_until")
-  
+
+  validFrom  DateTime @map("valid_from")
+  validUntil DateTime @map("valid_until")
+
   minOrderAmount Float? @map("min_order_amount") // Минимальная сумма заказа
-  maxDiscount Float?    @map("max_discount")     // Максимальная скидка
-  
+  maxDiscount    Float? @map("max_discount") // Максимальная скидка
+
   applicableProducts String? @map("applicable_products") // JSON array of product IDs, null = all products
-  
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
+
   @@map("promo_codes")
 }
 
@@ -247,17 +252,17 @@ model Order {
   id        String @id @default(uuid())
   orderCode Int    @unique @map("order_code")
 
-  deliveryType      DeliveryType @map("delivery_type")
-  address           String?
-  paymentType       PaymentType  @map("payment_type")
-  status            OrderStatus  @default(PENDING)
+  deliveryType DeliveryType @map("delivery_type")
+  address      String?
+  paymentType  PaymentType  @map("payment_type")
+  status       OrderStatus  @default(PENDING)
 
-  subtotalAmount    Float        @map("subtotal_amount")
-  discountAmount    Float        @default(0) @map("discount_amount")
-  totalAmount       Float        @map("total_amount")
+  subtotalAmount Float @map("subtotal_amount")
+  discountAmount Float @default(0) @map("discount_amount")
+  totalAmount    Float @map("total_amount")
 
-  promoCode         String?      @map("promo_code")  // Используемый промокод
-  appliedPromotions Json?        @map("applied_promotions")
+  promoCode         String? @map("promo_code") // Используемый промокод
+  appliedPromotions Json?   @map("applied_promotions")
 
   bepaidToken String? @map("bepaid_token")
   bepaidUid   String? @map("bepaid_uid")
@@ -296,6 +301,70 @@ model OrderItem {
   @@map("order_items")
 }
 
+model Promotion {
+  id             String         @id @default(uuid())
+  name           String
+  imageUrl       String         @map("image_url")
+  description    String
+  type           PromotionType
+  discountMethod DiscountMethod @map("discount_method")
+  discountValue  Float          @map("discount_value")
+  buyQuantity    Int?           @map("buy_quantity")
+  getQuantity    Int?           @map("get_quantity")
+  popularTopN    Int?           @map("popular_top_n")
+  active         Boolean        @default(true)
+  expiresAt      DateTime?      @map("expires_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@map("promotions")
+}
+
+model Notification {
+  id      String           @id @default(uuid())
+  message String
+  type    NotificationType
+  read    Boolean
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  userId    String
+
+  @@index([userId])
+  @@index([userId, read])
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+}
+
+model Comparison {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
 enum DeliveryType {
   PICKUP
   DELIVERY
@@ -319,9 +388,9 @@ enum OrderStatus {
 }
 
 enum DiscountType {
-  PERCENT     // Процент скидки (value = 10 означает 10%)
-  FIXED       // Фиксированная сумма (value = 100 означает 100 рублей)
-  BOGO        // Buy One Get One (два товара по цене одного)
+  PERCENT // Процент скидки (value = 10 означает 10%)
+  FIXED // Фиксированная сумма (value = 100 означает 100 рублей)
+  BOGO // Buy One Get One (два товара по цене одного)
 }
 
 enum UserRole {
@@ -353,21 +422,9 @@ enum DiscountMethod {
   FIXED
 }
 
-model Promotion {
-  id             String         @id @default(uuid())
-  name           String
-  imageUrl       String         @map("image_url")
-  description    String
-  type           PromotionType
-  discountMethod DiscountMethod @map("discount_method")
-  discountValue  Float          @map("discount_value")
-  buyQuantity    Int?           @map("buy_quantity")
-  getQuantity    Int?           @map("get_quantity")
-  popularTopN    Int?           @map("popular_top_n")
-  active         Boolean        @default(true)
-  expiresAt      DateTime?      @map("expires_at")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-
-  @@map("promotions")
+enum NotificationType {
+  DISCOUNT
+  PROMO
+  ORDER_DECORATED
+  ORDER_RECEIVED
 }
