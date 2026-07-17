@@ -17,26 +17,28 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  email       String @unique
+  email       String    @unique
   password    String
-  displayName String
-
-  role UserRole @default(REGULAR)
+  displayName String    @map("display_name")
+  number      String?
+  birthday    DateTime?
+  address     String?
+  role        UserRole  @default(REGULAR)
 
   isVerified         Boolean @default(false) @map("is_verified")
   isTwoFactorEnabled Boolean @default(false) @map("is_two_factor_enabled")
 
   metod AuthMetod
 
-  accounts Account[]
-  Cart     Cart?
-  Order    Order[]
-
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+  accounts      Account[]
+  Cart          Cart?
+  Order         Order[]
   notifications Notification[]
   favorites     Favorite[]
   comparisons   Comparison[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -106,29 +108,32 @@ model Provider {
 }
 
 model Product {
-  id               String                  @id @default(uuid())
+  id               String      @id @default(uuid())
   name             String
-  imageUrl         String                  @map("image_url")
-  shortDescription String                  @map("short_description")
+  imageUrl         String      @map("image_url")
+  shortDescription String      @map("short_description")
   description      String
   advantages       String
   structure        String
-  formRelease      String                  @map("form_release")
-  defaultPrice     Float                   @map("default_price")
-  subCategory      SubCategory             @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  subCategoryId    String                  @map("sub_category_id")
-  Provider         Provider                @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  providerId       String                  @map("provider_id")
-  characteristic   ProductCharacteristic[]
-  Taste            Taste[]
-  Size             Size[]
+  formRelease      String      @map("form_release")
+  defaultPrice     Float       @map("default_price")
+  subCategory      SubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId    String      @map("sub_category_id")
+  Provider         Provider    @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  providerId       String      @map("provider_id")
+  monthlySales     Int         @default(0)
+  totalSales       Int         @default(0)
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  ProductItem ProductItem[]
-  orderItems  OrderItem[]
-  favorites   Favorite[]
-  comparisons Comparison[]
+  characteristic ProductCharacteristic[]
+  Taste          Taste[]
+  Size           Size[]
+  ProductItem    ProductItem[]
+  orderItems     OrderItem[]
+  favorites      Favorite[]
+  comparisons    Comparison[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("products")
 }

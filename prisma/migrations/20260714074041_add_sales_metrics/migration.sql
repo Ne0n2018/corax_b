@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "products" ADD COLUMN     "monthlySales" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "totalSales" INTEGER NOT NULL DEFAULT 0;

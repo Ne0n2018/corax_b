@@ -24,6 +24,7 @@ import { FavoriteModule } from './favorite/favorite.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 import { ComparisonModule } from './comparison/comparison.module';
+import { TopProductsModule } from './top-products/top-products.module';
 import 'winston-daily-rotate-file';
 
 @Module({
@@ -108,6 +109,7 @@ import 'winston-daily-rotate-file';
     NotificationsModule,
     FavoriteModule,
     ComparisonModule,
+    TopProductsModule,
   ],
   providers: [NotificationsGateway],
 })

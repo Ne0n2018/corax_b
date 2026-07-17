@@ -28,10 +28,14 @@ export type AggregateProduct = {
 
 export type ProductAvgAggregateOutputType = {
   defaultPrice: number | null
+  monthlySales: number | null
+  totalSales: number | null
 }
 
 export type ProductSumAggregateOutputType = {
   defaultPrice: number | null
+  monthlySales: number | null
+  totalSales: number | null
 }
 
 export type ProductMinAggregateOutputType = {
@@ -46,6 +50,8 @@ export type ProductMinAggregateOutputType = {
   defaultPrice: number | null
   subCategoryId: string | null
   providerId: string | null
+  monthlySales: number | null
+  totalSales: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +68,8 @@ export type ProductMaxAggregateOutputType = {
   defaultPrice: number | null
   subCategoryId: string | null
   providerId: string | null
+  monthlySales: number | null
+  totalSales: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -78,6 +86,8 @@ export type ProductCountAggregateOutputType = {
   defaultPrice: number
   subCategoryId: number
   providerId: number
+  monthlySales: number
+  totalSales: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -86,10 +96,14 @@ export type ProductCountAggregateOutputType = {
 
 export type ProductAvgAggregateInputType = {
   defaultPrice?: true
+  monthlySales?: true
+  totalSales?: true
 }
 
 export type ProductSumAggregateInputType = {
   defaultPrice?: true
+  monthlySales?: true
+  totalSales?: true
 }
 
 export type ProductMinAggregateInputType = {
@@ -104,6 +118,8 @@ export type ProductMinAggregateInputType = {
   defaultPrice?: true
   subCategoryId?: true
   providerId?: true
+  monthlySales?: true
+  totalSales?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -120,6 +136,8 @@ export type ProductMaxAggregateInputType = {
   defaultPrice?: true
   subCategoryId?: true
   providerId?: true
+  monthlySales?: true
+  totalSales?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -136,6 +154,8 @@ export type ProductCountAggregateInputType = {
   defaultPrice?: true
   subCategoryId?: true
   providerId?: true
+  monthlySales?: true
+  totalSales?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -239,6 +259,8 @@ export type ProductGroupByOutputType = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales: number
+  totalSales: number
   createdAt: Date
   updatedAt: Date
   _count: ProductCountAggregateOutputType | null
@@ -278,6 +300,8 @@ export type ProductWhereInput = {
   defaultPrice?: Prisma.FloatFilter<"Product"> | number
   subCategoryId?: Prisma.StringFilter<"Product"> | string
   providerId?: Prisma.StringFilter<"Product"> | string
+  monthlySales?: Prisma.IntFilter<"Product"> | number
+  totalSales?: Prisma.IntFilter<"Product"> | number
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   subCategory?: Prisma.XOR<Prisma.SubCategoryScalarRelationFilter, Prisma.SubCategoryWhereInput>
@@ -303,6 +327,8 @@ export type ProductOrderByWithRelationInput = {
   defaultPrice?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   subCategory?: Prisma.SubCategoryOrderByWithRelationInput
@@ -331,6 +357,8 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   defaultPrice?: Prisma.FloatFilter<"Product"> | number
   subCategoryId?: Prisma.StringFilter<"Product"> | string
   providerId?: Prisma.StringFilter<"Product"> | string
+  monthlySales?: Prisma.IntFilter<"Product"> | number
+  totalSales?: Prisma.IntFilter<"Product"> | number
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   subCategory?: Prisma.XOR<Prisma.SubCategoryScalarRelationFilter, Prisma.SubCategoryWhereInput>
@@ -356,6 +384,8 @@ export type ProductOrderByWithAggregationInput = {
   defaultPrice?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
@@ -380,6 +410,8 @@ export type ProductScalarWhereWithAggregatesInput = {
   defaultPrice?: Prisma.FloatWithAggregatesFilter<"Product"> | number
   subCategoryId?: Prisma.StringWithAggregatesFilter<"Product"> | string
   providerId?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  monthlySales?: Prisma.IntWithAggregatesFilter<"Product"> | number
+  totalSales?: Prisma.IntWithAggregatesFilter<"Product"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
 }
@@ -394,6 +426,8 @@ export type ProductCreateInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -419,6 +453,8 @@ export type ProductUncheckedCreateInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -440,6 +476,8 @@ export type ProductUpdateInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -465,6 +503,8 @@ export type ProductUncheckedUpdateInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -488,6 +528,8 @@ export type ProductCreateManyInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -502,6 +544,8 @@ export type ProductUpdateManyMutationInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -518,6 +562,8 @@ export type ProductUncheckedUpdateManyInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -544,12 +590,16 @@ export type ProductCountOrderByAggregateInput = {
   defaultPrice?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ProductAvgOrderByAggregateInput = {
   defaultPrice?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
 }
 
 export type ProductMaxOrderByAggregateInput = {
@@ -564,6 +614,8 @@ export type ProductMaxOrderByAggregateInput = {
   defaultPrice?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -580,12 +632,16 @@ export type ProductMinOrderByAggregateInput = {
   defaultPrice?: Prisma.SortOrder
   subCategoryId?: Prisma.SortOrder
   providerId?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ProductSumOrderByAggregateInput = {
   defaultPrice?: Prisma.SortOrder
+  monthlySales?: Prisma.SortOrder
+  totalSales?: Prisma.SortOrder
 }
 
 export type ProductScalarRelationFilter = {
@@ -793,6 +849,8 @@ export type ProductCreateWithoutSubCategoryInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   Provider: Prisma.ProviderCreateNestedOneWithoutProductsInput
@@ -816,6 +874,8 @@ export type ProductUncheckedCreateWithoutSubCategoryInput = {
   formRelease: string
   defaultPrice: number
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -868,6 +928,8 @@ export type ProductScalarWhereInput = {
   defaultPrice?: Prisma.FloatFilter<"Product"> | number
   subCategoryId?: Prisma.StringFilter<"Product"> | string
   providerId?: Prisma.StringFilter<"Product"> | string
+  monthlySales?: Prisma.IntFilter<"Product"> | number
+  totalSales?: Prisma.IntFilter<"Product"> | number
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
 }
@@ -882,6 +944,8 @@ export type ProductCreateWithoutProviderInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -905,6 +969,8 @@ export type ProductUncheckedCreateWithoutProviderInput = {
   formRelease: string
   defaultPrice: number
   subCategoryId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -952,6 +1018,8 @@ export type ProductCreateWithoutCharacteristicInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -976,6 +1044,8 @@ export type ProductUncheckedCreateWithoutCharacteristicInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   Taste?: Prisma.TasteUncheckedCreateNestedManyWithoutProductInput
@@ -1012,6 +1082,8 @@ export type ProductUpdateWithoutCharacteristicInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1036,6 +1108,8 @@ export type ProductUncheckedUpdateWithoutCharacteristicInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Taste?: Prisma.TasteUncheckedUpdateManyWithoutProductNestedInput
@@ -1056,6 +1130,8 @@ export type ProductCreateWithoutTasteInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -1080,6 +1156,8 @@ export type ProductUncheckedCreateWithoutTasteInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -1116,6 +1194,8 @@ export type ProductUpdateWithoutTasteInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1140,6 +1220,8 @@ export type ProductUncheckedUpdateWithoutTasteInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1160,6 +1242,8 @@ export type ProductCreateWithoutSizeInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -1184,6 +1268,8 @@ export type ProductUncheckedCreateWithoutSizeInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -1220,6 +1306,8 @@ export type ProductUpdateWithoutSizeInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1244,6 +1332,8 @@ export type ProductUncheckedUpdateWithoutSizeInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1264,6 +1354,8 @@ export type ProductCreateWithoutProductItemInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -1288,6 +1380,8 @@ export type ProductUncheckedCreateWithoutProductItemInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -1324,6 +1418,8 @@ export type ProductUpdateWithoutProductItemInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1348,6 +1444,8 @@ export type ProductUncheckedUpdateWithoutProductItemInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1368,6 +1466,8 @@ export type ProductCreateWithoutOrderItemsInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -1392,6 +1492,8 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -1428,6 +1530,8 @@ export type ProductUpdateWithoutOrderItemsInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1452,6 +1556,8 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1472,6 +1578,8 @@ export type ProductCreateWithoutFavoritesInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -1496,6 +1604,8 @@ export type ProductUncheckedCreateWithoutFavoritesInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -1532,6 +1642,8 @@ export type ProductUpdateWithoutFavoritesInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1556,6 +1668,8 @@ export type ProductUncheckedUpdateWithoutFavoritesInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1576,6 +1690,8 @@ export type ProductCreateWithoutComparisonsInput = {
   structure: string
   formRelease: string
   defaultPrice: number
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subCategory: Prisma.SubCategoryCreateNestedOneWithoutProductInput
@@ -1600,6 +1716,8 @@ export type ProductUncheckedCreateWithoutComparisonsInput = {
   defaultPrice: number
   subCategoryId: string
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedCreateNestedManyWithoutProductInput
@@ -1636,6 +1754,8 @@ export type ProductUpdateWithoutComparisonsInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1660,6 +1780,8 @@ export type ProductUncheckedUpdateWithoutComparisonsInput = {
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1681,6 +1803,8 @@ export type ProductCreateManySubCategoryInput = {
   formRelease: string
   defaultPrice: number
   providerId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1695,6 +1819,8 @@ export type ProductUpdateWithoutSubCategoryInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   Provider?: Prisma.ProviderUpdateOneRequiredWithoutProductsNestedInput
@@ -1718,6 +1844,8 @@ export type ProductUncheckedUpdateWithoutSubCategoryInput = {
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1740,6 +1868,8 @@ export type ProductUncheckedUpdateManyWithoutSubCategoryInput = {
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   providerId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1755,6 +1885,8 @@ export type ProductCreateManyProviderInput = {
   formRelease: string
   defaultPrice: number
   subCategoryId: string
+  monthlySales?: number
+  totalSales?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1769,6 +1901,8 @@ export type ProductUpdateWithoutProviderInput = {
   structure?: Prisma.StringFieldUpdateOperationsInput | string
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subCategory?: Prisma.SubCategoryUpdateOneRequiredWithoutProductNestedInput
@@ -1792,6 +1926,8 @@ export type ProductUncheckedUpdateWithoutProviderInput = {
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   characteristic?: Prisma.ProductCharacteristicUncheckedUpdateManyWithoutProductNestedInput
@@ -1814,6 +1950,8 @@ export type ProductUncheckedUpdateManyWithoutProviderInput = {
   formRelease?: Prisma.StringFieldUpdateOperationsInput | string
   defaultPrice?: Prisma.FloatFieldUpdateOperationsInput | number
   subCategoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlySales?: Prisma.IntFieldUpdateOperationsInput | number
+  totalSales?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1915,6 +2053,8 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   defaultPrice?: boolean
   subCategoryId?: boolean
   providerId?: boolean
+  monthlySales?: boolean
+  totalSales?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   subCategory?: boolean | Prisma.SubCategoryDefaultArgs<ExtArgs>
@@ -1941,6 +2081,8 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   defaultPrice?: boolean
   subCategoryId?: boolean
   providerId?: boolean
+  monthlySales?: boolean
+  totalSales?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   subCategory?: boolean | Prisma.SubCategoryDefaultArgs<ExtArgs>
@@ -1959,6 +2101,8 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   defaultPrice?: boolean
   subCategoryId?: boolean
   providerId?: boolean
+  monthlySales?: boolean
+  totalSales?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   subCategory?: boolean | Prisma.SubCategoryDefaultArgs<ExtArgs>
@@ -1977,11 +2121,13 @@ export type ProductSelectScalar = {
   defaultPrice?: boolean
   subCategoryId?: boolean
   providerId?: boolean
+  monthlySales?: boolean
+  totalSales?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "imageUrl" | "shortDescription" | "description" | "advantages" | "structure" | "formRelease" | "defaultPrice" | "subCategoryId" | "providerId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "imageUrl" | "shortDescription" | "description" | "advantages" | "structure" | "formRelease" | "defaultPrice" | "subCategoryId" | "providerId" | "monthlySales" | "totalSales" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subCategory?: boolean | Prisma.SubCategoryDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
@@ -2028,6 +2174,8 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     defaultPrice: number
     subCategoryId: string
     providerId: string
+    monthlySales: number
+    totalSales: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["product"]>
@@ -2473,6 +2621,8 @@ export interface ProductFieldRefs {
   readonly defaultPrice: Prisma.FieldRef<"Product", 'Float'>
   readonly subCategoryId: Prisma.FieldRef<"Product", 'String'>
   readonly providerId: Prisma.FieldRef<"Product", 'String'>
+  readonly monthlySales: Prisma.FieldRef<"Product", 'Int'>
+  readonly totalSales: Prisma.FieldRef<"Product", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>
 }

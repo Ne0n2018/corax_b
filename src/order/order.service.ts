@@ -14,10 +14,15 @@ import { MetricsService } from '../metrics/metrics.service';
 import { PromoCodeService } from './promo/promo-code.service';
 import { PromotionService } from '../promotion/promotion.service';
 import type { Prisma } from '../generated/prisma/client';
-import { CreateOrderDto, DeliveryType, PaymentType } from './dto/create-order.dto';
+import {
+  CreateOrderDto,
+  DeliveryType,
+  PaymentType,
+} from './dto/create-order.dto';
 import type { BePaidWebhookDto } from './dto/bepaid-webhook.dto';
 import * as React from 'react';
 import OrderConfirmTemplate from '../libs/mail/templates/order.confirm.template';
+import { TopProductsService } from '../top-products/top-products.service';
 
 @Injectable()
 export class OrderService {
@@ -33,6 +38,7 @@ export class OrderService {
     private readonly metricsService: MetricsService,
     private readonly promoCodeService: PromoCodeService,
     private readonly promotionService: PromotionService,
+    private readonly topService: TopProductsService,
   ) {}
 
   // ─── Приватные утилиты ──────────────────────────────────────────────────────
@@ -79,27 +85,36 @@ export class OrderService {
     const promotionsDiscount = promotionResult.totalDiscount || 0;
 
     const subtotalAmount = cart.totalAmount;
-    const subtotalAfterPromotions = round2(Math.max(0, subtotalAmount - promotionsDiscount));
+    const subtotalAfterPromotions = round2(
+      Math.max(0, subtotalAmount - promotionsDiscount),
+    );
 
     // 5. Рассчитываем скидку по промокоду (если передан) на сумму уже после акций
     let promoDiscount = 0;
     let appliedPromoCode: string | null = null;
     if (promoCode) {
-      const productIds = cart.CartItem.map((item) => item.productItem.product.id);
-      const validation = await this.promoCodeService.validateAndCalculateDiscount(
-        promoCode,
-        subtotalAfterPromotions,
-        productIds,
+      const productIds = cart.CartItem.map(
+        (item) => item.productItem.product.id,
       );
+      const validation =
+        await this.promoCodeService.validateAndCalculateDiscount(
+          promoCode,
+          subtotalAfterPromotions,
+          productIds,
+        );
 
       if (!validation.isValid) {
-        throw new BadRequestException(validation.error || 'Ошибка применения промокода');
+        throw new BadRequestException(
+          validation.error || 'Ошибка применения промокода',
+        );
       }
       promoDiscount = validation.discountAmount ?? 0;
       if (promoDiscount > 0) appliedPromoCode = promoCode.trim().toUpperCase();
     }
 
-    const totalDiscount = round2(Math.min(subtotalAmount, promotionsDiscount + promoDiscount));
+    const totalDiscount = round2(
+      Math.min(subtotalAmount, promotionsDiscount + promoDiscount),
+    );
     const totalAmount = Math.max(0, round2(subtotalAmount - totalDiscount));
 
     // 6. Генерируем уникальный 6-значный цифровой код заказа
@@ -117,7 +132,8 @@ export class OrderService {
         discountAmount: totalDiscount,
         totalAmount,
         promoCode: appliedPromoCode,
-        appliedPromotions: promotionResult.breakdown as unknown as Prisma.InputJsonValue,
+        appliedPromotions:
+          promotionResult.breakdown as unknown as Prisma.InputJsonValue,
         // ONLINE → PENDING (ждём оплату), CASH/CARD → PROCESSING (уже можно собирать)
         status: paymentType === PaymentType.ONLINE ? 'PENDING' : 'PROCESSING',
         items: {
@@ -149,7 +165,9 @@ export class OrderService {
     const orderWithItems = order as unknown as OrderWithItems;
     if (paymentType !== PaymentType.ONLINE) {
       this.sendOrderConfirmEmail(user, orderWithItems).catch((err) =>
-        this.logger.error(`Не удалось отправить письмо для заказа ${order.id}: ${err.message}`),
+        this.logger.error(
+          `Не удалось отправить письмо для заказа ${order.id}: ${err.message}`,
+        ),
       );
       this.recordProductSales(orderWithItems);
     }
@@ -215,9 +233,7 @@ export class OrderService {
     }
 
     if (order.status !== 'PENDING') {
-      throw new BadRequestException(
-        'Заказ уже оплачен или отменён',
-      );
+      throw new BadRequestException('Заказ уже оплачен или отменён');
     }
 
     const user = await this.userService.findById(userId);
@@ -283,7 +299,9 @@ export class OrderService {
     // Не обрабатываем тестовые транзакции в продакшене и наоборот
     const isProduction = this.configService.get('NODE_ENV') === 'production';
     if (isProduction && transaction.test) {
-      this.logger.warn('bePaid webhook: ignoring test transaction in production');
+      this.logger.warn(
+        'bePaid webhook: ignoring test transaction in production',
+      );
       return;
     }
 
@@ -334,16 +352,16 @@ export class OrderService {
       user.email,
       `Заказ №${order.orderCode} принят`,
       React.createElement(OrderConfirmTemplate, {
-        email:        user.email,
-        name:         user.displayName,
-        orderCode:    order.orderCode,
+        email: user.email,
+        name: user.displayName,
+        orderCode: order.orderCode,
         deliveryType: order.deliveryType as DeliveryType,
-        address:      order.address,
-        items:        order.items.map((item) => ({
+        address: order.address,
+        items: order.items.map((item) => ({
           productName: item.productName,
-          taste:       item.taste,
-          size:        item.size,
-          quantity:    item.quantity,
+          taste: item.taste,
+          size: item.size,
+          quantity: item.quantity,
         })),
       }),
     );
@@ -362,6 +380,7 @@ export class OrderService {
         item.size,
         item.quantity,
       );
+      this.topService.incrementSales(item.id, item.quantity);
     }
   }
 
@@ -399,5 +418,11 @@ type OrderWithItems = {
   orderCode: number;
   deliveryType: string;
   address: string | null;
-  items: { productName: string; taste: string; size: string; quantity: number }[];
+  items: {
+    id: string;
+    productName: string;
+    taste: string;
+    size: string;
+    quantity: number;
+  }[];
 };
