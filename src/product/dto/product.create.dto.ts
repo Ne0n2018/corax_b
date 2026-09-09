@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CharacteristicCreateDto } from './characteristic.create.dto';
 import { TasteCreateDto } from './taste.create.dto';
@@ -96,4 +96,11 @@ export class ProductCreateDto {
     example: [{ name: 'XL', price: 1590 }],
   })
   size: SizeCreateDto[];
+  @IsBoolean({ message: 'Маркер одежды должен быть булевым значением' })
+  @IsNotEmpty()
+  @ApiProperty({
+    type: Boolean,
+    example: false,
+  })
+  isClothes: boolean;
 }

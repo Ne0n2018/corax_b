@@ -1,53 +1,59 @@
 # syntax=docker/dockerfile:1
 
-# Stage 1: общий базовый образ
-FROM node:20-alpine AS base
+# Stage 1: Base
+FROM node:22-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache dumb-init
 
-# Stage 2: все зависимости (включая dev — нужны для сборки и Prisma CLI)
-FROM base AS dependencies
-COPY package*.json ./
-RUN npm i --include=dev
+# Включаем pnpm через corepack, создаем директорию и задаем права
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && mkdir -p /pnpm && chown -R node:node /pnpm
 
-# Stage 3: production-зависимости отдельно
-FROM dependencies AS prod-deps
-WORKDIR /prod-deps
-COPY package*.json ./
-RUN npm i --omit=dev && npm install prisma
+# Stage 2: Сборка
+FROM base AS builder
+WORKDIR /app
 
-# Stage 4: сборка приложения и генерация Prisma-клиента
-FROM dependencies AS builder
+# Копируем манифесты
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY prisma ./prisma/
+
+# Кэшируем глобальный store pnpm между сборками
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Генерируем Prisma Client
+RUN pnpm exec prisma generate
+
+# Копируем остальной код и собираем NestJS
 COPY . .
-RUN npx prisma generate
-RUN npm run build
+RUN pnpm run build
 
-# Stage 5: production-контейнер
+# Удаляем devDependencies (Prisma Client останется)
+RUN pnpm prune --prod
+
+# Stage 3: Production
 FROM base AS production
 ENV NODE_ENV=production
 WORKDIR /app
 
-# Копируем production node_modules
-COPY --from=prod-deps /prod-deps/node_modules ./node_modules
+# Передаем права на рабочую директорию
+RUN chown node:node /app
 
-# Копируем собранное приложение, схему и конфиг Prisma
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/package.json ./
+COPY --from=builder --chown=node:node /app/pnpm-lock.yaml ./
+COPY --from=builder --chown=node:node /app/prisma ./prisma
 
-# Директория для логов и непривилегированный пользователь
-RUN mkdir -p /app/logs && chown -R node:node /app
+# Копируем конфигурационный файл Prisma с поддержкой любых расширений и с правильными правами
+COPY --from=builder --chown=node:node /app/prisma.config.* ./
+COPY --from=builder --chown=node:node /app/docker-entrypoint.sh ./
 
-COPY --chown=node:node docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+RUN mkdir -p /app/logs && chown node:node /app/logs && chmod +x docker-entrypoint.sh
 
 USER node
-
 EXPOSE 4000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:4000/metrics', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
-
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["./docker-entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "--", "./docker-entrypoint.sh"]
+CMD ["node", "dist/main.js"]

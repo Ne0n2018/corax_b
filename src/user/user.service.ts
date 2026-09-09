@@ -59,6 +59,9 @@ export class UserService {
       },
       data: {
         displayName: data.name,
+        address: data.address,
+        birthday: data.birthday,
+        number: data.number,
       },
     });
   }

@@ -26,7 +26,7 @@ export default function ConfirmationTemplate({
   token,
   name,
 }: ConfirmationTemplateProps) {
-  const confirmLink = `${domain}/verify/new-verification?token=${token}`;
+  const confirmLink = `${domain}/verify/new-verification?vToken=${token}`;
 
   return (
     <Html>

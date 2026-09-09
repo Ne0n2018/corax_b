@@ -8,7 +8,6 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { join } from 'path';
 import { SESSION_MIDDLEWARE } from './session/session.provider';
 import type { RequestHandler } from 'express';
 
@@ -16,14 +15,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const config = app.get(ConfigService);
-  const isProd = config.get('NODE_ENV') === 'production';
-
-  // В dev раздаём ws-test.html по адресу http://localhost:4000/ws-test.html
-  // Регистрируем ДО всех middleware и фильтров, иначе глобальный HttpExceptionFilter
-  // перехватит 404 раньше, чем express.static успеет отдать файл
-  if (!isProd) {
-    app.useStaticAssets(join(process.cwd()), { index: false });
-  }
 
   app.use(cookieParser(config.getOrThrow('COOKIES_SECRET')));
   app.useGlobalPipes(
@@ -36,22 +27,34 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.set('trust proxy', true);
 
   // Берём session middleware из DI-контейнера (создан в SessionModule)
   const sessionMiddleware = app.get<RequestHandler>(SESSION_MIDDLEWARE);
   app.use(sessionMiddleware);
 
   app.enableCors({
+    // 1. Строгий контроль источника (никаких '*')
     origin: config.getOrThrow<string>('ALLOWED_ORIGIN'),
+
+    // 2. Разрешаем куки/сессии только для доверенного origin
     credentials: true,
-    // @ts-ignore
-    exposeHeaders: ['set-cookie'],
+
+    // 3. Жесткий белый список HTTP-методов (блокируем TRACE, OPTIONS и прочий мусор)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+
+    // 4. Жесткий белый список заголовков от клиента (никаких '*')
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+
+    // 5. Кэширование preflight-запросов (OPTIONS) на 24 часа
+    maxAge: 86400,
   });
 
   const configSwagger = new DocumentBuilder()
     .setTitle('Corax API')
     .setDescription('API для магазина спортивного питания Corax')
     .setVersion('1.0.0')
+    .addServer('/api', 'Production / Nginx Proxy')
     .addCookieAuth(config.getOrThrow('SESSION_NAME'), {
       type: 'apiKey',
       in: 'cookie',
@@ -61,25 +64,17 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, configSwagger);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('swagger', app, document);
 
   await app.listen(config.getOrThrow<number>('APPLICATION_PORT'));
 
   const appUrl = config.getOrThrow('APPLICATION_URL');
-  Logger.log(
-    `сервер запущен по адресу ${appUrl}`,
-  );
-  Logger.log(
-    `сваггер запущен по адресу ${appUrl}/api`,
-  );
-  Logger.log(
-    `тестирование сокета запущено по адресу ${appUrl}/ws-test.html`,
-  );
-  Logger.log(
-    `метрики Prometheus доступны по адресу ${appUrl}/metrics`,
-  );
+  Logger.log(`сервер запущен по адресу ${appUrl}`);
+  Logger.log(`сваггер запущен по адресу ${appUrl}/swagger`);
   // Construct Grafana URL by replacing port in APPLICATION_URL with 3000
-  const grafanaUrl = appUrl.replace(/:(\d+)$/, ':3000').replace(/:(\d+)\//, ':3000/');
+  const grafanaUrl = appUrl
+    .replace(/:(\d+)$/, ':3000')
+    .replace(/:(\d+)\//, ':3000/');
   Logger.log(
     `Grafana доступна по адресу ${grafanaUrl} (логин: ${process.env.GRAFANA_ADMIN_USER || 'admin'}, пароль: ${process.env.GRAFANA_ADMIN_PASSWORD || 'admin'})`,
   );

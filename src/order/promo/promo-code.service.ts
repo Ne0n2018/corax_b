@@ -176,7 +176,7 @@ export class PromoCodeService {
     if (!promoCode) {
       throw new NotFoundException('Промокод не найден');
     }
-    return this.prismaService.promoCode.update({
+    await this.prismaService.promoCode.update({
       where: { id },
       data: {
         code: data.code.toUpperCase(),
@@ -193,6 +193,8 @@ export class PromoCodeService {
           : null,
       },
     });
+
+    return { message: 'Промокод успешно обновлен' };
   }
 
   async deletePromoCode(id: string) {
@@ -204,6 +206,12 @@ export class PromoCodeService {
       throw new NotFoundException('промокод не найден');
     }
 
-    return this.prismaService.promoCode.delete({ where: { id } });
+    await this.prismaService.promoCode.delete({ where: { id } });
+
+    return { message: 'Промокод успешно удален' };
+  }
+
+  async getAllPromoCodes() {
+    return this.prismaService.promoCode.findMany();
   }
 }

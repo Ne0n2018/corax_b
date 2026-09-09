@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { S3Service } from '../libs/s3/s3.service';
@@ -8,13 +10,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PromotionCreateDto } from './dto/promotion.create.dto';
 import { PromotionUpdateDto } from './dto/promotion.update.dto';
 import { PromotionFilterDto } from './dto/promotion.filter.dto';
-import {
-  DiscountMethod,
-  PromotionType,
-} from '../generated/prisma/enums';
-import type { Prisma } from '../generated/prisma/client';
+import { DiscountMethod, PromotionType } from '../generated/prisma/enums';
+import type { Prisma, Promotion } from '../generated/prisma/client';
+import type { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
-/** Одна применённая акция в чеке — сохраняется в order.appliedPromotions. */
 export interface AppliedPromotion {
   promotionId: string;
   name: string;
@@ -27,7 +27,6 @@ export interface DiscountResult {
   breakdown: AppliedPromotion[];
 }
 
-/** Минимальная форма корзины, нужная движку скидок. */
 interface CartForDiscount {
   totalAmount: number;
   CartItem: {
@@ -45,7 +44,30 @@ export class PromotionService {
   public constructor(
     private readonly s3Service: S3Service,
     private readonly prismaService: PrismaService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
+
+  /**
+   * Вспомогательный метод для сброса кэша акций при изменениях.
+   */
+  private async clearCache(id?: string): Promise<void> {
+    if (id) {
+      await this.cacheManager.del(`promotion:${id}`);
+    }
+    await this.cacheManager.del('promotions:active');
+
+    const store = this.cacheManager.stores as any;
+    if (store.client?.keys) {
+      // Сбрасываем списки акций и кэшированные топы популярных товаров
+      const listKeys = await store.client.keys('promotions:list:*');
+      const popularKeys = await store.client.keys('promotions:popular_top:*');
+      const keysToDelete = [...listKeys, ...popularKeys];
+
+      if (keysToDelete.length > 0) {
+        await store.client.del(keysToDelete);
+      }
+    }
+  }
 
   // ─── Публичные CRUD-методы ──────────────────────────────────────────────────
 
@@ -59,7 +81,7 @@ export class PromotionService {
       mimetype,
     );
 
-    return this.prismaService.promotion.create({
+    await this.prismaService.promotion.create({
       data: {
         name: dto.name,
         imageUrl,
@@ -74,6 +96,10 @@ export class PromotionService {
         expiresAt: dto.expiresAt ?? null,
       },
     });
+
+    await this.clearCache();
+
+    return { message: 'Скидка успешно создана' };
   }
 
   public async update(
@@ -87,15 +113,15 @@ export class PromotionService {
 
     if (dto.name !== undefined) updateData.name = dto.name;
     if (dto.description !== undefined) updateData.description = dto.description;
-    if (dto.discountValue !== undefined) updateData.discountValue = dto.discountValue;
+    if (dto.discountValue !== undefined)
+      updateData.discountValue = dto.discountValue;
     if (dto.buyQuantity !== undefined) updateData.buyQuantity = dto.buyQuantity;
     if (dto.getQuantity !== undefined) updateData.getQuantity = dto.getQuantity;
     if (dto.popularTopN !== undefined) updateData.popularTopN = dto.popularTopN;
     if (dto.active !== undefined) updateData.active = dto.active === 'true';
-    if (dto.expiresAt !== undefined) updateData.expiresAt = dto.expiresAt ?? null;
+    if (dto.expiresAt !== undefined)
+      updateData.expiresAt = dto.expiresAt ?? null;
 
-    // type неизменяем после создания — игнорируем.
-    // Согласованность полей по типу проверяем по уже сохранённым + новым значениям.
     this.validateTypeFields({
       type: existing.type,
       discountMethod: existing.discountMethod,
@@ -115,20 +141,33 @@ export class PromotionService {
       );
     }
 
-    return this.prismaService.promotion.update({
+    await this.prismaService.promotion.update({
       where: { id },
       data: updateData,
     });
+
+    await this.clearCache(id);
+
+    return { message: 'Скидка успешно обновлена' };
   }
 
   public async delete(id: string) {
     const existing = await this.findById(id);
     await this.s3Service.deleteByUrl(existing.imageUrl);
     await this.prismaService.promotion.delete({ where: { id } });
-    return true;
+
+    await this.clearCache(id);
+
+    return { message: 'Скидка успешно удалена' };
   }
 
   public async getAll(dto: PromotionFilterDto) {
+    const cacheKey = `promotions:list:${JSON.stringify(dto)}`;
+    const cachedData = await this.cacheManager.get(cacheKey);
+    if (cachedData) {
+      return cachedData as Promotion[];
+    }
+
     const { name, type, active, page = 1, limit = 20 } = dto;
     const skip = (page - 1) * limit;
 
@@ -150,26 +189,42 @@ export class PromotionService {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        omit: {
+          createdAt: true,
+          updatedAt: true,
+        },
       }),
       this.prismaService.promotion.count({ where }),
     ]);
 
-    return { items, total };
+    const result = { items, total };
+    await this.cacheManager.set(cacheKey, result, 120000); // 2 минуты
+
+    return result;
   }
 
   public async getById(id: string) {
-    return this.findById(id);
+    const cacheKey = `promotion:${id}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) {
+      return cached as Promotion;
+    }
+
+    const promotion = await this.findById(id);
+    await this.cacheManager.set(cacheKey, promotion, 600000); // 10 минут
+
+    return promotion;
   }
 
-  /**
-   * Активные акции для публичного каталога.
-   * Возвращает только name/imageUrl/description/expiresAt.
-   * Активной считается: active=true, дата начала (createdAt) <= сейчас,
-   * и не истекла (expiresAt > сейчас или null).
-   */
   public async getActive() {
+    const cacheKey = 'promotions:active';
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const now = new Date();
-    return this.prismaService.promotion.findMany({
+    const activePromotions = await this.prismaService.promotion.findMany({
       where: {
         active: true,
         createdAt: { lte: now },
@@ -183,14 +238,14 @@ export class PromotionService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    await this.cacheManager.set(cacheKey, activePromotions, 300000); // 5 минут
+
+    return activePromotions;
   }
 
   // ─── Движок применения скидок ───────────────────────────────────────────────
 
-  /**
-   * Считает суммарную скидку по всем активным акциям для текущей корзины.
-   * Скидка не может превышать сумму корзины.
-   */
   public async calculateDiscount(
     cart: CartForDiscount,
     user: { id: string },
@@ -227,7 +282,6 @@ export class PromotionService {
     return { totalDiscount, breakdown };
   }
 
-  /** Активна ли акция в момент `now`. */
   private isActive(
     promo: {
       active: boolean;
@@ -243,7 +297,6 @@ export class PromotionService {
     );
   }
 
-  /** Скидка по одной акции (без ограничения общей суммой). */
   private async computePromoDiscount(
     promo: {
       id: string;
@@ -269,10 +322,6 @@ export class PromotionService {
     }
   }
 
-  /**
-   * FIRST_ORDER: скидка на первый заказ.
-   * Считаем ВСЕ заказы юзера (даже отменённые) — анти-абуз.
-   */
   private async computeFirstOrder(
     promo: {
       discountMethod: DiscountMethod;
@@ -286,16 +335,13 @@ export class PromotionService {
     });
     if (orderCount > 0) return 0;
 
-    return this.applyMethod(promo.discountMethod, promo.discountValue, subtotal);
+    return this.applyMethod(
+      promo.discountMethod,
+      promo.discountValue,
+      subtotal,
+    );
   }
 
-  /**
-   * BUY_X_GET_Y: «1+1=3».
-   * Группируем корзину по productId; на каждые (buyQuantity+getQuantity) штук
-   * getQuantity достаются бесплатно. Бесплатные единицы списываем с самых
-   * дешёвых линий этого товара.
-   * discountMethod/discountValue игнорируются.
-   */
   private computeBuyXGetY(
     promo: {
       buyQuantity: number | null;
@@ -307,8 +353,6 @@ export class PromotionService {
     const get = promo.getQuantity ?? 0;
     if (buy < 1 || get < 1) return 0;
 
-    // Линии корзины, сгруппированные по productId, отсортированные по цене
-    // внутри группы (дешёвые первыми — списываем их).
     const lines = cart.CartItem.map((item) => ({
       productId: item.productItem.productId,
       price: item.productItem.price,
@@ -330,7 +374,6 @@ export class PromotionService {
       const freeCount = Math.floor(totalQty / groupSize) * get;
       if (freeCount <= 0) continue;
 
-      // Списываем бесплатные единицы с самых дешёвых линий.
       let remaining = freeCount;
       for (const line of arr) {
         if (remaining <= 0) break;
@@ -344,10 +387,7 @@ export class PromotionService {
   }
 
   /**
-   * POPULAR: скидка на топ-N самых покупаемых товаров.
-   * Топ считается по всем order_items (статусы не фильтруем — это история
-   * покупок, а не текущие корзины).
-   * Скидка применяется к линиям корзины, чей productId входит в топ-N.
+   * Кэширование агрегации популярных товаров для исключения нагрузок на базу
    */
   private async computePopular(
     promo: {
@@ -360,19 +400,28 @@ export class PromotionService {
     const topN = promo.popularTopN ?? 0;
     if (topN < 1) return 0;
 
-    const grouped = await this.prismaService.orderItem.groupBy({
-      by: ['productId'],
-      _sum: { quantity: true },
-      orderBy: { _sum: { quantity: 'desc' } },
-      take: topN,
-    });
+    const cacheKey = `promotions:popular_top:${topN}`;
+    let topProductIds = await this.cacheManager.get<string[]>(cacheKey);
 
-    const topProductIds = new Set(grouped.map((g) => g.productId));
-    if (topProductIds.size === 0) return 0;
+    if (!topProductIds) {
+      const grouped = await this.prismaService.orderItem.groupBy({
+        by: ['productId'],
+        _sum: { quantity: true },
+        orderBy: { _sum: { quantity: 'desc' } },
+        take: topN,
+      });
+
+      topProductIds = grouped.map((g) => g.productId);
+      // Сохраняем список популярных ID в кэше на 1 час (3 600 000 мс)
+      await this.cacheManager.set(cacheKey, topProductIds, 3600000);
+    }
+
+    const topSet = new Set(topProductIds);
+    if (topSet.size === 0) return 0;
 
     let discount = 0;
     for (const item of cart.CartItem) {
-      if (!topProductIds.has(item.productItem.productId)) continue;
+      if (!topSet.has(item.productItem.productId)) continue;
       const lineSubtotal = item.productItem.price * item.quantity;
       discount += this.applyMethod(
         promo.discountMethod,
@@ -385,12 +434,6 @@ export class PromotionService {
     return discount;
   }
 
-  /**
-   * Применяет метод скидки.
-   * PERCENT: base * value/100.
-   * FIXED: min(value * qty, base) — фиксированная сумма на единицу, ограничена
-   * суммой линии (по умолчанию qty=1 для FIRST_ORDER, где base = subtotal).
-   */
   private applyMethod(
     method: DiscountMethod,
     value: number,
@@ -400,7 +443,6 @@ export class PromotionService {
     if (method === DiscountMethod.PERCENT) {
       return (base * value) / 100;
     }
-    // FIXED
     return Math.min(value * qty, base);
   }
 
@@ -409,6 +451,10 @@ export class PromotionService {
   private async findById(id: string) {
     const promotion = await this.prismaService.promotion.findUnique({
       where: { id },
+      omit: {
+        createdAt: true,
+        updatedAt: true,
+      },
     });
     if (!promotion) {
       throw new NotFoundException('Акция не найдена');
@@ -416,10 +462,6 @@ export class PromotionService {
     return promotion;
   }
 
-  /**
-   * Сервис-side валидация связки полей по типу акции.
-   * Конвенция проекта — мягкая DTO-валидация + проверки в сервисе.
-   */
   private validateTypeFields(fields: {
     type: PromotionType;
     discountMethod: DiscountMethod;
@@ -463,7 +505,6 @@ export class PromotionService {
   }
 }
 
-/** Округление до копеек, чтобы избежать накопления float-погрешности. */
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }

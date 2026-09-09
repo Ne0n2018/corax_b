@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.util';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -25,7 +25,13 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 import { ComparisonModule } from './comparison/comparison.module';
 import { TopProductsModule } from './top-products/top-products.module';
+import { TwoFactorModule } from './two-factor/two-factor.module';
 import 'winston-daily-rotate-file';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { APP_GUARD } from '@nestjs/core';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -89,6 +95,17 @@ import 'winston-daily-rotate-file';
         };
       },
     }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: await redisStore({
+          url: configService.getOrThrow<string>('REDIS_URI'),
+          ttl: 6 * 1000,
+        }),
+      }),
+    }),
     PrismaModule,
     AuthModule,
     UserModule,
@@ -110,7 +127,29 @@ import 'winston-daily-rotate-file';
     FavoriteModule,
     ComparisonModule,
     TopProductsModule,
+    TwoFactorModule,
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'short',
+          ttl: 1000,
+          limit: 50,
+        },
+        {
+          name: 'medium',
+          ttl: 10000,
+          limit: 100,
+        },
+      ],
+      storage: new ThrottlerStorageRedisService(process.env.REDIS_URI),
+    }),
   ],
-  providers: [NotificationsGateway],
+  providers: [
+    NotificationsGateway,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

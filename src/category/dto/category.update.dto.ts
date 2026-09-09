@@ -1,9 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
+import { SubCategoryUpdateDto } from './subCategory.update.dto';
 
 export class CategoryUpdateDto {
-  @ApiProperty({ description: 'имя категории', example: 'Протеин' })
+  @IsOptional()
+  @ApiProperty({
+    description: 'имя категории',
+    example: 'Протеин',
+    required: false,
+  })
   @IsString({ message: 'Имя категории должно быть стракой' })
-  @IsNotEmpty({ message: 'Имя категории не должно быть пустым' })
-  name: string;
+  name?: string;
+
+  @ApiPropertyOptional({
+    type: () => [SubCategoryUpdateDto],
+    description: 'Массив подкатегорий, создаваемых вместе с категорией',
+    example: [{ name: 'Протеины' }, { name: 'Аминокислоты' }],
+    required: false,
+  })
+  subCategory?: SubCategoryUpdateDto[];
 }

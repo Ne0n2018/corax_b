@@ -5,15 +5,19 @@ import {
   HttpStatus,
   Param,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { ProviderResponseDto } from './dto/response/provider.response.dto';
 import { ProviderFilterDto } from './dto/provider.filter.dto';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import ms from '../libs/common/utils/ms.util';
 
 @ApiTags('manufacturer')
 @Controller('providers')
+@UseInterceptors(CacheInterceptor)
 export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
 
@@ -24,6 +28,7 @@ export class ProviderController {
   })
   @ApiOperation({ summary: 'получение всех поставщиков' })
   @ApiQuery({ name: 'name', type: 'string', required: false })
+  @CacheTTL(ms('1d'))
   public async findAll(@Query() filterDto: ProviderFilterDto) {
     const providers = await this.providerService.findAll(filterDto);
 
@@ -47,6 +52,7 @@ export class ProviderController {
     description: 'Поставщика с таким айди не был найден',
   })
   @ApiOperation({ summary: 'Получение поставщика по айди' })
+  @CacheTTL(ms('1d'))
   public async findById(@Param('id') id: string) {
     const provider = await this.providerService.findById(id);
     return plainToInstance(ProviderResponseDto, provider);

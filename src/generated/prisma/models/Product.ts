@@ -43,6 +43,7 @@ export type ProductMinAggregateOutputType = {
   name: string | null
   imageUrl: string | null
   shortDescription: string | null
+  isClothes: boolean | null
   description: string | null
   advantages: string | null
   structure: string | null
@@ -61,6 +62,7 @@ export type ProductMaxAggregateOutputType = {
   name: string | null
   imageUrl: string | null
   shortDescription: string | null
+  isClothes: boolean | null
   description: string | null
   advantages: string | null
   structure: string | null
@@ -79,6 +81,7 @@ export type ProductCountAggregateOutputType = {
   name: number
   imageUrl: number
   shortDescription: number
+  isClothes: number
   description: number
   advantages: number
   structure: number
@@ -111,6 +114,7 @@ export type ProductMinAggregateInputType = {
   name?: true
   imageUrl?: true
   shortDescription?: true
+  isClothes?: true
   description?: true
   advantages?: true
   structure?: true
@@ -129,6 +133,7 @@ export type ProductMaxAggregateInputType = {
   name?: true
   imageUrl?: true
   shortDescription?: true
+  isClothes?: true
   description?: true
   advantages?: true
   structure?: true
@@ -147,6 +152,7 @@ export type ProductCountAggregateInputType = {
   name?: true
   imageUrl?: true
   shortDescription?: true
+  isClothes?: true
   description?: true
   advantages?: true
   structure?: true
@@ -252,6 +258,7 @@ export type ProductGroupByOutputType = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes: boolean
   description: string
   advantages: string
   structure: string
@@ -293,6 +300,7 @@ export type ProductWhereInput = {
   name?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringFilter<"Product"> | string
   shortDescription?: Prisma.StringFilter<"Product"> | string
+  isClothes?: Prisma.BoolFilter<"Product"> | boolean
   description?: Prisma.StringFilter<"Product"> | string
   advantages?: Prisma.StringFilter<"Product"> | string
   structure?: Prisma.StringFilter<"Product"> | string
@@ -320,6 +328,7 @@ export type ProductOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  isClothes?: Prisma.SortOrder
   description?: Prisma.SortOrder
   advantages?: Prisma.SortOrder
   structure?: Prisma.SortOrder
@@ -350,6 +359,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringFilter<"Product"> | string
   shortDescription?: Prisma.StringFilter<"Product"> | string
+  isClothes?: Prisma.BoolFilter<"Product"> | boolean
   description?: Prisma.StringFilter<"Product"> | string
   advantages?: Prisma.StringFilter<"Product"> | string
   structure?: Prisma.StringFilter<"Product"> | string
@@ -377,6 +387,7 @@ export type ProductOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  isClothes?: Prisma.SortOrder
   description?: Prisma.SortOrder
   advantages?: Prisma.SortOrder
   structure?: Prisma.SortOrder
@@ -403,6 +414,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Product"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"Product"> | string
   shortDescription?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  isClothes?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   description?: Prisma.StringWithAggregatesFilter<"Product"> | string
   advantages?: Prisma.StringWithAggregatesFilter<"Product"> | string
   structure?: Prisma.StringWithAggregatesFilter<"Product"> | string
@@ -421,6 +433,7 @@ export type ProductCreateInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -446,6 +459,7 @@ export type ProductUncheckedCreateInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -471,6 +485,7 @@ export type ProductUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -496,6 +511,7 @@ export type ProductUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -521,6 +537,7 @@ export type ProductCreateManyInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -539,6 +556,7 @@ export type ProductUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -555,6 +573,7 @@ export type ProductUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -583,6 +602,7 @@ export type ProductCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  isClothes?: Prisma.SortOrder
   description?: Prisma.SortOrder
   advantages?: Prisma.SortOrder
   structure?: Prisma.SortOrder
@@ -607,6 +627,7 @@ export type ProductMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  isClothes?: Prisma.SortOrder
   description?: Prisma.SortOrder
   advantages?: Prisma.SortOrder
   structure?: Prisma.SortOrder
@@ -625,6 +646,7 @@ export type ProductMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  isClothes?: Prisma.SortOrder
   description?: Prisma.SortOrder
   advantages?: Prisma.SortOrder
   structure?: Prisma.SortOrder
@@ -844,6 +866,7 @@ export type ProductCreateWithoutSubCategoryInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -868,6 +891,7 @@ export type ProductUncheckedCreateWithoutSubCategoryInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -921,6 +945,7 @@ export type ProductScalarWhereInput = {
   name?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringFilter<"Product"> | string
   shortDescription?: Prisma.StringFilter<"Product"> | string
+  isClothes?: Prisma.BoolFilter<"Product"> | boolean
   description?: Prisma.StringFilter<"Product"> | string
   advantages?: Prisma.StringFilter<"Product"> | string
   structure?: Prisma.StringFilter<"Product"> | string
@@ -939,6 +964,7 @@ export type ProductCreateWithoutProviderInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -963,6 +989,7 @@ export type ProductUncheckedCreateWithoutProviderInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1013,6 +1040,7 @@ export type ProductCreateWithoutCharacteristicInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1037,6 +1065,7 @@ export type ProductUncheckedCreateWithoutCharacteristicInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1077,6 +1106,7 @@ export type ProductUpdateWithoutCharacteristicInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1101,6 +1131,7 @@ export type ProductUncheckedUpdateWithoutCharacteristicInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1125,6 +1156,7 @@ export type ProductCreateWithoutTasteInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1149,6 +1181,7 @@ export type ProductUncheckedCreateWithoutTasteInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1189,6 +1222,7 @@ export type ProductUpdateWithoutTasteInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1213,6 +1247,7 @@ export type ProductUncheckedUpdateWithoutTasteInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1237,6 +1272,7 @@ export type ProductCreateWithoutSizeInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1261,6 +1297,7 @@ export type ProductUncheckedCreateWithoutSizeInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1301,6 +1338,7 @@ export type ProductUpdateWithoutSizeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1325,6 +1363,7 @@ export type ProductUncheckedUpdateWithoutSizeInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1349,6 +1388,7 @@ export type ProductCreateWithoutProductItemInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1373,6 +1413,7 @@ export type ProductUncheckedCreateWithoutProductItemInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1413,6 +1454,7 @@ export type ProductUpdateWithoutProductItemInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1437,6 +1479,7 @@ export type ProductUncheckedUpdateWithoutProductItemInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1461,6 +1504,7 @@ export type ProductCreateWithoutOrderItemsInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1485,6 +1529,7 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1525,6 +1570,7 @@ export type ProductUpdateWithoutOrderItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1549,6 +1595,7 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1573,6 +1620,7 @@ export type ProductCreateWithoutFavoritesInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1597,6 +1645,7 @@ export type ProductUncheckedCreateWithoutFavoritesInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1637,6 +1686,7 @@ export type ProductUpdateWithoutFavoritesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1661,6 +1711,7 @@ export type ProductUncheckedUpdateWithoutFavoritesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1685,6 +1736,7 @@ export type ProductCreateWithoutComparisonsInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1709,6 +1761,7 @@ export type ProductUncheckedCreateWithoutComparisonsInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1749,6 +1802,7 @@ export type ProductUpdateWithoutComparisonsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1773,6 +1827,7 @@ export type ProductUncheckedUpdateWithoutComparisonsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1797,6 +1852,7 @@ export type ProductCreateManySubCategoryInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1814,6 +1870,7 @@ export type ProductUpdateWithoutSubCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1838,6 +1895,7 @@ export type ProductUncheckedUpdateWithoutSubCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1862,6 +1920,7 @@ export type ProductUncheckedUpdateManyWithoutSubCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1879,6 +1938,7 @@ export type ProductCreateManyProviderInput = {
   name: string
   imageUrl: string
   shortDescription: string
+  isClothes?: boolean
   description: string
   advantages: string
   structure: string
@@ -1896,6 +1956,7 @@ export type ProductUpdateWithoutProviderInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1920,6 +1981,7 @@ export type ProductUncheckedUpdateWithoutProviderInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1944,6 +2006,7 @@ export type ProductUncheckedUpdateManyWithoutProviderInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  isClothes?: Prisma.BoolFieldUpdateOperationsInput | boolean
   description?: Prisma.StringFieldUpdateOperationsInput | string
   advantages?: Prisma.StringFieldUpdateOperationsInput | string
   structure?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2046,6 +2109,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name?: boolean
   imageUrl?: boolean
   shortDescription?: boolean
+  isClothes?: boolean
   description?: boolean
   advantages?: boolean
   structure?: boolean
@@ -2074,6 +2138,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   imageUrl?: boolean
   shortDescription?: boolean
+  isClothes?: boolean
   description?: boolean
   advantages?: boolean
   structure?: boolean
@@ -2094,6 +2159,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   imageUrl?: boolean
   shortDescription?: boolean
+  isClothes?: boolean
   description?: boolean
   advantages?: boolean
   structure?: boolean
@@ -2114,6 +2180,7 @@ export type ProductSelectScalar = {
   name?: boolean
   imageUrl?: boolean
   shortDescription?: boolean
+  isClothes?: boolean
   description?: boolean
   advantages?: boolean
   structure?: boolean
@@ -2127,7 +2194,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "imageUrl" | "shortDescription" | "description" | "advantages" | "structure" | "formRelease" | "defaultPrice" | "subCategoryId" | "providerId" | "monthlySales" | "totalSales" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "imageUrl" | "shortDescription" | "isClothes" | "description" | "advantages" | "structure" | "formRelease" | "defaultPrice" | "subCategoryId" | "providerId" | "monthlySales" | "totalSales" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subCategory?: boolean | Prisma.SubCategoryDefaultArgs<ExtArgs>
   Provider?: boolean | Prisma.ProviderDefaultArgs<ExtArgs>
@@ -2167,6 +2234,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     name: string
     imageUrl: string
     shortDescription: string
+    isClothes: boolean
     description: string
     advantages: string
     structure: string
@@ -2614,6 +2682,7 @@ export interface ProductFieldRefs {
   readonly name: Prisma.FieldRef<"Product", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Product", 'String'>
   readonly shortDescription: Prisma.FieldRef<"Product", 'String'>
+  readonly isClothes: Prisma.FieldRef<"Product", 'Boolean'>
   readonly description: Prisma.FieldRef<"Product", 'String'>
   readonly advantages: Prisma.FieldRef<"Product", 'String'>
   readonly structure: Prisma.FieldRef<"Product", 'String'>

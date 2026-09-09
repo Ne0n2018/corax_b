@@ -40,6 +40,7 @@ export class AdminOrdersService {
         { id: { contains: search.trim(), mode: 'insensitive' } },
         { userId: { contains: search.trim(), mode: 'insensitive' } },
         ...(Number.isFinite(searchNum) ? [{ orderCode: searchNum }] : []),
+        { address: { contains: search.trim(), mode: 'insensitive' } },
       ];
     }
 
@@ -106,27 +107,38 @@ export class AdminOrdersService {
   // ─── Private ───────────────────────────────────────────────────────────────
 
   private async sendStatusNotification(
-    order: { orderCode: number; status: string; deliveryType: string; address: string | null; items: { productName: string; taste: string; size: string; quantity: number }[] },
+    order: {
+      orderCode: number;
+      status: string;
+      deliveryType: string;
+      address: string | null;
+      items: {
+        productName: string;
+        taste: string;
+        size: string;
+        quantity: number;
+      }[];
+    },
     user: { email: string; displayName: string },
   ) {
     const deliveryType = order.deliveryType as unknown as DeliveryType;
-    const orderStatus  = order.status      as unknown as OrderStatus;
+    const orderStatus = order.status as unknown as OrderStatus;
 
     await this.mailService.sendMail(
       user.email,
       getStatusSubject(orderStatus, deliveryType),
       React.createElement(OrderStatusTemplate, {
-        email:        user.email,
-        name:         user.displayName,
-        orderCode:    order.orderCode,
-        status:       orderStatus,
+        email: user.email,
+        name: user.displayName,
+        orderCode: order.orderCode,
+        status: orderStatus,
         deliveryType,
-        address:      order.address,
-        items:        order.items.map((i) => ({
+        address: order.address,
+        items: order.items.map((i) => ({
           productName: i.productName,
-          taste:       i.taste,
-          size:        i.size,
-          quantity:    i.quantity,
+          taste: i.taste,
+          size: i.size,
+          quantity: i.quantity,
         })),
       }),
     );

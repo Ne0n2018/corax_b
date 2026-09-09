@@ -9,9 +9,7 @@ export class ProductFilterDto {
   @IsUUID()
   subCategoryId?: string;
   @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  page?: number = 1;
+  @IsString()
+  cursor?: string;
   limit: number = 28;
 }
