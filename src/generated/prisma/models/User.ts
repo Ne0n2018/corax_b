@@ -29,7 +29,11 @@ export type UserMinAggregateOutputType = {
   email: string | null
   password: string | null
   displayName: string | null
+  number: string | null
+  birthday: Date | null
+  address: string | null
   role: $Enums.UserRole | null
+  isActive: boolean | null
   isVerified: boolean | null
   isTwoFactorEnabled: boolean | null
   metod: $Enums.AuthMetod | null
@@ -42,7 +46,11 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   password: string | null
   displayName: string | null
+  number: string | null
+  birthday: Date | null
+  address: string | null
   role: $Enums.UserRole | null
+  isActive: boolean | null
   isVerified: boolean | null
   isTwoFactorEnabled: boolean | null
   metod: $Enums.AuthMetod | null
@@ -55,7 +63,11 @@ export type UserCountAggregateOutputType = {
   email: number
   password: number
   displayName: number
+  number: number
+  birthday: number
+  address: number
   role: number
+  isActive: number
   isVerified: number
   isTwoFactorEnabled: number
   metod: number
@@ -70,7 +82,11 @@ export type UserMinAggregateInputType = {
   email?: true
   password?: true
   displayName?: true
+  number?: true
+  birthday?: true
+  address?: true
   role?: true
+  isActive?: true
   isVerified?: true
   isTwoFactorEnabled?: true
   metod?: true
@@ -83,7 +99,11 @@ export type UserMaxAggregateInputType = {
   email?: true
   password?: true
   displayName?: true
+  number?: true
+  birthday?: true
+  address?: true
   role?: true
+  isActive?: true
   isVerified?: true
   isTwoFactorEnabled?: true
   metod?: true
@@ -96,7 +116,11 @@ export type UserCountAggregateInputType = {
   email?: true
   password?: true
   displayName?: true
+  number?: true
+  birthday?: true
+  address?: true
   role?: true
+  isActive?: true
   isVerified?: true
   isTwoFactorEnabled?: true
   metod?: true
@@ -182,7 +206,11 @@ export type UserGroupByOutputType = {
   email: string
   password: string
   displayName: string
+  number: string | null
+  birthday: Date | null
+  address: string | null
   role: $Enums.UserRole
+  isActive: boolean
   isVerified: boolean
   isTwoFactorEnabled: boolean
   metod: $Enums.AuthMetod
@@ -216,7 +244,11 @@ export type UserWhereInput = {
   email?: Prisma.StringFilter<"User"> | string
   password?: Prisma.StringFilter<"User"> | string
   displayName?: Prisma.StringFilter<"User"> | string
+  number?: Prisma.StringNullableFilter<"User"> | string | null
+  birthday?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  address?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  isActive?: Prisma.BoolFilter<"User"> | boolean
   isVerified?: Prisma.BoolFilter<"User"> | boolean
   isTwoFactorEnabled?: Prisma.BoolFilter<"User"> | boolean
   metod?: Prisma.EnumAuthMetodFilter<"User"> | $Enums.AuthMetod
@@ -235,7 +267,11 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  number?: Prisma.SortOrderInput | Prisma.SortOrder
+  birthday?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isTwoFactorEnabled?: Prisma.SortOrder
   metod?: Prisma.SortOrder
@@ -257,7 +293,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   password?: Prisma.StringFilter<"User"> | string
   displayName?: Prisma.StringFilter<"User"> | string
+  number?: Prisma.StringNullableFilter<"User"> | string | null
+  birthday?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  address?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  isActive?: Prisma.BoolFilter<"User"> | boolean
   isVerified?: Prisma.BoolFilter<"User"> | boolean
   isTwoFactorEnabled?: Prisma.BoolFilter<"User"> | boolean
   metod?: Prisma.EnumAuthMetodFilter<"User"> | $Enums.AuthMetod
@@ -276,7 +316,11 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  number?: Prisma.SortOrderInput | Prisma.SortOrder
+  birthday?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isTwoFactorEnabled?: Prisma.SortOrder
   metod?: Prisma.SortOrder
@@ -295,7 +339,11 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   password?: Prisma.StringWithAggregatesFilter<"User"> | string
   displayName?: Prisma.StringWithAggregatesFilter<"User"> | string
+  number?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  birthday?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  address?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+  isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   isVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   isTwoFactorEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   metod?: Prisma.EnumAuthMetodWithAggregatesFilter<"User"> | $Enums.AuthMetod
@@ -308,7 +356,11 @@ export type UserCreateInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -327,7 +379,11 @@ export type UserUncheckedCreateInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -346,7 +402,11 @@ export type UserUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -365,7 +425,11 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -384,7 +448,11 @@ export type UserCreateManyInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -397,7 +465,11 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -410,7 +482,11 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -423,7 +499,11 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  number?: Prisma.SortOrder
+  birthday?: Prisma.SortOrder
+  address?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isTwoFactorEnabled?: Prisma.SortOrder
   metod?: Prisma.SortOrder
@@ -436,7 +516,11 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  number?: Prisma.SortOrder
+  birthday?: Prisma.SortOrder
+  address?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isTwoFactorEnabled?: Prisma.SortOrder
   metod?: Prisma.SortOrder
@@ -449,7 +533,11 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   password?: Prisma.SortOrder
   displayName?: Prisma.SortOrder
+  number?: Prisma.SortOrder
+  birthday?: Prisma.SortOrder
+  address?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   isTwoFactorEnabled?: Prisma.SortOrder
   metod?: Prisma.SortOrder
@@ -469,6 +557,14 @@ export type UserScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -578,7 +674,11 @@ export type UserCreateWithoutAccountsInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -596,7 +696,11 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -630,7 +734,11 @@ export type UserUpdateWithoutAccountsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -648,7 +756,11 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -666,7 +778,11 @@ export type UserCreateWithoutCartInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -684,7 +800,11 @@ export type UserUncheckedCreateWithoutCartInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -718,7 +838,11 @@ export type UserUpdateWithoutCartInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -736,7 +860,11 @@ export type UserUncheckedUpdateWithoutCartInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -754,7 +882,11 @@ export type UserCreateWithoutOrderInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -772,7 +904,11 @@ export type UserUncheckedCreateWithoutOrderInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -806,7 +942,11 @@ export type UserUpdateWithoutOrderInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -824,7 +964,11 @@ export type UserUncheckedUpdateWithoutOrderInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -842,7 +986,11 @@ export type UserCreateWithoutNotificationsInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -860,7 +1008,11 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -894,7 +1046,11 @@ export type UserUpdateWithoutNotificationsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -912,7 +1068,11 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -930,7 +1090,11 @@ export type UserCreateWithoutFavoritesInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -948,7 +1112,11 @@ export type UserUncheckedCreateWithoutFavoritesInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -982,7 +1150,11 @@ export type UserUpdateWithoutFavoritesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -1000,7 +1172,11 @@ export type UserUncheckedUpdateWithoutFavoritesInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -1018,7 +1194,11 @@ export type UserCreateWithoutComparisonsInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -1036,7 +1216,11 @@ export type UserUncheckedCreateWithoutComparisonsInput = {
   email: string
   password: string
   displayName: string
+  number?: string | null
+  birthday?: Date | string | null
+  address?: string | null
   role?: $Enums.UserRole
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod: $Enums.AuthMetod
@@ -1070,7 +1254,11 @@ export type UserUpdateWithoutComparisonsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -1088,7 +1276,11 @@ export type UserUncheckedUpdateWithoutComparisonsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthday?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isTwoFactorEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   metod?: Prisma.EnumAuthMetodFieldUpdateOperationsInput | $Enums.AuthMetod
@@ -1173,7 +1365,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   password?: boolean
   displayName?: boolean
+  number?: boolean
+  birthday?: boolean
+  address?: boolean
   role?: boolean
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod?: boolean
@@ -1193,7 +1389,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   password?: boolean
   displayName?: boolean
+  number?: boolean
+  birthday?: boolean
+  address?: boolean
   role?: boolean
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod?: boolean
@@ -1206,7 +1406,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   password?: boolean
   displayName?: boolean
+  number?: boolean
+  birthday?: boolean
+  address?: boolean
   role?: boolean
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod?: boolean
@@ -1219,7 +1423,11 @@ export type UserSelectScalar = {
   email?: boolean
   password?: boolean
   displayName?: boolean
+  number?: boolean
+  birthday?: boolean
+  address?: boolean
   role?: boolean
+  isActive?: boolean
   isVerified?: boolean
   isTwoFactorEnabled?: boolean
   metod?: boolean
@@ -1227,7 +1435,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "displayName" | "role" | "isVerified" | "isTwoFactorEnabled" | "metod" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "password" | "displayName" | "number" | "birthday" | "address" | "role" | "isActive" | "isVerified" | "isTwoFactorEnabled" | "metod" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   Cart?: boolean | Prisma.User$CartArgs<ExtArgs>
@@ -1255,7 +1463,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string
     password: string
     displayName: string
+    number: string | null
+    birthday: Date | null
+    address: string | null
     role: $Enums.UserRole
+    isActive: boolean
     isVerified: boolean
     isTwoFactorEnabled: boolean
     metod: $Enums.AuthMetod
@@ -1694,7 +1906,11 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
   readonly displayName: Prisma.FieldRef<"User", 'String'>
+  readonly number: Prisma.FieldRef<"User", 'String'>
+  readonly birthday: Prisma.FieldRef<"User", 'DateTime'>
+  readonly address: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
+  readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
   readonly isVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly isTwoFactorEnabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly metod: Prisma.FieldRef<"User", 'AuthMetod'>

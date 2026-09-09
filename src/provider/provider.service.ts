@@ -27,6 +27,12 @@ export class ProviderService {
       this.prismaService.provider.findMany({
         where,
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          imageUrl: true,
+          description: true,
+        },
       }),
       this.prismaService.provider.count({ where }),
     ]);
@@ -40,6 +46,24 @@ export class ProviderService {
       include: {
         products: true,
       },
+      omit: {
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!existingProvider) {
+      throw new NotFoundException(
+        'Поставщик с таким айди не был найден. Проверьте введенный айди',
+      );
+    }
+
+    return existingProvider;
+  }
+
+  public async findByIdAdmin(id: string) {
+    const existingProvider = await this.prismaService.provider.findFirst({
+      where: { id },
     });
 
     if (!existingProvider) {
@@ -61,13 +85,15 @@ export class ProviderService {
       mimetype,
     );
 
-    return this.prismaService.provider.create({
+    await this.prismaService.provider.create({
       data: {
         name,
         description,
         imageUrl,
       },
     });
+
+    return { message: 'Поставщик успешно создан' };
   }
 
   public async update(
@@ -103,10 +129,12 @@ export class ProviderService {
       await this.s3Service.deleteByUrl(existingProvider.imageUrl);
     }
 
-    return this.prismaService.provider.update({
+    await this.prismaService.provider.update({
       where: { id },
       data: updateData,
     });
+
+    return { message: 'Поставщик успешно обновлен' };
   }
 
   public async delete(id: string) {
@@ -117,6 +145,6 @@ export class ProviderService {
         id,
       },
     });
-    return true;
+    return { message: 'Поставщик успешно удален' };
   }
 }

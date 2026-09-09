@@ -5,6 +5,7 @@ import { Injectable, Logger } from '@nestjs/common';
 @Injectable()
 export class TopProductsService {
   private readonly logger = new Logger(TopProductsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   // Запускается автоматически 1-го числа каждого месяца в 00:05
@@ -29,41 +30,29 @@ export class TopProductsService {
         id: true,
         name: true,
         imageUrl: true,
-        defaultPrice: true,
-        monthlySales: true,
-        shortDescription: true,
       },
     });
 
-    // Если топ пустой — берём 3 самых дорогих
+    // Если топ пустой — берём заданное количество самых дорогих
     if (top.length === 0) {
       top = await this.prisma.product.findMany({
         orderBy: { defaultPrice: 'desc' },
-        take: 3,
+        take: limit,
         select: {
           id: true,
           name: true,
           imageUrl: true,
-          defaultPrice: true,
-          monthlySales: true,
-          shortDescription: true,
         },
       });
     }
 
-    return {
-      success: true,
-      message:
-        top.length > 0 ? `Топ ${top.length} товаров` : 'Товары не найдены',
-      data: top,
-      count: top.length,
-      source: top[0]?.monthlySales > 0 ? 'sales' : 'price_fallback',
-    };
+    return top;
   }
 
-  // Метод для увеличения счётчика продаж (вызывать при создании заказа)
+  // Метод для увеличения счётчика продаж
   async incrementSales(productId: string, quantity: number = 1) {
-    this.prisma.product.update({
+    // Добавлен обязательный await
+    await this.prisma.product.update({
       where: { id: productId },
       data: {
         monthlySales: { increment: quantity },

@@ -30,8 +30,24 @@ done
 # Применение миграций Prisma (можно отключить переменной RUN_MIGRATIONS=false)
 if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
   echo "Running Prisma migrations..."
-  npx prisma migrate deploy
+
+  USER="${POSTGRES_USER:-root}"
+  PASS="${POSTGRES_PASSWORD:-123456}"
+  HOST="${POSTGRES_HOST:-db}"
+  PORT="${POSTGRES_PORT:-5432}"
+  DB="${POSTGRES_DB:-corax}"
+
+  export DATABASE_URL="postgresql://${USER}:${PASS}@${HOST}:${PORT}/${DB}?schema=public"
+
+  # Проверка чтения конфига средствами Node.js (выведет ошибку, если файл битый)
+  node -e "console.log('[ENTRYPOINT TEST] Config parsed:', require('./prisma.config.cjs'))"
+
+  ./node_modules/.bin/prisma migrate deploy
 fi
 
 echo "Starting application..."
-exec node dist/src/main
+if [ -f "dist/main.js" ]; then
+  exec node dist/main.js
+else
+  exec node dist/src/main.js
+fi

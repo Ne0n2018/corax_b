@@ -38,7 +38,7 @@ export class BePaidService {
     const isTest = this.configService.get<string>('NODE_ENV') !== 'production';
 
     // bePaid принимает сумму в копейках (целое число)
-    const amountInCents = Math.round((amount * 100) / 2);
+    const amountInCents = amount * 100;
 
     const credentials = Buffer.from(`${shopId}:${secretKey}`).toString(
       'base64',

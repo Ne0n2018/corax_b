@@ -24,7 +24,7 @@ export class ProductController {
   @Get()
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'subCategoryId', required: false })
-  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'cursor', required: false, type: 'string' })
   @ApiOperation({ summary: 'Получить список всех продуктов' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Список продуктов' })
   public async findAll(@Query() filterDTO: ProductFilterDto) {

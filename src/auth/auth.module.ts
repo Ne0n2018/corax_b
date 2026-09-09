@@ -9,6 +9,9 @@ import { ProviderModule } from './provider/provider.module';
 import { getProvidersConfig } from '../config/providers.config';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 import { MailService } from '../libs/mail/mail.service';
+import { AdminModule } from '../admin/admin.module';
+import { SessionModule } from '../session/session.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
@@ -23,6 +26,8 @@ import { MailService } from '../libs/mail/mail.service';
       inject: [ConfigService],
     }),
     forwardRef(() => EmailConfirmationModule),
+    AdminModule,
+    SessionModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UserService, MailService],

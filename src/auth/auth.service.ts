@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -17,6 +18,9 @@ import { ConfigService } from '@nestjs/config';
 import { ProviderService } from './provider/provider.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailConfirmationService } from './email-confirmation/email-confirmation.service';
+import { REDIS_CLIENT } from '../session/redis.provider';
+import { Redis } from 'ioredis';
+import { AdminService } from '../admin/admin.service';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +30,8 @@ export class AuthService {
     private readonly providerService: ProviderService,
     private readonly prismaService: PrismaService,
     private readonly confirmationService: EmailConfirmationService,
+    private readonly adminService: AdminService,
+    @Inject(REDIS_CLIENT) private readonly redisClient: Redis,
   ) {}
   private logger = new Logger('AuthService');
   public async register(dto: RegisterDto) {
@@ -57,11 +63,6 @@ export class AuthService {
       throw new NotFoundException('Не удалось найти пользователя');
     }
     const isValidPassword = await verify(user.password, dto.password);
-    if (!isValidPassword) {
-      throw new UnauthorizedException(
-        'Неверный пароль,пожалуйста попробуйте еще раз или восстановите пароль,если забыли его',
-      );
-    }
 
     if (!user.isVerified) {
       await this.confirmationService.sendVerificationToken(user);
@@ -69,6 +70,47 @@ export class AuthService {
         'Ваш email не потвержден. Пожалуйста, проверьте вашу почту  и подтвердите адрес',
       );
     }
+
+    if (!user.isActive) {
+      throw new UnauthorizedException('Ваша учетная запись заблокирована');
+    }
+
+    if (!isValidPassword) {
+      const attemptsKey = `failed_attempts:${user.id}`;
+
+      // Увеличиваем счетчик ошибок (создаст ключ со значением 1, если его нет)
+      const attempts = await this.redisClient.incr(attemptsKey);
+
+      // Если это первая ошибка, ставим таймер сброса (например, 15 минут = 900 секунд)
+      if (attempts === 1) {
+        await this.redisClient.expire(attemptsKey, 900);
+      }
+
+      // Если достигли 3 ошибок — блокируем
+      if (attempts >= 3) {
+        // Удаляем счетчик из Redis за ненадобностью
+        await this.redisClient.del(attemptsKey);
+
+        // Вызываем ваш существующий метод блокировки
+        // (Так как user.isActive сейчас true, метод переключит его на false)
+        await this.adminService.blockUser(user.id, {
+          message:
+            'Автоматическая система безопасности заблокировала ваш аккаунт из-за превышения лимита неверных попыток ввода пароля.',
+        });
+
+        throw new UnauthorizedException(
+          'Учетная запись заблокирована из-за 3 неверных попыток',
+        );
+      }
+
+      // Сообщаем, сколько попыток осталось
+      throw new UnauthorizedException(
+        `Неверный email или пароль. Осталось попыток: ${3 - attempts}`,
+      );
+    }
+
+    // 3. Успешный вход — обязательно очищаем счетчик ошибок
+    await this.redisClient.del(`failed_attempts:${user.id}`);
 
     return this.saveSession(req, user);
   }
@@ -145,7 +187,7 @@ export class AuthService {
           );
         }
         resolve({
-          user,
+          message: 'Успешный вход в систему',
         });
       });
     });

@@ -68,3 +68,7 @@ prisma/generated/
 
 # Prisma studio / временные файлы
 .prisma/
+
+# Docker local overrides
+docker-compose.override.yml
+certs-local/

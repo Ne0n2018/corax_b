@@ -11,6 +11,7 @@ import { Authorized } from '../auth/decorators/authorized.decorator';
 import { Authorization } from '../auth/decorators/auth.decorator';
 import { UpdateUserDto } from './dto/updateUserDto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserResponseDto } from './dto/User.Response.Dto';
 
 @ApiTags('user')
 @Controller('users')
@@ -29,7 +30,7 @@ export class UserController {
   })
   @ApiOperation({ summary: 'получение аккаунта пользователя' })
   public async getProfile(@Authorized('id') userId: string) {
-    return await this.userService.findById(userId);
+    return new UserResponseDto(await this.userService.findById(userId));
   }
 
   @Put()
@@ -49,6 +50,6 @@ export class UserController {
     @Authorized('id') userId: string,
     @Body() data: UpdateUserDto,
   ) {
-    return this.userService.update(userId, data);
+    return new UserResponseDto(await this.userService.update(userId, data));
   }
 }

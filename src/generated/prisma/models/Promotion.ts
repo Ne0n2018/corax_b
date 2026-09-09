@@ -573,10 +573,6 @@ export type EnumDiscountMethodFieldUpdateOperationsInput = {
   set?: $Enums.DiscountMethod
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 
 
 export type PromotionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
