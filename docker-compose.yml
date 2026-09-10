@@ -36,6 +36,9 @@ services:
     image: ghcr.io/ne0n2018/corax_f:sha-d16b3e5
     container_name: corax_frontend
     restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_SERVER_URL: https://corax.by/api
+      NEXT_PUBLIC_DADATA_API_KEY: e4cbf1bafaa5e6324a67d04ba7c495215692bc96
     expose:
       - "3000"
     networks:
