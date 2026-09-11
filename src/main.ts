@@ -27,7 +27,7 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.set('trust proxy', () => true);
+  app.set('trust proxy', 2);
 
   // Берём session middleware из DI-контейнера (создан в SessionModule)
   const sessionMiddleware = app.get<RequestHandler>(SESSION_MIDDLEWARE);
