@@ -43,19 +43,7 @@ services:
     networks:
       - backend
 
-  nginx:
-    image: nginx:alpine
-    container_name: corax_nginx
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    networks:
-      - backend
-    depends_on:
-      - app
-      - frontend
+
 
 
 
