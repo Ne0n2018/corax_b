@@ -17,6 +17,7 @@ services:
       DATABASE_URL: postgresql://root:123456@db:5432/corax?schema=public
       POSTGRES_URI: postgresql://root:123456@db:5432/corax?schema=public
       RUN_MIGRATIONS: "true"
+      RUN_SEEDS: 'true'
     expose:
       - "4000"
     depends_on:

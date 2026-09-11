@@ -43,6 +43,12 @@ if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
   node -e "console.log('[ENTRYPOINT TEST] Config parsed:', require('./prisma.config.cjs'))"
 
   ./node_modules/.bin/prisma migrate deploy
+
+  # Запуск сидинга (управляется флагом RUN_SEEDS, по умолчанию включён)
+  if [ "${RUN_SEEDS:-true}" = "true" ]; then
+    echo "Running Prisma seed..."
+    ./node_modules/.bin/prisma db seed
+  fi
 fi
 
 echo "Starting application..."

@@ -44,6 +44,7 @@ COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/dist ./dist
 COPY --from=builder --chown=node:node /app/package.json ./
 COPY --from=builder --chown=node:node /app/pnpm-lock.yaml ./
+COPY --from=builder --chown=node:node /app/src/generated ./src/generated
 COPY --from=builder --chown=node:node /app/prisma ./prisma
 
 # Копируем конфигурационный файл Prisma с поддержкой любых расширений и с правильными правами
