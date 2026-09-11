@@ -25,6 +25,7 @@ services:
       - redis
     networks:
       - backend
+      - dokploy-network
     healthcheck:
       test: |
         node -e "require('http').get('http://localhost:4000/metrics', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
@@ -37,15 +38,14 @@ services:
     image: ghcr.io/ne0n2018/corax_f:latest
     container_name: corax_frontend
     restart: unless-stopped
-
+    environment:
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
     expose:
       - "3000"
     networks:
       - backend
-
-
-
-
+      - dokploy-network
 
   db:
     image: postgres:15-alpine
@@ -57,7 +57,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432" # Проброс порта наружу для локального подключения через DBeaver
+      - "5433:5432"
     expose:
       - "5432"
     volumes:
@@ -85,3 +85,5 @@ volumes:
 networks:
   backend:
     driver: bridge
+  dokploy-network:
+    external: true
