@@ -69,6 +69,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiOperation({ summary: 'вход в систему' })
   public async login(@Req() req: Request, @Body() dto: LoginDto) {
+    console.log(req.secure);
     return this.authService.login(req, dto);
   }
 

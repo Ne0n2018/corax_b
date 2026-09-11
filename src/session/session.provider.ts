@@ -19,6 +19,7 @@ export const sessionProvider: Provider = {
       secret: config.getOrThrow<string>('SESSION_SECRET'),
       name: config.getOrThrow<string>('SESSION_NAME'),
       resave: true,
+      proxy: true,
       saveUninitialized: false,
       cookie: {
         domain: config.getOrThrow<string>('SESSION_DOMAIN'),
