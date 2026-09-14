@@ -247,7 +247,7 @@ model PromoCode {
   minOrderAmount Float? @map("min_order_amount") // Минимальная сумма заказа
   maxDiscount    Float? @map("max_discount") // Максимальная скидка
 
-  applicableProducts String? @map("applicable_products") // JSON array of product IDs, null = all products
+  applicableSubcategories String? @map("applicable_products") // JSON array of product IDs, null = all products
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

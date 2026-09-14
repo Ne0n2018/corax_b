@@ -118,9 +118,9 @@ export class UpdatePromoDto {
     type: 'array',
     required: false,
     description:
-      'список товаров на который распростроняется действие промокода',
+      'список подкатегорий на который распростроняется действие промокода',
     example:
       '[123e4567-e89b-12d3-a456-426614174000,a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6,f47ac10b-58cc-4372-a567-0e02b2c3d4e5]',
   })
-  applicableProducts?: string[];
+  applicableSubcategories?: string[];
 }

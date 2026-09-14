@@ -2142,7 +2142,7 @@ export const PromoCodeScalarFieldEnum = {
   validUntil: 'validUntil',
   minOrderAmount: 'minOrderAmount',
   maxDiscount: 'maxDiscount',
-  applicableProducts: 'applicableProducts',
+  applicableSubcategories: 'applicableSubcategories',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

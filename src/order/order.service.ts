@@ -105,7 +105,7 @@ export class OrderService {
 
       if (!validation.isValid) {
         throw new BadRequestException(
-          validation.error || 'Ошибка применения промокода',
+          validation.message || 'Ошибка применения промокода',
         );
       }
       promoDiscount = validation.discountAmount ?? 0;
@@ -205,7 +205,6 @@ export class OrderService {
       include: this.getOrderInclude(),
     });
   }
-
 
   /**
    * Получить конкретный заказ пользователя по ID.

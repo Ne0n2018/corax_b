@@ -9,7 +9,7 @@ import { UpdatePromoDto } from './dto/update.promo.dto';
 
 export interface PromoCodeValidationResult {
   isValid: boolean;
-  error?: string;
+  message?: string;
   discountAmount?: number;
   discountPercent?: number;
 }
@@ -24,10 +24,10 @@ export class PromoCodeService {
   async validateAndCalculateDiscount(
     code: string,
     orderSubtotal: number,
-    productIds?: string[],
+    subcategoryIds?: string[], // Заменили productIds на subcategoryIds
   ): Promise<PromoCodeValidationResult> {
     if (!code || !code.trim()) {
-      return { isValid: true }; // Пустой код = без скидки
+      return { isValid: true };
     }
 
     const promoCode = await this.prismaService.promoCode.findUnique({
@@ -37,58 +37,59 @@ export class PromoCodeService {
     if (!promoCode) {
       return {
         isValid: false,
-        error: 'Промокод не найден',
+        message: 'Промокод не найден',
       };
     }
 
-    // Проверка активности
     if (!promoCode.isActive) {
       return {
         isValid: false,
-        error: 'Промокод неактивен',
+        message: 'Промокод неактивен',
       };
     }
 
-    // Проверка дат
     const now = new Date();
     if (now < promoCode.validFrom || now > promoCode.validUntil) {
       return {
         isValid: false,
-        error: 'Промокод истёк или ещё не активирован',
+        message: 'Промокод истёк или ещё не активирован',
       };
     }
 
-    // Проверка количества использований
     if (promoCode.maxUses && promoCode.currentUses >= promoCode.maxUses) {
       return {
         isValid: false,
-        error: 'Промокод использован максимальное количество раз',
+        message: 'Промокод использован максимальное количество раз',
       };
     }
 
-    // Проверка минимальной суммы заказа
     if (promoCode.minOrderAmount && orderSubtotal < promoCode.minOrderAmount) {
       return {
         isValid: false,
-        error: `Минимальная сумма заказа: ${promoCode.minOrderAmount} руб.`,
+        message: `Минимальная сумма заказа: ${promoCode.minOrderAmount} руб.`,
       };
     }
 
-    // Проверка применимости к товарам
-    if (promoCode.applicableProducts && productIds && productIds.length > 0) {
-      const applicableIds = JSON.parse(promoCode.applicableProducts);
-      const hasApplicableProduct = productIds.some((id) =>
+    // Проверка применимости к подкатегориям
+    if (
+      promoCode.applicableSubcategories &&
+      subcategoryIds &&
+      subcategoryIds.length > 0
+    ) {
+      const applicableIds: string[] = JSON.parse(
+        promoCode.applicableSubcategories,
+      );
+      const hasApplicableSubcategory = subcategoryIds.some((id) =>
         applicableIds.includes(id),
       );
-      if (!hasApplicableProduct) {
+      if (!hasApplicableSubcategory) {
         return {
           isValid: false,
-          error: 'Промокод не применим к выбранным товарам',
+          message: 'Промокод не применим к выбранным подкатегориям',
         };
       }
     }
 
-    // Расчёт скидки
     let discountAmount = 0;
     let discountPercent = 0;
 
@@ -99,15 +100,12 @@ export class PromoCodeService {
       discountAmount = promoCode.value;
       discountPercent = (promoCode.value / orderSubtotal) * 100;
     }
-    // BOGO обрабатывается отдельно, здесь нет рассчёта
 
-    // Применение максимальной скидки
     if (promoCode.maxDiscount && discountAmount > promoCode.maxDiscount) {
       discountAmount = promoCode.maxDiscount;
       discountPercent = (discountAmount / orderSubtotal) * 100;
     }
 
-    // Скидка не должна быть больше суммы заказа
     if (discountAmount > orderSubtotal) {
       discountAmount = orderSubtotal;
       discountPercent = 100;
@@ -139,10 +137,20 @@ export class PromoCodeService {
   }
 
   /**
-   * Создать новый промокод (для администратора).
+   * Создать новый промокод.
    */
   async createPromoCode(data: CreatePromoDto) {
-    return this.prismaService.promoCode.create({
+    const existingCode = await this.prismaService.promoCode.findUnique({
+      where: { code: data.code.toUpperCase() },
+    });
+
+    if (existingCode) {
+      throw new BadRequestException('Промокод с таким кодом уже существует');
+    }
+
+    const subcategories = data.applicableSubcategories;
+
+    await this.prismaService.promoCode.create({
       data: {
         code: data.code.toUpperCase(),
         description: data.description,
@@ -153,11 +161,13 @@ export class PromoCodeService {
         maxUses: data.maxUses,
         minOrderAmount: data.minOrderAmount,
         maxDiscount: data.maxDiscount,
-        applicableProducts: data.applicableProducts
-          ? JSON.stringify(data.applicableProducts)
+        applicableSubcategories: subcategories
+          ? JSON.stringify(subcategories)
           : null,
       },
     });
+
+    return { message: 'Промокод успешно создан' };
   }
 
   /**
@@ -169,17 +179,24 @@ export class PromoCodeService {
     });
   }
 
+  /**
+   * Обновить промокод.
+   */
   async updatePromoCode(data: UpdatePromoDto, id: string) {
     const promoCode = await this.prismaService.promoCode.findUnique({
       where: { id },
     });
+
     if (!promoCode) {
       throw new NotFoundException('Промокод не найден');
     }
+
+    const subcategories = data.applicableSubcategories;
+
     await this.prismaService.promoCode.update({
       where: { id },
       data: {
-        code: data.code.toUpperCase(),
+        code: data.code ? data.code.toUpperCase() : undefined,
         description: data.description,
         type: data.type,
         value: data.value,
@@ -188,22 +205,25 @@ export class PromoCodeService {
         maxUses: data.maxUses,
         minOrderAmount: data.minOrderAmount,
         maxDiscount: data.maxDiscount,
-        applicableProducts: data.applicableProducts
-          ? JSON.stringify(data.applicableProducts)
-          : null,
+        applicableSubcategories: subcategories
+          ? JSON.stringify(subcategories)
+          : undefined,
       },
     });
 
     return { message: 'Промокод успешно обновлен' };
   }
 
+  /**
+   * Удалить промокод.
+   */
   async deletePromoCode(id: string) {
     const promoCode = await this.prismaService.promoCode.findUnique({
       where: { id },
     });
 
     if (!promoCode) {
-      throw new NotFoundException('промокод не найден');
+      throw new NotFoundException('Промокод не найден');
     }
 
     await this.prismaService.promoCode.delete({ where: { id } });

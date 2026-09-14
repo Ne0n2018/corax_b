@@ -55,7 +55,7 @@ export type PromoCodeMinAggregateOutputType = {
   validUntil: Date | null
   minOrderAmount: number | null
   maxDiscount: number | null
-  applicableProducts: string | null
+  applicableSubcategories: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -73,7 +73,7 @@ export type PromoCodeMaxAggregateOutputType = {
   validUntil: Date | null
   minOrderAmount: number | null
   maxDiscount: number | null
-  applicableProducts: string | null
+  applicableSubcategories: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -91,7 +91,7 @@ export type PromoCodeCountAggregateOutputType = {
   validUntil: number
   minOrderAmount: number
   maxDiscount: number
-  applicableProducts: number
+  applicableSubcategories: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -127,7 +127,7 @@ export type PromoCodeMinAggregateInputType = {
   validUntil?: true
   minOrderAmount?: true
   maxDiscount?: true
-  applicableProducts?: true
+  applicableSubcategories?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -145,7 +145,7 @@ export type PromoCodeMaxAggregateInputType = {
   validUntil?: true
   minOrderAmount?: true
   maxDiscount?: true
-  applicableProducts?: true
+  applicableSubcategories?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -163,7 +163,7 @@ export type PromoCodeCountAggregateInputType = {
   validUntil?: true
   minOrderAmount?: true
   maxDiscount?: true
-  applicableProducts?: true
+  applicableSubcategories?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -268,7 +268,7 @@ export type PromoCodeGroupByOutputType = {
   validUntil: Date
   minOrderAmount: number | null
   maxDiscount: number | null
-  applicableProducts: string | null
+  applicableSubcategories: string | null
   createdAt: Date
   updatedAt: Date
   _count: PromoCodeCountAggregateOutputType | null
@@ -309,7 +309,7 @@ export type PromoCodeWhereInput = {
   validUntil?: Prisma.DateTimeFilter<"PromoCode"> | Date | string
   minOrderAmount?: Prisma.FloatNullableFilter<"PromoCode"> | number | null
   maxDiscount?: Prisma.FloatNullableFilter<"PromoCode"> | number | null
-  applicableProducts?: Prisma.StringNullableFilter<"PromoCode"> | string | null
+  applicableSubcategories?: Prisma.StringNullableFilter<"PromoCode"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PromoCode"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PromoCode"> | Date | string
 }
@@ -327,7 +327,7 @@ export type PromoCodeOrderByWithRelationInput = {
   validUntil?: Prisma.SortOrder
   minOrderAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   maxDiscount?: Prisma.SortOrderInput | Prisma.SortOrder
-  applicableProducts?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicableSubcategories?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -348,7 +348,7 @@ export type PromoCodeWhereUniqueInput = Prisma.AtLeast<{
   validUntil?: Prisma.DateTimeFilter<"PromoCode"> | Date | string
   minOrderAmount?: Prisma.FloatNullableFilter<"PromoCode"> | number | null
   maxDiscount?: Prisma.FloatNullableFilter<"PromoCode"> | number | null
-  applicableProducts?: Prisma.StringNullableFilter<"PromoCode"> | string | null
+  applicableSubcategories?: Prisma.StringNullableFilter<"PromoCode"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PromoCode"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PromoCode"> | Date | string
 }, "id" | "code">
@@ -366,7 +366,7 @@ export type PromoCodeOrderByWithAggregationInput = {
   validUntil?: Prisma.SortOrder
   minOrderAmount?: Prisma.SortOrderInput | Prisma.SortOrder
   maxDiscount?: Prisma.SortOrderInput | Prisma.SortOrder
-  applicableProducts?: Prisma.SortOrderInput | Prisma.SortOrder
+  applicableSubcategories?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PromoCodeCountOrderByAggregateInput
@@ -392,7 +392,7 @@ export type PromoCodeScalarWhereWithAggregatesInput = {
   validUntil?: Prisma.DateTimeWithAggregatesFilter<"PromoCode"> | Date | string
   minOrderAmount?: Prisma.FloatNullableWithAggregatesFilter<"PromoCode"> | number | null
   maxDiscount?: Prisma.FloatNullableWithAggregatesFilter<"PromoCode"> | number | null
-  applicableProducts?: Prisma.StringNullableWithAggregatesFilter<"PromoCode"> | string | null
+  applicableSubcategories?: Prisma.StringNullableWithAggregatesFilter<"PromoCode"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PromoCode"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PromoCode"> | Date | string
 }
@@ -410,7 +410,7 @@ export type PromoCodeCreateInput = {
   validUntil: Date | string
   minOrderAmount?: number | null
   maxDiscount?: number | null
-  applicableProducts?: string | null
+  applicableSubcategories?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -428,7 +428,7 @@ export type PromoCodeUncheckedCreateInput = {
   validUntil: Date | string
   minOrderAmount?: number | null
   maxDiscount?: number | null
-  applicableProducts?: string | null
+  applicableSubcategories?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -446,7 +446,7 @@ export type PromoCodeUpdateInput = {
   validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   minOrderAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   maxDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  applicableProducts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicableSubcategories?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -464,7 +464,7 @@ export type PromoCodeUncheckedUpdateInput = {
   validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   minOrderAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   maxDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  applicableProducts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicableSubcategories?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -482,7 +482,7 @@ export type PromoCodeCreateManyInput = {
   validUntil: Date | string
   minOrderAmount?: number | null
   maxDiscount?: number | null
-  applicableProducts?: string | null
+  applicableSubcategories?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -500,7 +500,7 @@ export type PromoCodeUpdateManyMutationInput = {
   validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   minOrderAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   maxDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  applicableProducts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicableSubcategories?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -518,7 +518,7 @@ export type PromoCodeUncheckedUpdateManyInput = {
   validUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   minOrderAmount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   maxDiscount?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  applicableProducts?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  applicableSubcategories?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -536,7 +536,7 @@ export type PromoCodeCountOrderByAggregateInput = {
   validUntil?: Prisma.SortOrder
   minOrderAmount?: Prisma.SortOrder
   maxDiscount?: Prisma.SortOrder
-  applicableProducts?: Prisma.SortOrder
+  applicableSubcategories?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -562,7 +562,7 @@ export type PromoCodeMaxOrderByAggregateInput = {
   validUntil?: Prisma.SortOrder
   minOrderAmount?: Prisma.SortOrder
   maxDiscount?: Prisma.SortOrder
-  applicableProducts?: Prisma.SortOrder
+  applicableSubcategories?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -580,7 +580,7 @@ export type PromoCodeMinOrderByAggregateInput = {
   validUntil?: Prisma.SortOrder
   minOrderAmount?: Prisma.SortOrder
   maxDiscount?: Prisma.SortOrder
-  applicableProducts?: Prisma.SortOrder
+  applicableSubcategories?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -628,7 +628,7 @@ export type PromoCodeSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   validUntil?: boolean
   minOrderAmount?: boolean
   maxDiscount?: boolean
-  applicableProducts?: boolean
+  applicableSubcategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["promoCode"]>
@@ -646,7 +646,7 @@ export type PromoCodeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   validUntil?: boolean
   minOrderAmount?: boolean
   maxDiscount?: boolean
-  applicableProducts?: boolean
+  applicableSubcategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["promoCode"]>
@@ -664,7 +664,7 @@ export type PromoCodeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   validUntil?: boolean
   minOrderAmount?: boolean
   maxDiscount?: boolean
-  applicableProducts?: boolean
+  applicableSubcategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["promoCode"]>
@@ -682,12 +682,12 @@ export type PromoCodeSelectScalar = {
   validUntil?: boolean
   minOrderAmount?: boolean
   maxDiscount?: boolean
-  applicableProducts?: boolean
+  applicableSubcategories?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PromoCodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "type" | "value" | "isActive" | "maxUses" | "currentUses" | "validFrom" | "validUntil" | "minOrderAmount" | "maxDiscount" | "applicableProducts" | "createdAt" | "updatedAt", ExtArgs["result"]["promoCode"]>
+export type PromoCodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "description" | "type" | "value" | "isActive" | "maxUses" | "currentUses" | "validFrom" | "validUntil" | "minOrderAmount" | "maxDiscount" | "applicableSubcategories" | "createdAt" | "updatedAt", ExtArgs["result"]["promoCode"]>
 
 export type $PromoCodePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PromoCode"
@@ -705,7 +705,7 @@ export type $PromoCodePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     validUntil: Date
     minOrderAmount: number | null
     maxDiscount: number | null
-    applicableProducts: string | null
+    applicableSubcategories: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["promoCode"]>
@@ -1143,7 +1143,7 @@ export interface PromoCodeFieldRefs {
   readonly validUntil: Prisma.FieldRef<"PromoCode", 'DateTime'>
   readonly minOrderAmount: Prisma.FieldRef<"PromoCode", 'Float'>
   readonly maxDiscount: Prisma.FieldRef<"PromoCode", 'Float'>
-  readonly applicableProducts: Prisma.FieldRef<"PromoCode", 'String'>
+  readonly applicableSubcategories: Prisma.FieldRef<"PromoCode", 'String'>
   readonly createdAt: Prisma.FieldRef<"PromoCode", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PromoCode", 'DateTime'>
 }
