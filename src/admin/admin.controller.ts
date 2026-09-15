@@ -8,7 +8,6 @@ import {
   HttpStatus,
   Param,
   Post,
-  Provider,
   Put,
   Query,
   UploadedFile,
@@ -16,57 +15,52 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { Authorization } from '../auth/decorators/auth.decorator';
-import { UserRole } from '../generated/prisma/enums';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ParseJsonFieldsPipe } from '../common/pipes/parse-json-fields.pipe';
 import {
   ApiBadRequestResponse,
   ApiBody,
   ApiConsumes,
-  ApiExcludeController,
-  ApiExcludeEndpoint,
   ApiOperation,
   ApiParam,
   ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ProductCreateWithImageDto } from '../product/dto/product.createWithImage.dto';
-import { ProductCreateDto } from '../product/dto/product.create.dto';
-import { ProductService } from '../product/product.service';
-import { ProductUpdateWithImageDto } from '../product/dto/product.updateWithImage.dto';
-import { ProductUpdateDto } from '../product/dto/product.update.dto';
-import { ProviderUpdateWithImageDto } from '../provider/dto/provider.updateWithImage.dto';
-import { ProviderUpdateDto } from '../provider/dto/provider.update.dto';
-import { ProviderCreateDto } from '../provider/dto/provider.create.dto';
-import { ProviderCreateWithImageDto } from '../provider/dto/Provider.createWithImage.dto';
-import { ProviderService } from '../provider/provider.service';
-import { CategoryUpdateDto } from '../category/dto/category.update.dto';
-import { SubCategoryCreateDto } from '../category/dto/subCategory.create.dto';
-import { CreateCategoryDto } from '../category/dto/category.create.dto';
-import { CategoryService } from '../category/category.service';
-import { SubCategoryUpdateDto } from '../category/dto/subCategory.update.dto';
-import { ProductFilterDto } from '../product/dto/product.filter.dto';
-import { ProviderFilterDto } from '../provider/dto/provider.filter.dto';
-import { SubCategoryFilterDto } from '../category/dto/filter/subCategory.filter.dto';
-import { CategoryFilterDto } from '../category/dto/filter/category.filter.dto';
-import { UpdateUserDto } from '../user/dto/updateUserDto';
-import { GetUsersDto } from './dto/user.get.dto';
-import { UsersPaginatedResponseDto } from './dto/user.response.dto';
-import { UserBlockedDTO } from './dto/user.blocked.dto';
-import { PromotionCreateWithImageDto } from '../promotion/dto/promotion.createWithImage.dto';
-import { PromotionService } from '../promotion/promotion.service';
-import { PromotionFilterDto } from '../promotion/dto/promotion.filter.dto';
 import { plainToInstance } from 'class-transformer';
-import { PromotionResponseDto } from '../promotion/dto/response/promotion.response.dto';
-import { PromotionUpdateDto } from '../promotion/dto/promotion.update.dto';
-import { PromotionUpdateWithImageDto } from '../promotion/dto/promotion.updateWithImage.dto';
-import { PromotionCreateDto } from '../promotion/dto/promotion.create.dto';
+import { Authorization } from '../auth/decorators/auth.decorator';
+import { CategoryService } from '../category/category.service';
+import { CategoryFilterDto } from '../category/dto/filter/category.filter.dto';
+import { CreateCategoryDto } from '../category/dto/category.create.dto';
+import { CategoryUpdateDto } from '../category/dto/category.update.dto';
+import { ParseJsonFieldsPipe } from '../common/pipes/parse-json-fields.pipe';
+import { UserRole } from '../generated/prisma/enums';
 import { CreatePromoDto } from '../order/promo/dto/create.promo.dto';
 import { UpdatePromoDto } from '../order/promo/dto/update.promo.dto';
 import { PromoCodeService } from '../order/promo/promo-code.service';
+import { ProductService } from '../product/product.service';
+import { ProductCreateDto } from '../product/dto/product.create.dto';
+import { ProductCreateWithImageDto } from '../product/dto/product.createWithImage.dto';
+import { ProductFilterDto } from '../product/dto/product.filter.dto';
+import { ProductUpdateDto } from '../product/dto/product.update.dto';
+import { ProductUpdateWithImageDto } from '../product/dto/product.updateWithImage.dto';
+import { PromotionService } from '../promotion/promotion.service';
+import { PromotionCreateDto } from '../promotion/dto/promotion.create.dto';
+import { PromotionCreateWithImageDto } from '../promotion/dto/promotion.createWithImage.dto';
+import { PromotionFilterDto } from '../promotion/dto/promotion.filter.dto';
+import { PromotionResponseDto } from '../promotion/dto/response/promotion.response.dto';
+import { PromotionUpdateDto } from '../promotion/dto/promotion.update.dto';
+import { PromotionUpdateWithImageDto } from '../promotion/dto/promotion.updateWithImage.dto';
+import { ProviderService } from '../provider/provider.service';
+import { ProviderCreateDto } from '../provider/dto/provider.create.dto';
+import { ProviderCreateWithImageDto } from '../provider/dto/Provider.createWithImage.dto';
+import { ProviderFilterDto } from '../provider/dto/provider.filter.dto';
+import { ProviderUpdateDto } from '../provider/dto/provider.update.dto';
+import { ProviderUpdateWithImageDto } from '../provider/dto/provider.updateWithImage.dto';
+import { AdminService } from './admin.service';
+
+import { GetUsersDto } from './dto/user.get.dto';
+import { UserBlockedDTO } from './dto/user.blocked.dto';
+import { UsersPaginatedResponseDto } from './dto/user.response.dto';
 import { UserUpdateRoleDto } from './dto/user.updateRole.dto';
 
 const validationPipe = new ValidationPipe({
@@ -75,6 +69,7 @@ const validationPipe = new ValidationPipe({
 });
 
 @Controller('admin')
+@Authorization(UserRole.ADMIN)
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
@@ -85,10 +80,10 @@ export class AdminController {
     private readonly promoCodeService: PromoCodeService,
   ) {}
 
+  /* ==================== PRODUCTS ==================== */
+
   @Post('product')
-  @Authorization(UserRole.ADMIN)
   @ApiTags('Admin - product')
-  @ApiExcludeEndpoint(false)
   @UseInterceptors(FileInterceptor('image'))
   @UsePipes(
     new ParseJsonFieldsPipe(['characteristic', 'taste', 'size']),
@@ -104,9 +99,11 @@ export class AdminController {
     description: 'Данные продукта + изображение',
     type: ProductCreateWithImageDto,
   })
-  @ApiResponse({ status: 201, description: 'Продукт успешно создан' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Продукт успешно создан',
+  })
   @ApiBadRequestResponse({ description: 'Неверный формат файла или данные' })
-  @ApiExcludeEndpoint(false)
   public async createProduct(
     @UploadedFile() image: Express.Multer.File,
     @Body() dto: ProductCreateDto,
@@ -114,10 +111,8 @@ export class AdminController {
     return await this.productService.create(image, dto);
   }
 
-  @Put('product:id')
-  @Authorization(UserRole.ADMIN)
+  @Put('product/:id')
   @ApiTags('Admin - product')
-  @ApiExcludeEndpoint(false)
   @UseInterceptors(FileInterceptor('image'))
   @UsePipes(new ParseJsonFieldsPipe(['characteristic', 'taste', 'size']))
   @UsePipes(
@@ -126,7 +121,7 @@ export class AdminController {
       transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors) => {
         console.log(errors);
-        new BadRequestException(errors);
+        return new BadRequestException(errors);
       },
     }),
   )
@@ -135,16 +130,11 @@ export class AdminController {
   @ApiBody({ type: ProductUpdateWithImageDto })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'продукт успешно обновлен',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или обладает не достаточным количеством прав',
+    description: 'Продукт успешно обновлен',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'продукт не найден',
+    description: 'Продукт не найден',
   })
   public async updateProduct(
     @Param('id') id: string,
@@ -154,78 +144,62 @@ export class AdminController {
     return await this.productService.update(id, image, dto);
   }
 
-  @Delete('product:id')
-  @Authorization(UserRole.ADMIN)
+  @Delete('product/:id')
   @ApiTags('Admin - product')
-  @ApiExcludeEndpoint(false)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'удалить продукт (только ADMIN)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'продукт успешно удален' })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или обладает не достаточным количеством прав',
-  })
+  @ApiOperation({ summary: 'Удалить продукт (только ADMIN)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Продукт успешно удален' })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'продукт не найден',
+    description: 'Продукт не найден',
   })
   public async deleteProduct(@Param('id') id: string) {
     return await this.productService.delete(id);
   }
 
   @Get('product')
-  @Authorization(UserRole.ADMIN)
   @ApiTags('Admin - product')
-  @ApiExcludeEndpoint(false)
-  @ApiOperation({ summary: 'получение всех продуктов для админ панели' })
+  @ApiOperation({ summary: 'Получение всех продуктов для админ панели' })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'subCategoryId', required: false })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное получение всех продуктов',
+    description: 'Успешное получение всех продуктов',
   })
   public async getProduct(@Query() dto: ProductFilterDto) {
     return this.productService.getAll(dto);
   }
 
   @Get('product/:id')
-  @Authorization(UserRole.ADMIN)
   @ApiTags('Admin - product')
-  @ApiExcludeEndpoint(false)
-  @ApiOperation({ summary: 'получение продукта для айди для админ понели' })
+  @ApiOperation({ summary: 'Получение продукта по ID для админ панели' })
   @ApiParam({
     name: 'id',
     required: true,
     type: 'string',
-    description: 'айди запрашиваемого продукта',
+    description: 'ID запрашиваемого продукта',
   })
   public async getProductById(@Param('id') id: string) {
     return this.productService.getById(id);
   }
 
+  /* ==================== PROVIDERS ==================== */
+
   @Post('provider')
-  @Authorization(UserRole.ADMIN)
   @ApiTags('Admin - provider')
-  @ApiExcludeEndpoint(false)
   @UseInterceptors(FileInterceptor('image'))
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Создать нового производителя (Только ADMIN)' })
+  @ApiOperation({ summary: 'Создать нового поставщика (только ADMIN)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    description: 'Данные производителя + изображение',
+    description: 'Данные поставщика + изображение',
     type: ProviderCreateWithImageDto,
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Успешное создание производителя',
+    description: 'Успешное создание поставщика',
   })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Пользователь не авторизован или имеет недостаточно прав',
-  })
-  @ApiOperation({ summary: 'создание нового поставщика (только ADMIN)' })
   public async createProvider(
     @Body() dto: ProviderCreateDto,
     @UploadedFile() image: Express.Multer.File,
@@ -233,30 +207,23 @@ export class AdminController {
     return this.providerService.create(dto, image);
   }
 
-  @Put('provider:id')
-  @Authorization(UserRole.ADMIN)
+  @Put('provider/:id')
   @ApiTags('Admin - provider')
-  @ApiExcludeEndpoint(false)
   @UseInterceptors(FileInterceptor('image'))
-  @ApiQuery({ type: String, name: 'id', description: 'Айди производителя' })
+  @ApiParam({ name: 'id', type: String, description: 'ID поставщика' })
   @HttpCode(HttpStatus.OK)
   @ApiConsumes('multipart/form-data')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное обновление производителя',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или не облодает достаточнвми правами',
+    description: 'Успешное обновление поставщика',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'производитель не найден',
+    description: 'Поставщик не найден',
   })
   @ApiBody({ type: ProviderUpdateWithImageDto })
-  @ApiOperation({ summary: 'обновление производителя (только ADMIN)' })
-  public async update(
+  @ApiOperation({ summary: 'Обновление поставщика (только ADMIN)' })
+  public async updateProvider(
     @Param('id') id: string,
     @Body() dto: ProviderUpdateDto,
     @UploadedFile() image?: Express.Multer.File,
@@ -264,125 +231,93 @@ export class AdminController {
     return this.providerService.update(dto, id, image);
   }
 
-  @Delete('provider:id')
-  @Authorization(UserRole.ADMIN)
+  @Delete('provider/:id')
   @ApiTags('Admin - provider')
-  @ApiExcludeEndpoint(false)
   @HttpCode(HttpStatus.OK)
   @ApiParam({
     name: 'id',
     type: String,
     required: true,
-    description: 'Айди удаляемоего поставщика',
+    description: 'ID удаляемого поставщика',
   })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Поставщик успешно удален',
   })
   @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'Пользователь не авторизован или обладает недостаточным количеством прав',
-  })
-  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Поставщик с таким айди не найден',
+    description: 'Поставщик с таким ID не найден',
   })
-  @ApiOperation({
-    summary: 'Удаление поставщика (только ADMIN)',
-  })
+  @ApiOperation({ summary: 'Удаление поставщика (только ADMIN)' })
   public async deleteProvider(@Param('id') id: string) {
     return this.providerService.delete(id);
   }
 
   @Get('provider')
   @HttpCode(HttpStatus.OK)
-  @Authorization(UserRole.ADMIN)
-  @ApiExcludeEndpoint(false)
-  @ApiOperation({ summary: 'получение всех проихводителей для админа' })
   @ApiTags('Admin - provider')
+  @ApiOperation({ summary: 'Получение всех поставщиков для админа' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успещное получение всех поставщиков',
+    description: 'Успешное получение всех поставщиков',
   })
   @ApiQuery({ name: 'name', type: 'string', required: false })
-  public async ProviderFindAll(@Query() filterDto: ProviderFilterDto) {
+  public async providerFindAll(@Query() filterDto: ProviderFilterDto) {
     return this.providerService.findAll(filterDto);
   }
 
-  @Get('provider:id')
-  @Authorization(UserRole.ADMIN)
+  @Get('provider/:id')
   @ApiTags('Admin - provider')
-  @ApiExcludeEndpoint(false)
   @HttpCode(HttpStatus.OK)
   @ApiParam({
     name: 'id',
     type: String,
     required: true,
-    description: 'Айди запрашиваегомого поставщика',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'Пользователь не авторизован или обладает недостаточным количеством прав',
+    description: 'ID запрашиваемого поставщика',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Поставщик с таким айди не найден',
+    description: 'Поставщик с таким ID не найден',
   })
-  @ApiOperation({
-    summary: 'получение поставщика по айди (только ADMIN)',
-  })
+  @ApiOperation({ summary: 'Получение поставщика по ID (только ADMIN)' })
   public async getProviderById(@Param('id') id: string) {
     return await this.providerService.findByIdAdmin(id);
   }
 
+  /* ==================== CATEGORIES ==================== */
+
   @Post('category')
-  @Authorization(UserRole.ADMIN)
   @ApiTags('Admin - category')
-  @ApiExcludeEndpoint(false)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное создание категории',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или обладает недостаточными провами',
+    description: 'Успешное создание категории',
   })
   @ApiBody({ type: CreateCategoryDto })
-  @ApiOperation({ summary: 'создание категории' })
-  public async create(@Body() dto: CreateCategoryDto) {
+  @ApiOperation({ summary: 'Создание категории' })
+  public async createCategory(@Body() dto: CreateCategoryDto) {
     return this.categoryService.create(dto);
   }
 
-  @Put('category:id')
+  @Put('category/:id')
   @ApiTags('Admin - category')
-  @ApiExcludeEndpoint(false)
-  @Authorization(UserRole.ADMIN)
   @ApiParam({
     name: 'id',
     type: String,
     required: true,
-    description: 'Айди категории для обновления',
+    description: 'ID категории для обновления',
   })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное обновление категории',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или не облодает достаточнвми правами',
+    description: 'Успешное обновление категории',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'категория не найдена',
+    description: 'Категория не найдена',
   })
   @ApiBody({ type: CategoryUpdateDto })
-  @ApiOperation({ summary: 'обновление категории' })
+  @ApiOperation({ summary: 'Обновление категории' })
   public async updateCategory(
     @Param('id') id: string,
     @Body() dto: CategoryUpdateDto,
@@ -390,101 +325,81 @@ export class AdminController {
     return this.categoryService.update(id, dto);
   }
 
-  @Get('Category:id')
-  @ApiTags('Admin - Category')
-  @ApiExcludeEndpoint(false)
-  @Authorization(UserRole.ADMIN)
+  @Get('category/:id')
+  @ApiTags('Admin - category')
   @HttpCode(HttpStatus.OK)
   @ApiParam({
     name: 'id',
     type: String,
     required: true,
-    description: 'айди категории',
+    description: 'ID категории',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное обновление подкатегории',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или обладает не достаточным количеством прав',
+    description: 'Успешное получение категории',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'не найдена подкатегория',
+    description: 'Категория не найдена',
   })
-  @ApiOperation({ summary: 'получение категорий с подкотегориями по айди' })
-  public async updateSubCategory(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Получение категории с подкатегориями по ID' })
+  public async getCategoryById(@Param('id') id: string) {
     return this.categoryService.findById(id);
   }
 
-  @Delete('category:id')
+  @Delete('category/:id')
   @ApiTags('Admin - category')
-  @ApiExcludeEndpoint(false)
-  @Authorization(UserRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({
     name: 'id',
     type: String,
     required: true,
-    description: 'айди категории',
+    description: 'ID категории',
   })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: 'успешное удаление категории',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description:
-      'пользователь не авторизован или обладает не достаточным количеством прав',
+    description: 'Успешное удаление категории',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'не найдена категория',
+    description: 'Категория не найдена',
   })
-  @ApiOperation({ summary: 'удаление категории' })
-  public async delete(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Удаление категории' })
+  public async deleteCategory(@Param('id') id: string) {
     return this.categoryService.delete(id);
   }
 
   @Get('category')
+  @ApiTags('Admin - category')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное получение всех категорий',
+    description: 'Успешное получение всех категорий',
   })
-  @Authorization(UserRole.ADMIN)
-  @ApiTags('Admin - category')
-  @ApiExcludeEndpoint(false)
-  @ApiOperation({ summary: 'получение всех категорий вместе с подкатегориями' })
+  @ApiOperation({ summary: 'Получение всех категорий вместе с подкатегориями' })
   @ApiQuery({ name: 'name', type: String, required: false })
   @ApiQuery({ name: 'page', type: Number, example: 1 })
-  public async findAll(@Query() filterDto: CategoryFilterDto) {
+  public async findAllCategories(@Query() filterDto: CategoryFilterDto) {
     return this.categoryService.getAll(filterDto);
   }
 
-  @Get('sabCategory')
+  @Get('subcategory')
+  @ApiTags('Admin - subCategory')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'успешное получение всех категорий',
+    description: 'Успешное получение всех подкатегорий',
   })
-  @Authorization(UserRole.ADMIN)
-  @ApiTags('Admin - subCategory')
-  @ApiExcludeEndpoint(false)
-  @ApiOperation({
-    summary: 'получение всех подкатегорий вместе с подкатегориями',
-  })
+  @ApiOperation({ summary: 'Получение всех подкатегорий' })
   public async getSubCategory() {
     return this.categoryService.getSubCategory();
   }
 
+  /* ==================== USERS ==================== */
+
   @Post('user/:id')
-  @Authorization(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiTags('Admin - user')
-  @ApiExcludeEndpoint(false)
-  @ApiOperation({ summary: 'обновление роли пользователя' })
-  public async updateUser(
+  @ApiOperation({ summary: 'Обновление роли пользователя' })
+  public async updateUserRole(
     @Param('id') id: string,
     @Body() dto: UserUpdateRoleDto,
   ) {
@@ -493,53 +408,26 @@ export class AdminController {
   }
 
   @Get('users')
-  @Authorization(UserRole.ADMIN)
   @ApiTags('Admin - user')
-  @ApiExcludeEndpoint(false)
   @ApiOperation({
     summary:
       'Получить всех пользователей с пагинацией, поиском и сортировкой (только ADMIN)',
   })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Номер страницы',
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Количество элементов на странице',
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    example: 'john',
-    description: 'Поиск по имени, email или телефону',
-  })
-  @ApiQuery({
-    name: 'role',
-    required: false,
-    enum: UserRole,
-    description: 'Фильтр по роли пользователя',
-  })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, example: 'john' })
+  @ApiQuery({ name: 'role', required: false, enum: UserRole })
   @ApiQuery({
     name: 'sortBy',
     required: false,
     type: String,
     example: 'createdAt',
-    description: 'Поле для сортировки (createdAt, name, email и т.д.)',
   })
   @ApiQuery({
     name: 'sortOrder',
     required: false,
     enum: ['asc', 'desc'],
     example: 'desc',
-    description: 'Направление сортировки',
   })
   public async getAllUsers(
     @Query() dto: GetUsersDto,
@@ -548,39 +436,29 @@ export class AdminController {
   }
 
   @Put('users/block/:id')
-  @Authorization(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiTags('Admin - user')
-  @ApiOperation({ summary: 'блокировка и разблокировка пользователя' })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    type: String,
-  })
-  public async blockedUser(
-    @Param('id') id: string,
-    @Body() dto: UserBlockedDTO,
-  ) {
+  @ApiOperation({ summary: 'Блокировка и разблокировка пользователя' })
+  @ApiParam({ name: 'id', required: true, type: String })
+  public async blockUser(@Param('id') id: string, @Body() dto: UserBlockedDTO) {
     return this.adminService.blockUser(id, dto);
   }
 
+  /* ==================== PROMOTIONS ==================== */
+
   @Post('promotion')
-  @Authorization(UserRole.ADMIN)
+  @ApiTags('Admin - promotion')
   @UseInterceptors(FileInterceptor('image'))
   @UsePipes(validationPipe)
   @ApiOperation({ summary: 'Создать новую акцию (только ADMIN)' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: 'Данные акции + изображение',
-    type: PromotionCreateWithImageDto,
-  })
+  @ApiBody({ type: PromotionCreateWithImageDto })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Акция успешно создана',
   })
   @ApiBadRequestResponse({ description: 'Неверный формат файла или данные' })
-  @ApiTags('Admin - promotion')
-  public async PromotionCreate(
+  public async createPromotion(
     @UploadedFile() image: Express.Multer.File,
     @Body() dto: PromotionCreateDto,
   ) {
@@ -592,7 +470,7 @@ export class AdminController {
   }
 
   @Put('promotion/:id')
-  @Authorization(UserRole.ADMIN)
+  @ApiTags('Admin - promotion')
   @UseInterceptors(FileInterceptor('image'))
   @UsePipes(validationPipe)
   @ApiOperation({
@@ -608,8 +486,7 @@ export class AdminController {
     status: HttpStatus.NOT_FOUND,
     description: 'Акция не найдена',
   })
-  @ApiTags('Admin - promotion')
-  public async PromotionUpdate(
+  public async updatePromotion(
     @Param('id') id: string,
     @UploadedFile() image: Express.Multer.File | undefined,
     @Body() dto: PromotionUpdateDto,
@@ -618,8 +495,8 @@ export class AdminController {
     return plainToInstance(PromotionResponseDto, promotion);
   }
 
-  @Delete('promotion:id')
-  @Authorization(UserRole.ADMIN)
+  @Delete('promotion/:id')
+  @ApiTags('Admin - promotion')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Удалить акцию (только ADMIN)' })
   @ApiParam({ name: 'id', type: String, description: 'ID акции' })
@@ -628,13 +505,12 @@ export class AdminController {
     status: HttpStatus.NOT_FOUND,
     description: 'Акция не найдена',
   })
-  @ApiTags('Admin - promotion')
-  public async PromotionDelete(@Param('id') id: string) {
+  public async deletePromotion(@Param('id') id: string) {
     return await this.promotionService.delete(id);
   }
 
   @Get('promotion')
-  @Authorization(UserRole.ADMIN)
+  @ApiTags('Admin - promotion')
   @ApiOperation({
     summary: 'Список акций с пагинацией/фильтром (только ADMIN)',
   })
@@ -647,16 +523,13 @@ export class AdminController {
     status: HttpStatus.OK,
     description: 'Успешное получение списка акций',
   })
-  @ApiTags('Admin - promotion')
-  public async getAll(@Query() filterDto: PromotionFilterDto) {
+  public async getAllPromotions(@Query() filterDto: PromotionFilterDto) {
     const result = await this.promotionService.getAll(filterDto);
-    return {
-      items: plainToInstance(PromotionResponseDto, result),
-    };
+    return plainToInstance(PromotionResponseDto, result);
   }
 
   @Get('promotion/:id')
-  @Authorization(UserRole.ADMIN)
+  @ApiTags('Admin - promotion')
   @ApiOperation({ summary: 'Получить акцию по ID (только ADMIN)' })
   @ApiParam({ name: 'id', type: String, description: 'ID акции' })
   @ApiResponse({
@@ -667,47 +540,43 @@ export class AdminController {
     status: HttpStatus.NOT_FOUND,
     description: 'Акция не найдена',
   })
-  @ApiTags('Admin - promotion')
-  public async getById(@Param('id') id: string) {
+  public async getPromotionById(@Param('id') id: string) {
     const promotion = await this.promotionService.getById(id);
     return plainToInstance(PromotionResponseDto, promotion);
   }
 
+  /* ==================== PROMO CODES ==================== */
+
   @Post('promo')
-  @Authorization(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Создать промокод' })
   @ApiTags('Admin - promo')
-  async createPromoCode(@Body() data: CreatePromoDto) {
+  @ApiOperation({ summary: 'Создать промокод' })
+  public async createPromoCode(@Body() data: CreatePromoDto) {
     return this.promoCodeService.createPromoCode(data);
   }
 
   @Put('promo/:id')
-  @Authorization(UserRole.ADMIN)
-  @ApiOperation({ summary: 'обновление данных промокода' })
-  @ApiParam({
-    name: 'id',
-    type: 'string',
-    required: true,
-  })
   @ApiTags('Admin - promo')
-  async updatePromoCode(@Param('id') id: string, @Body() data: UpdatePromoDto) {
+  @ApiOperation({ summary: 'Обновление данных промокода' })
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  public async updatePromoCode(
+    @Param('id') id: string,
+    @Body() data: UpdatePromoDto,
+  ) {
     return this.promoCodeService.updatePromoCode(data, id);
   }
 
   @Delete('promo/:id')
-  @Authorization(UserRole.ADMIN)
-  @ApiOperation({ summary: 'удаление промокода' })
-  @ApiParam({ name: 'id', type: 'string', required: true })
   @ApiTags('Admin - promo')
-  async deletePromoCode(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Удаление промокода' })
+  @ApiParam({ name: 'id', type: 'string', required: true })
+  public async deletePromoCode(@Param('id') id: string) {
     return this.promoCodeService.deletePromoCode(id);
   }
 
   @Get('promo')
-  @Authorization(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Получене всех промокодов (для Админа)' })
   @ApiTags('Admin - promo')
-  async getPromoCode() {
+  @ApiOperation({ summary: 'Получение всех промокодов (для Админа)' })
+  public async getAllPromoCodes() {
     return this.promoCodeService.getAllPromoCodes();
   }
 }
