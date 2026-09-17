@@ -57,6 +57,67 @@ export class ProductService {
     return existingProduct;
   }
 
+  public async getForCatalog(dto: ProductFilterDto) {
+    const cacheKey = `products:list:${JSON.stringify(dto)}`;
+
+    // 2. Проверяем кэш
+    const cachedData = await this.cacheManager.get(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    // 3. Выполняем запрос к БД при промахе кэша
+    const { name, subCategoryId, cursor, limit = 28 } = dto;
+    const where: Prisma.ProductWhereInput = {};
+
+    if (name?.trim()) {
+      where.name = {
+        contains: name.trim(),
+        mode: 'insensitive',
+      };
+    }
+
+    if (subCategoryId?.trim()) {
+      where.subCategoryId = subCategoryId.trim();
+    }
+
+    const products = await this.prismaService.product.findMany({
+      where,
+      take: limit,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      omit: {
+        subCategoryId: true,
+        providerId: true,
+        monthlySales: true,
+        totalSales: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      include: {
+        Provider: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    });
+
+    const nextCursor =
+      products.length === limit ? products[products.length - 1].id : null;
+
+    const result = {
+      data: products,
+      nextCursor,
+    };
+
+    // 4. Сохраняем в кэш на 2 минуты (120 000 мс)
+    await this.cacheManager.set(cacheKey, result, 120000);
+
+    return result;
+  }
+
   public async create(image: Express.Multer.File, dto: ProductCreateDto) {
     if (!image) {
       throw new BadRequestException(
@@ -217,11 +278,21 @@ export class ProductService {
     const product = await this.prismaService.product.findUnique({
       where: { id },
       include: {
-        subCategory: true,
-        Provider: true,
         Taste: true,
         Size: true,
         characteristic: true,
+        Provider: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      omit: {
+        createdAt: true,
+        updatedAt: true,
+        monthlySales: true,
+        totalSales: true,
+        providerId: true,
       },
     });
 

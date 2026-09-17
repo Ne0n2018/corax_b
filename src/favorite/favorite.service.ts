@@ -11,7 +11,7 @@ export class FavoriteService {
   constructor(private prisma: PrismaService) {}
 
   async addToFavorites(userId: string, dto: CreateFavoriteDto) {
-    // Проверяем, существует ли товар
+    // 1. Проверяем существование товара
     const product = await this.prisma.product.findUnique({
       where: { id: dto.productId },
     });
@@ -20,23 +20,38 @@ export class FavoriteService {
       throw new NotFoundException('Товар не найден');
     }
 
-    try {
-      this.prisma.favorite.create({
-        data: {
-          userId,
-          productId: dto.productId,
-        },
-        include: {
-          product: true, // возвращаем информацию о товаре
-        },
-      });
-      return { success: true };
-    } catch (error) {
-      if (error.code === 'P2002') {
-        throw new ConflictException('Этот товар уже в избранном');
-      }
-      throw error;
+    // 2. Проверяем, есть ли уже товар в избранном У ЭТОГО ПОЛЬЗОВАТЕЛЯ
+    const existingFavorite = await this.prisma.favorite.findFirst({
+      where: {
+        userId,
+        productId: dto.productId,
+      },
+    });
+
+    if (existingFavorite) {
+      throw new ConflictException('Товар уже добавлен в избранное');
     }
+
+    // 3. Создаем запись с await и возвращаем созданный объект
+    await this.prisma.favorite.create({
+      data: {
+        userId,
+        productId: dto.productId,
+      },
+      include: {
+        product: true,
+      },
+    });
+    return { message: 'Товар успешно добавлен в избранное' };
+  }
+
+  public async getFavorites(userId: string) {
+    return await this.prisma.favorite.findMany({
+      where: { userId },
+      select: {
+        productId: true,
+      },
+    });
   }
 
   async removeFromFavorites(userId: string, productId: string) {
@@ -50,11 +65,13 @@ export class FavoriteService {
       throw new NotFoundException('Товар не найден в избранном');
     }
 
-    return this.prisma.favorite.delete({
+    await this.prisma.favorite.delete({
       where: {
         userId_productId: { userId, productId },
       },
     });
+
+    return { message: 'Товар успешно удален из избранного' };
   }
 
   async getUserFavorites(userId: string) {

@@ -37,4 +37,13 @@ export class FavoriteController {
   getFavorites(@Authorized('id') id: string) {
     return this.favoriteService.getUserFavorites(id);
   }
+
+  @Get('favorites')
+  @ApiOperation({
+    summary: 'Получить айди всех избранных товаров пользователя',
+  })
+  @Authorization()
+  public async getUserFavorites(@Authorized('id') id: string) {
+    return await this.favoriteService.getFavorites(id);
+  }
 }

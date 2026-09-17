@@ -28,8 +28,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Получить список всех продуктов' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Список продуктов' })
   public async findAll(@Query() filterDTO: ProductFilterDto) {
-    const products = await this.productService.getAll(filterDTO);
-    return plainToInstance(ProductResponseDto, products);
+    return this.productService.getForCatalog(filterDTO);
   }
 
   @Get(':id')
