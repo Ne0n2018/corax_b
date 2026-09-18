@@ -35,7 +35,11 @@ export class BePaidService {
       this.configService.getOrThrow<string>('BEPAID_SECRET_KEY');
     const appUrl = this.configService.getOrThrow<string>('BEPAID_CALLBACK_URL');
     const clientUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
-    const isTest = this.configService.get<string>('NODE_ENV') !== 'production';
+    const testModeConfig = this.configService.get<string>('BEPAID_TEST_MODE');
+    const isTest =
+      testModeConfig !== undefined
+        ? testModeConfig === 'true'
+        : this.configService.get<string>('NODE_ENV') !== 'production';
 
     // bePaid принимает сумму в копейках (целое число)
     const amountInCents = amount * 100;
