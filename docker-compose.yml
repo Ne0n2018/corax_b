@@ -23,6 +23,10 @@ services:
     depends_on:
       - db
       - redis
+    extra_hosts:
+      - "checkout.bepaid.by:185.183.120.65"
+      - "s3-minsk.cloud.mts.by:134.17.88.139"
+      - "image.s3-minsk.cloud.mts.by:134.17.88.139"
     networks:
       - backend
       - dokploy-network

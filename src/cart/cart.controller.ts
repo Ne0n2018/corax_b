@@ -41,6 +41,13 @@ export class CartController {
     return plainToInstance(CartResponse, cart);
   }
 
+  @Get('discount')
+  @ApiOperation({ summary: 'Рассчитать скидку для корзины текущего пользователя' })
+  @HttpCode(HttpStatus.OK)
+  public async getCartDiscount(@Authorized('id') userId: string) {
+    return this.cartService.getCartDiscount(userId);
+  }
+
   @Post()
   @ApiOperation({ summary: 'Добавить товар в корзину' })
   @ApiResponse({ status: 200, description: 'Корзина после добавления', type: CartResponse })

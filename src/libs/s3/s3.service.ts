@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException, OnModuleInit } from '@nestjs/common';
+import { Injectable, BadRequestException, OnModuleInit, Logger } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { S3 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class S3Service implements OnModuleInit {
+  private readonly logger = new Logger(S3Service.name);
   private readonly bucket: string;
 
   constructor(
@@ -22,8 +23,8 @@ export class S3Service implements OnModuleInit {
     try {
       try {
         await this.s3.headBucket({ Bucket: this.bucket });
-      } catch (error) {
-        if (error.statusCode === 404) {
+      } catch (error: any) {
+        if (error.statusCode === 404 || error.$metadata?.httpStatusCode === 404) {
           await this.s3.createBucket({ Bucket: this.bucket });
         }
       }
@@ -45,9 +46,9 @@ export class S3Service implements OnModuleInit {
         Bucket: this.bucket,
         Policy: JSON.stringify(policy),
       });
-    } catch (error) {
-      console.error('Full error:', error);
-      throw new BadRequestException(`Bucket config failed: ${error.message}`);
+      this.logger.log(`S3 bucket "${this.bucket}" configured successfully`);
+    } catch (error: any) {
+      this.logger.warn(`S3 bucket initialization warning: ${error?.message || error}`);
     }
   }
 

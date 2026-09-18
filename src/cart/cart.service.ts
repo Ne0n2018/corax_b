@@ -3,12 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AddCartDto } from './dto/add.cart.dto';
 import { UpdateCartDto } from './dto/update.cart.dto';
 import { ProductService } from '../product/product.service';
+import { PromotionService } from '../promotion/promotion.service';
 
 @Injectable()
 export class CartService {
   public constructor(
     private readonly prismaService: PrismaService,
     private readonly productService: ProductService,
+    private readonly promotionService: PromotionService,
   ) {}
 
   // ─── Приватные утилиты ──────────────────────────────────────────────────────
@@ -92,7 +94,43 @@ export class CartService {
       });
     }
 
-    return cart;
+    let discountAmount = 0;
+    let appliedPromotions: any[] = [];
+
+    if (cart.CartItem && cart.CartItem.length > 0) {
+      try {
+        const discountResult = await this.promotionService.calculateDiscount(
+          cart as any,
+          { id: userId },
+        );
+        discountAmount = discountResult.totalDiscount || 0;
+        appliedPromotions = discountResult.breakdown || [];
+      } catch (e) {
+        // Если расчет скидок выдал ошибку, скидка 0
+      }
+    }
+
+    const finalAmount = Math.max(0, cart.totalAmount - discountAmount);
+
+    return {
+      ...cart,
+      discountAmount,
+      finalAmount,
+      appliedPromotions,
+    };
+  }
+
+  /**
+   * Рассчитать скидку для корзины текущего пользователя
+   */
+  public async getCartDiscount(userId: string) {
+    const cart = await this.getCart(userId);
+    return {
+      totalAmount: cart.totalAmount,
+      discountAmount: cart.discountAmount,
+      finalAmount: cart.finalAmount,
+      appliedPromotions: cart.appliedPromotions,
+    };
   }
 
   /**
@@ -157,7 +195,7 @@ export class CartService {
     // 5. Пересчитать итоговую сумму
     await this.recalculateTotalAmount(cart.id);
 
-    return this.getCart(userId);
+    return { message: 'товар успешно добавлен в корзину' };
   }
 
   /**
@@ -186,7 +224,7 @@ export class CartService {
 
     await this.recalculateTotalAmount(cart.id);
 
-    return this.getCart(userId);
+    return { message: 'Корзина успешно обновлена' };
   }
 
   /**
@@ -209,7 +247,7 @@ export class CartService {
 
     await this.recalculateTotalAmount(cart.id);
 
-    return this.getCart(userId);
+    return { message: 'Товар убран из корзины' };
   }
 
   /**
@@ -227,6 +265,6 @@ export class CartService {
       data: { totalAmount: 0 },
     });
 
-    return this.getCart(userId);
+    return { message: 'Корзина успешно отчищена' };
   }
 }
