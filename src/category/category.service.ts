@@ -1,16 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/category.create.dto';
-import { SubCategoryCreateDto } from './dto/subCategory.create.dto';
 import { CategoryUpdateDto } from './dto/category.update.dto';
-import { SubCategoryUpdateDto } from './dto/subCategory.update.dto';
 import type { Prisma } from '../generated/prisma/client';
-import { SubCategoryFilterDto } from './dto/filter/subCategory.filter.dto';
 import { CategoryFilterDto } from './dto/filter/category.filter.dto';
+import { AppCacheService } from '../libs/cache/cache.service';
 
 @Injectable()
 export class CategoryService {
-  public constructor(private readonly prismaService: PrismaService) {}
+  public constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cacheService: AppCacheService,
+  ) {}
 
   public async findById(id: string) {
     const existingCategory = await this.prismaService.category.findUnique({
@@ -70,7 +71,7 @@ export class CategoryService {
   public async create(dto: CreateCategoryDto) {
     const { name, subCategory } = dto;
 
-    return this.prismaService.category.create({
+    const created = await this.prismaService.category.create({
       data: {
         name,
         SubCategory: subCategory?.length
@@ -85,6 +86,10 @@ export class CategoryService {
         SubCategory: true,
       },
     });
+
+    await this.cacheService.clearCategoryCache();
+
+    return created;
   }
 
   // Обновление категории и пакетное обновление/создание подкатегорий
@@ -96,7 +101,7 @@ export class CategoryService {
     const newSubCategories = subCategory?.filter((sub) => !sub.id) || [];
     const existingSubCategories = subCategory?.filter((sub) => sub.id) || [];
 
-    return this.prismaService.category.update({
+    const updated = await this.prismaService.category.update({
       where: { id },
       data: {
         name,
@@ -120,6 +125,10 @@ export class CategoryService {
         SubCategory: true,
       },
     });
+
+    await this.cacheService.clearCategoryCache();
+
+    return updated;
   }
 
   public async delete(id: string) {
@@ -127,6 +136,7 @@ export class CategoryService {
     await this.prismaService.category.delete({
       where: { id },
     });
+    await this.cacheService.clearCategoryCache();
     return true;
   }
 }

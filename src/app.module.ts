@@ -31,7 +31,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { APP_GUARD } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet';
+import { createKeyv } from '@keyv/redis';
+import { AppCacheModule } from './libs/cache/cache.module';
 
 @Module({
   imports: [
@@ -100,12 +101,12 @@ import { redisStore } from 'cache-manager-redis-yet';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        store: await redisStore({
-          url: configService.getOrThrow<string>('REDIS_URI'),
-          ttl: 6 * 1000,
-        }),
+        stores: [
+          createKeyv(configService.getOrThrow<string>('REDIS_URI')),
+        ],
       }),
     }),
+    AppCacheModule,
     PrismaModule,
     AuthModule,
     UserModule,

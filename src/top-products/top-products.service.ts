@@ -1,12 +1,20 @@
 import { PrismaService } from '../prisma/prisma.service';
 import { Cron } from '@nestjs/schedule';
 import { Injectable, Logger } from '@nestjs/common';
+import { AppCacheService } from '../libs/cache/cache.service';
 
 @Injectable()
 export class TopProductsService {
   private readonly logger = new Logger(TopProductsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cacheService: AppCacheService,
+  ) {}
+
+  public async clearCache() {
+    await this.cacheService.clearTopProductsCache();
+  }
 
   // Запускается автоматически 1-го числа каждого месяца в 00:05
   @Cron('5 0 1 * *')
@@ -18,7 +26,9 @@ export class TopProductsService {
       data: { monthlySales: 0 },
     });
 
-    this.logger.log('✅ Счётчики monthlySales сброшены');
+    await this.clearCache();
+
+    this.logger.log('✅ Счётчики monthlySales сброшены, кэш топа очищен');
   }
 
   async getTopProducts(limit: number = 3) {
@@ -59,5 +69,7 @@ export class TopProductsService {
         totalSales: { increment: quantity },
       },
     });
+
+    await this.clearCache();
   }
 }

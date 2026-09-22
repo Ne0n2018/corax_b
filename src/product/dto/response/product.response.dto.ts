@@ -73,6 +73,9 @@ export class ProductResponseDto {
   @ApiProperty()
   advantages: string;
 
+  @ApiProperty({ type: Boolean, example: false })
+  isClothes: boolean;
+
   @ApiProperty()
   structure: string;
 

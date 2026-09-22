@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -13,8 +12,7 @@ import { ProviderService } from '../provider/provider.service';
 import { ProductFilterDto } from './dto/product.filter.dto';
 import type { Prisma, Product } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import type { Cache } from 'cache-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { AppCacheService } from '../libs/cache/cache.service';
 
 @Injectable()
 export class ProductService {
@@ -23,22 +21,8 @@ export class ProductService {
     private readonly s3Service: S3Service,
     private readonly prismaService: PrismaService,
     private readonly providersService: ProviderService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly cacheService: AppCacheService,
   ) {}
-
-  /**
-   * Вспомогательный метод для очистки кэша всех списков товаров
-   */
-  private async clearListCache(): Promise<void> {
-    const store = this.cacheManager.stores as any;
-    // Если клиент поддерживается (ioredis / redis-yet), удаляем все ключи списков по маске
-    if (store.client?.keys) {
-      const keys = await store.client.keys('products:list:*');
-      if (keys.length > 0) {
-        await store.client.del(keys);
-      }
-    }
-  }
 
   private async findById(id: string) {
     const existingProduct = await this.prismaService.product.findUnique({
@@ -58,10 +42,10 @@ export class ProductService {
   }
 
   public async getForCatalog(dto: ProductFilterDto) {
-    const cacheKey = `products:list:${JSON.stringify(dto)}`;
+    const cacheKey = `products:catalog:${JSON.stringify(dto)}`;
 
     // 2. Проверяем кэш
-    const cachedData = await this.cacheManager.get(cacheKey);
+    const cachedData = await this.cacheService.get(cacheKey);
     if (cachedData) {
       return cachedData;
     }
@@ -113,7 +97,7 @@ export class ProductService {
     };
 
     // 4. Сохраняем в кэш на 2 минуты (120 000 мс)
-    await this.cacheManager.set(cacheKey, result, 120000);
+    await this.cacheService.set(cacheKey, result, 120000);
 
     return result;
   }
@@ -195,8 +179,8 @@ export class ProductService {
         },
       });
 
-      // Инвалидируем кэш списков, так как появился новый товар
-      await this.clearListCache();
+      // Инвалидируем кэш списков и продукта, так как появился новый товар
+      await this.cacheService.clearProductCache(product.id);
 
       return { message: 'Продукт успешно создан', productId: product.id };
     } catch (error) {
@@ -220,10 +204,10 @@ export class ProductService {
 
   public async getAll(dto: ProductFilterDto) {
     // 1. Формируем уникальный ключ на основе параметров фильтрации
-    const cacheKey = `products:list:${JSON.stringify(dto)}`;
+    const cacheKey = `products:all:${JSON.stringify(dto)}`;
 
     // 2. Проверяем кэш
-    const cachedData = await this.cacheManager.get(cacheKey);
+    const cachedData = await this.cacheService.get(cacheKey);
     if (cachedData) {
       return cachedData;
     }
@@ -260,7 +244,7 @@ export class ProductService {
     };
 
     // 4. Сохраняем в кэш на 2 минуты (120 000 мс)
-    await this.cacheManager.set(cacheKey, result, 120000);
+    await this.cacheService.set(cacheKey, result, 120000);
 
     return result;
   }
@@ -269,9 +253,9 @@ export class ProductService {
     const cacheKey = `product:${id}`;
 
     // 1. Проверяем кэш отдельного товара
-    const cachedProduct = await this.cacheManager.get(cacheKey);
+    const cachedProduct = await this.cacheService.get<Product>(cacheKey);
     if (cachedProduct) {
-      return cachedProduct as Product;
+      return cachedProduct;
     }
 
     // 2. Выполняем 1 запрос со всеми связями вместо дублирования findById
@@ -283,6 +267,13 @@ export class ProductService {
         characteristic: true,
         Provider: {
           select: {
+            id: true,
+            name: true,
+          },
+        },
+        subCategory: {
+          select: {
+            id: true,
             name: true,
           },
         },
@@ -292,7 +283,6 @@ export class ProductService {
         updatedAt: true,
         monthlySales: true,
         totalSales: true,
-        providerId: true,
       },
     });
 
@@ -303,7 +293,7 @@ export class ProductService {
     }
 
     // 3. Сохраняем товар в кэш на 10 минут (600 000 мс)
-    await this.cacheManager.set(cacheKey, product, 600000);
+    await this.cacheService.set(cacheKey, product, 600000);
 
     return product;
   }
@@ -327,18 +317,55 @@ export class ProductService {
       );
     }
 
+    const cleanString = (val?: string) => {
+      if (!val || typeof val !== 'string') return undefined;
+      const trimmed = val.trim();
+      return !trimmed ||
+        trimmed === 'string' ||
+        trimmed === 'null' ||
+        trimmed === 'undefined'
+        ? undefined
+        : trimmed;
+    };
+
+    const providerId = cleanString(dto.providerId);
+    if (providerId) {
+      await this.providersService.findById(providerId);
+    }
+
+    const subCategoryId = cleanString(dto.subCategoryId);
+    if (subCategoryId) {
+      await this.categoryService.findByIdSubCategory(subCategoryId);
+    }
+
     await this.prismaService.product.update({
       where: { id },
       data: {
-        name: dto.name,
-        description: dto.description,
-        shortDescription: dto.shortDescription,
-        formRelease: dto.formRelease,
-        structure: dto.structure,
-        advantages: dto.advantages,
-        providerId: dto.providerId,
-        subCategoryId: dto.subCategoryId,
-        defaultPrice: dto.defaultPrice,
+        name: cleanString(dto.name),
+        description: cleanString(dto.description),
+        shortDescription: cleanString(dto.shortDescription),
+        formRelease: cleanString(dto.formRelease),
+        structure: cleanString(dto.structure),
+        advantages: cleanString(dto.advantages),
+        providerId,
+        subCategoryId,
+        defaultPrice:
+          dto.defaultPrice !== undefined &&
+          !isNaN(Number(dto.defaultPrice)) &&
+          Number(dto.defaultPrice) > 0
+            ? Number(dto.defaultPrice)
+            : undefined,
+        isClothes:
+          dto.isClothes !== undefined &&
+          dto.isClothes !== null &&
+          dto.isClothes !== '' &&
+          dto.isClothes !== 'undefined' &&
+          dto.isClothes !== 'null'
+            ? typeof dto.isClothes === 'string'
+              ? dto.isClothes.trim().toLowerCase() === 'true' ||
+                dto.isClothes.trim() === '1'
+              : Boolean(dto.isClothes)
+            : undefined,
         imageUrl: newImageUrl,
 
         characteristic: dto.characteristic
@@ -382,9 +409,8 @@ export class ProductService {
       },
     });
 
-    // Очищаем кэш конкретного товара и кэш списков
-    await this.cacheManager.del(`product:${id}`);
-    await this.clearListCache();
+    // Очищаем кэш конкретного товара, списков и топов
+    await this.cacheService.clearProductCache(id);
 
     return { message: 'Продукт успешно обновлен' };
   }
@@ -401,9 +427,8 @@ export class ProductService {
       where: { id },
     });
 
-    // Очищаем кэш
-    await this.cacheManager.del(`product:${id}`);
-    await this.clearListCache();
+    // Очищаем кэш товара, списков и топов
+    await this.cacheService.clearProductCache(id);
 
     return { message: 'Продукт успешно удален' };
   }

@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CharacteristicCreateDto } from './characteristic.create.dto';
 import { TasteCreateDto } from './taste.create.dto';
 import { SizeCreateDto } from './size.create.dto';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class ProductCreateDto {
   @IsString({ message: 'Имя продукта должно быть стракой' })
@@ -96,11 +96,16 @@ export class ProductCreateDto {
     example: [{ name: 'XL', price: 1590 }],
   })
   size: SizeCreateDto[];
+  @Transform(({ value }) => {
+    if (value === 'false' || value === false || value === 0 || value === '0') return false;
+    if (value === 'true' || value === true || value === 1 || value === '1') return true;
+    return value;
+  })
   @IsBoolean({ message: 'Маркер одежды должен быть булевым значением' })
   @IsNotEmpty()
   @ApiProperty({
     type: Boolean,
     example: false,
   })
-  isClothes: boolean;
+  isClothes: boolean | string;
 }

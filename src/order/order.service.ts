@@ -380,7 +380,7 @@ export class OrderService {
         item.size,
         item.quantity,
       );
-      this.topService.incrementSales(item.id, item.quantity);
+      this.topService.incrementSales(item.productId, item.quantity);
     }
   }
 
@@ -420,6 +420,7 @@ type OrderWithItems = {
   address: string | null;
   items: {
     id: string;
+    productId: string;
     productName: string;
     taste: string;
     size: string;

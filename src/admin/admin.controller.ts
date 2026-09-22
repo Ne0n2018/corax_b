@@ -89,7 +89,6 @@ export class AdminController {
     new ParseJsonFieldsPipe(['characteristic', 'taste', 'size']),
     new ValidationPipe({
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors) => new BadRequestException(errors),
     }),
   )
@@ -114,11 +113,10 @@ export class AdminController {
   @Put('product/:id')
   @ApiTags('Admin - product')
   @UseInterceptors(FileInterceptor('image'))
-  @UsePipes(new ParseJsonFieldsPipe(['characteristic', 'taste', 'size']))
   @UsePipes(
+    new ParseJsonFieldsPipe(['characteristic', 'taste', 'size']),
     new ValidationPipe({
       transform: true,
-      transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors) => {
         console.log(errors);
         return new BadRequestException(errors);

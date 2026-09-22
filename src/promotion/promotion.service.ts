@@ -1,8 +1,6 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { S3Service } from '../libs/s3/s3.service';
@@ -12,8 +10,7 @@ import { PromotionUpdateDto } from './dto/promotion.update.dto';
 import { PromotionFilterDto } from './dto/promotion.filter.dto';
 import { DiscountMethod, PromotionType } from '../generated/prisma/enums';
 import type { Prisma, Promotion } from '../generated/prisma/client';
-import type { Cache } from 'cache-manager';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { AppCacheService } from '../libs/cache/cache.service';
 
 export interface AppliedPromotion {
   promotionId: string;
@@ -44,29 +41,14 @@ export class PromotionService {
   public constructor(
     private readonly s3Service: S3Service,
     private readonly prismaService: PrismaService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly cacheService: AppCacheService,
   ) {}
 
   /**
    * Вспомогательный метод для сброса кэша акций при изменениях.
    */
   private async clearCache(id?: string): Promise<void> {
-    if (id) {
-      await this.cacheManager.del(`promotion:${id}`);
-    }
-    await this.cacheManager.del('promotions:active');
-
-    const store = this.cacheManager.stores as any;
-    if (store.client?.keys) {
-      // Сбрасываем списки акций и кэшированные топы популярных товаров
-      const listKeys = await store.client.keys('promotions:list:*');
-      const popularKeys = await store.client.keys('promotions:popular_top:*');
-      const keysToDelete = [...listKeys, ...popularKeys];
-
-      if (keysToDelete.length > 0) {
-        await store.client.del(keysToDelete);
-      }
-    }
+    await this.cacheService.clearPromotionCache(id);
   }
 
   // ─── Публичные CRUD-методы ──────────────────────────────────────────────────
@@ -163,7 +145,7 @@ export class PromotionService {
 
   public async getAll(dto: PromotionFilterDto) {
     const cacheKey = `promotions:list:${JSON.stringify(dto)}`;
-    const cachedData = await this.cacheManager.get(cacheKey);
+    const cachedData = await this.cacheService.get(cacheKey);
     if (cachedData) {
       return cachedData as Promotion[];
     }
@@ -198,27 +180,27 @@ export class PromotionService {
     ]);
 
     const result = { items, total };
-    await this.cacheManager.set(cacheKey, result, 120000); // 2 минуты
+    await this.cacheService.set(cacheKey, result, 120000); // 2 минуты
 
     return result;
   }
 
   public async getById(id: string) {
     const cacheKey = `promotion:${id}`;
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheService.get(cacheKey);
     if (cached) {
       return cached as Promotion;
     }
 
     const promotion = await this.findById(id);
-    await this.cacheManager.set(cacheKey, promotion, 600000); // 10 минут
+    await this.cacheService.set(cacheKey, promotion, 600000); // 10 минут
 
     return promotion;
   }
 
   public async getActive() {
     const cacheKey = 'promotions:active';
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheService.get(cacheKey);
     if (cached) {
       return cached;
     }
@@ -239,7 +221,7 @@ export class PromotionService {
       orderBy: { createdAt: 'desc' },
     });
 
-    await this.cacheManager.set(cacheKey, activePromotions, 300000); // 5 минут
+    await this.cacheService.set(cacheKey, activePromotions, 300000); // 5 минут
 
     return activePromotions;
   }
@@ -401,7 +383,7 @@ export class PromotionService {
     if (topN < 1) return 0;
 
     const cacheKey = `promotions:popular_top:${topN}`;
-    let topProductIds = await this.cacheManager.get<string[]>(cacheKey);
+    let topProductIds = await this.cacheService.get<string[]>(cacheKey);
 
     if (!topProductIds) {
       const grouped = await this.prismaService.orderItem.groupBy({
@@ -413,7 +395,7 @@ export class PromotionService {
 
       topProductIds = grouped.map((g) => g.productId);
       // Сохраняем список популярных ID в кэше на 1 час (3 600 000 мс)
-      await this.cacheManager.set(cacheKey, topProductIds, 3600000);
+      await this.cacheService.set(cacheKey, topProductIds, 3600000);
     }
 
     const topSet = new Set(topProductIds);

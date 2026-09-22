@@ -15,7 +15,12 @@ export class ParseJsonFieldsPipe implements PipeTransform {
 
       if (typeof raw === 'string') {
         const trimmed = raw.trim();
-        if (!trimmed || trimmed === '[]' || trimmed === '') {
+        if (!trimmed || trimmed === 'string' || trimmed === 'null' || trimmed === 'undefined') {
+          delete result[field];
+          continue;
+        }
+
+        if (trimmed === '[]') {
           result[field] = [];
           continue;
         }
@@ -51,7 +56,35 @@ export class ParseJsonFieldsPipe implements PipeTransform {
 
     // Приводим defaultPrice
     if (result.defaultPrice !== undefined) {
-      result.defaultPrice = Number(result.defaultPrice);
+      if (
+        result.defaultPrice === '' ||
+        result.defaultPrice === null ||
+        result.defaultPrice === 'string' ||
+        result.defaultPrice === 'undefined'
+      ) {
+        delete result.defaultPrice;
+      } else {
+        const num = Number(result.defaultPrice);
+        if (!isNaN(num)) {
+          result.defaultPrice = num;
+        } else {
+          delete result.defaultPrice;
+        }
+      }
+    }
+
+    // Приводим isClothes к булеву типу до попадания в ValidationPipe с enableImplicitConversion
+    if (result.isClothes !== undefined) {
+      if (typeof result.isClothes === 'string') {
+        const val = result.isClothes.trim().toLowerCase();
+        if (val === 'false' || val === '0') {
+          result.isClothes = false;
+        } else if (val === 'true' || val === '1') {
+          result.isClothes = true;
+        } else if (val === '' || val === 'null' || val === 'undefined' || val === 'string') {
+          delete result.isClothes;
+        }
+      }
     }
 
     return result;

@@ -5,12 +5,14 @@ import { S3Service } from '../libs/s3/s3.service';
 import { ProviderUpdateDto } from './dto/provider.update.dto';
 import { ProviderFilterDto } from './dto/provider.filter.dto';
 import type { Prisma } from '../generated/prisma/client';
+import { AppCacheService } from '../libs/cache/cache.service';
 
 @Injectable()
 export class ProviderService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
+    private readonly cacheService: AppCacheService,
   ) {}
 
   public async findAll(filterDto: ProviderFilterDto) {
@@ -85,13 +87,15 @@ export class ProviderService {
       mimetype,
     );
 
-    await this.prismaService.provider.create({
+    const created = await this.prismaService.provider.create({
       data: {
         name,
         description,
         imageUrl,
       },
     });
+
+    await this.cacheService.clearProviderCache(created.id);
 
     return { message: 'Поставщик успешно создан' };
   }
@@ -134,17 +138,24 @@ export class ProviderService {
       data: updateData,
     });
 
+    await this.cacheService.clearProviderCache(id);
+
     return { message: 'Поставщик успешно обновлен' };
   }
 
   public async delete(id: string) {
     const existingProvider = await this.findById(id);
-    await this.s3Service.deleteByUrl(existingProvider.imageUrl);
-    this.prismaService.provider.delete({
+    if (existingProvider.imageUrl) {
+      await this.s3Service.deleteByUrl(existingProvider.imageUrl);
+    }
+    await this.prismaService.provider.delete({
       where: {
         id,
       },
     });
+
+    await this.cacheService.clearProviderCache(id);
+
     return { message: 'Поставщик успешно удален' };
   }
 }
