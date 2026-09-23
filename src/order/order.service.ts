@@ -58,10 +58,24 @@ export class OrderService {
   async createOrder(userId: string, dto: CreateOrderDto) {
     const { deliveryType, address, paymentType, promoCode } = dto;
 
-    // 1. Проверка: при доставке адрес обязателен
-    if (deliveryType === DeliveryType.DELIVERY && !address?.trim()) {
+    // 1. Проверка: при доставке курьером или Европочтой адрес обязателен
+    if (
+      (deliveryType === DeliveryType.DELIVERY ||
+        deliveryType === DeliveryType.EUROMAIL) &&
+      !address?.trim()
+    ) {
       throw new BadRequestException(
-        'Адрес доставки обязателен при выборе типа доставки',
+        'Адрес обязателен при выборе доставки курьером или Европочтой',
+      );
+    }
+
+    // 1.1 Для Европочты оплата возможна только онлайн картой
+    if (
+      deliveryType === DeliveryType.EUROMAIL &&
+      paymentType !== PaymentType.ONLINE
+    ) {
+      throw new BadRequestException(
+        'Для доставки Европочтой доступна только оплата сразу по карте',
       );
     }
 
@@ -74,8 +88,50 @@ export class OrderService {
       );
     }
 
-    // 3. Получаем данные пользователя (email для bePaid)
+    // 3. Получаем данные пользователя
     const user = await this.userService.findById(userId);
+
+    // 3.1 Для Европочты требуются ФИО и номер телефона получателя
+    if (deliveryType === DeliveryType.EUROMAIL) {
+      const recipientName =
+        dto.recipientName?.trim() || user?.displayName?.trim();
+      const recipientPhone = dto.recipientPhone?.trim() || user?.number?.trim();
+
+      if (!recipientName) {
+        throw new BadRequestException(
+          'Для доставки Европочтой необходимо указать ФИО получателя',
+        );
+      }
+      if (!recipientPhone) {
+        throw new BadRequestException(
+          'Для доставки Европочтой необходимо указать номер телефона получателя',
+        );
+      }
+
+      // Если в профиле пользователя не было номера или имени, дополняем их
+      if (
+        (dto.recipientName && !user.displayName) ||
+        (dto.recipientPhone && !user.number)
+      ) {
+        await this.prismaService.user
+          .update({
+            where: { id: userId },
+            data: {
+              ...(dto.recipientName && !user.displayName
+                ? { displayName: dto.recipientName.trim() }
+                : {}),
+              ...(dto.recipientPhone && !user.number
+                ? { number: dto.recipientPhone.trim() }
+                : {}),
+            },
+          })
+          .catch((err) =>
+            this.logger.warn(
+              `Не удалось обновить профиль пользователя из заказа: ${err.message}`,
+            ),
+          );
+      }
+    }
 
     // 4. Считаем скидки по акциям (promotion service)
     const promotionResult = await this.promotionService.calculateDiscount(

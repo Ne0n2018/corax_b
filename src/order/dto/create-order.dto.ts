@@ -74,4 +74,24 @@ export class CreateOrderDto {
     example: 'SUMMER2024',
   })
   promoCode?: string;
+
+  @IsOptional()
+  @IsString({ message: 'ФИО получателя должно быть строкой' })
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'ФИО получателя (обязательно для EUROMAIL)',
+    example: 'Иванов Иван Иванович',
+  })
+  recipientName?: string;
+
+  @IsOptional()
+  @IsString({ message: 'Номер телефона получателя должен быть строкой' })
+  @ApiProperty({
+    type: String,
+    required: false,
+    description: 'Номер телефона получателя (обязательно для EUROMAIL)',
+    example: '+375 (29) 123-45-67',
+  })
+  recipientPhone?: string;
 }
