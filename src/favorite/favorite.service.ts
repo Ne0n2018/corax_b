@@ -77,8 +77,19 @@ export class FavoriteService {
   async getUserFavorites(userId: string) {
     const items = await this.prisma.favorite.findMany({
       where: { userId },
+      omit: {
+        createdAt: true,
+        userId: true,
+        productId: true,
+      },
       include: {
-        product: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
