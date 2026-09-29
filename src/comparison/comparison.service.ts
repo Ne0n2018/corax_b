@@ -69,7 +69,7 @@ export class ComparisonService {
       throw new NotFoundException('Товар не найден в сравнении');
     }
 
-    this.prisma.comparison.delete({
+    await this.prisma.comparison.delete({
       where: {
         userId_productId: { userId, productId },
       },
@@ -82,7 +82,34 @@ export class ComparisonService {
     const items = await this.prisma.comparison.findMany({
       where: { userId },
       include: {
-        product: true, // можно расширить нужными полями
+        product: {
+          include: {
+            Taste: {
+              omit: {
+                productId: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+            Size: {
+              omit: {
+                productId: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+            characteristic: {
+
+            },
+          },
+          omit: {
+            providerId: true,
+            monthlySales: true,
+            totalSales: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -94,7 +121,7 @@ export class ComparisonService {
   }
 
   async clearComparison(userId: string) {
-    this.prisma.comparison.deleteMany({
+    await this.prisma.comparison.deleteMany({
       where: { userId },
     });
     return { message: 'Сравнение успешно отчищено' };
