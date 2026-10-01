@@ -187,7 +187,7 @@ model ProductItem {
   taste     String
   size      String
   CartItem  CartItem[]
-  product   Product    @relation(fields: [productId], references: [id])
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String     @map("product_id")
   createdAt DateTime   @default(now()) @map("created_At")
   updatedAt DateTime   @updatedAt @map("updatetd_At")
@@ -290,7 +290,7 @@ model OrderItem {
 
   productItemId String  @map("product_item_id")
   productId     String  @map("product_id")
-  product       Product @relation(fields: [productId], references: [id])
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   productName String @map("product_name")
   imageUrl    String @map("image_url")

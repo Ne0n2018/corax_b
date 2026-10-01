@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,7 +11,7 @@ import { ProductCreateDto } from './dto/product.create.dto';
 import { ProductUpdateDto } from './dto/product.update.dto';
 import { ProviderService } from '../provider/provider.service';
 import { ProductFilterDto } from './dto/product.filter.dto';
-import type { Prisma, Product } from '../generated/prisma/client';
+import { OrderStatus, Prisma, Product } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppCacheService } from '../libs/cache/cache.service';
 
@@ -163,6 +164,7 @@ export class ProductService {
             create: this.parseArray(taste)
               .map((t) => ({
                 name: t?.name?.trim(),
+
                 price: Number(t?.price),
               }))
               .filter((t) => t.name && !isNaN(t.price)),
@@ -183,7 +185,7 @@ export class ProductService {
       await this.cacheService.clearProductCache(product.id);
 
       return { message: 'Продукт успешно создан', productId: product.id };
-    } catch (error) {
+    } catch (error: unknown) {
       await this.s3Service.deleteByUrl(imageUrl);
       throw new InternalServerErrorException(
         'Не удалось создать продукт. Файл удален из хранилища.',
@@ -417,6 +419,22 @@ export class ProductService {
 
   public async delete(id: string) {
     const product = await this.findById(id);
+
+    // Ищем хотя бы одну запись (возвращает объект или null)
+    const activeOrderItem = await this.prismaService.orderItem.findFirst({
+      where: {
+        productId: id,
+        order: {
+          status: OrderStatus.PROCESSING,
+        },
+      },
+      select: { id: true }, // Оптимизация: не загружаем лишние данные из БД
+    });
+
+    // Если нашли хотя бы одну запись — выбрасываем 409 Conflict
+    if (activeOrderItem) {
+      throw new ConflictException('Этот товар находится в активном заказе');
+    }
 
     // Удаляем изображение из S3 перед удалением из базы
     if (product.imageUrl) {
