@@ -46,7 +46,13 @@ export class ProviderService {
     const existingProvider = await this.prismaService.provider.findFirst({
       where: { id },
       include: {
-        products: true,
+        products: {
+          select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
       },
       omit: {
         createdAt: true,

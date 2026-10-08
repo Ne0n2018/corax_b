@@ -2,6 +2,8 @@ import { Injectable, BadRequestException, OnModuleInit, Logger } from '@nestjs/c
 import { Inject } from '@nestjs/common';
 import { S3 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
+import { extname } from 'path';
 
 @Injectable()
 export class S3Service implements OnModuleInit {
@@ -53,13 +55,15 @@ export class S3Service implements OnModuleInit {
   }
 
   async uploadImage(
-    key: string,
+    originalName: string,
     body: Buffer,
     contentType: string,
   ): Promise<string> {
     if (!contentType.startsWith('image/')) {
       throw new BadRequestException('Only images allowed');
     }
+
+    const key = this.buildKey(originalName);
 
     try {
       await this.s3.putObject({
@@ -71,10 +75,18 @@ export class S3Service implements OnModuleInit {
       });
 
       const endpoint = this.configService.getOrThrow('S3_ENDPOINT');
-      return `${endpoint}/${this.bucket}/${key}`;
+      return `${endpoint}/${this.bucket}/${encodeURIComponent(key)}`;
     } catch (error) {
       throw new BadRequestException(`Upload failed: ${error.message}`);
     }
+  }
+
+  // Уникальный ключ на каждую загрузку, чтобы файлы с одинаковыми именами
+  // не перезаписывали и не удаляли объекты друг друга.
+  private buildKey(originalName: string): string {
+    const ext = extname(originalName || '').toLowerCase();
+    const safeExt = /^\.[a-z0-9]{1,5}$/.test(ext) ? ext : '';
+    return `${randomUUID()}${safeExt}`;
   }
 
   async deleteImage(key: string): Promise<void> {
@@ -96,7 +108,8 @@ export class S3Service implements OnModuleInit {
     if (!imageUrl) return;
 
     try {
-      const key = imageUrl.split(`/${this.bucket}/`).pop();
+      const rawKey = imageUrl.split(`/${this.bucket}/`).pop();
+      const key = rawKey ? decodeURIComponent(rawKey) : undefined;
       if (key) {
         await this.deleteImage(key);
       }
