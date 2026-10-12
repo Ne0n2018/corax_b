@@ -37,7 +37,7 @@ export class YandexProvider extends BaseOAuthService {
     return { Authorization: `OAuth ${accessToken}` }; // Yandex uses 'OAuth' not 'Bearer'
   }
 
-  protected async extractUserInfo(data: YandexProfile): Promise<TypeUserInfo> {
+  protected extractUserInfo(data: YandexProfile): TypeUserInfo {
     return {
       id: data.id,
       email: data.default_email,
