@@ -25,7 +25,7 @@ async function bootstrap() {
       },
     }),
   );
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(app.get(LoggingInterceptor));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.set('trust proxy', 2);
 
@@ -71,10 +71,11 @@ async function bootstrap() {
   const appUrl = config.getOrThrow('APPLICATION_URL');
   Logger.log(`сервер запущен по адресу ${appUrl}`);
   Logger.log(`сваггер запущен по адресу ${appUrl}/swagger`);
-  // Construct Grafana URL by replacing port in APPLICATION_URL with 3000
+  // Construct Grafana URL by replacing port in APPLICATION_URL with GRAFANA_PORT
+  const grafanaPort = process.env.GRAFANA_PORT || '3001';
   const grafanaUrl = appUrl
-    .replace(/:(\d+)$/, ':3000')
-    .replace(/:(\d+)\//, ':3000/');
+    .replace(/:(\d+)$/, `:${grafanaPort}`)
+    .replace(/:(\d+)\//, `:${grafanaPort}/`);
   Logger.log(
     `Grafana доступна по адресу ${grafanaUrl} (логин: ${process.env.GRAFANA_ADMIN_USER || 'admin'}, пароль: ${process.env.GRAFANA_ADMIN_PASSWORD || 'admin'})`,
   );

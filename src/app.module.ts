@@ -33,6 +33,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 import { AppCacheModule } from './libs/cache/cache.module';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -147,6 +148,7 @@ import { AppCacheModule } from './libs/cache/cache.module';
   ],
   providers: [
     NotificationsGateway,
+    LoggingInterceptor,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
