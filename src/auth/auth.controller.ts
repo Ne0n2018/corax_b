@@ -96,7 +96,7 @@ export class AuthController {
   @UseGuards(AuthProviderGuard)
   @Get('oauth/connect/:provider')
   @ApiExcludeEndpoint(true)
-  public async connect(@Param('provider') provider: string) {
+  public connect(@Param('provider') provider: string) {
     const providerInstance = this.providerService.FindByServices(provider);
 
     return {

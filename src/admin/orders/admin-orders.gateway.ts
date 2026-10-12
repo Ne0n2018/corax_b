@@ -149,7 +149,14 @@ export class AdminOrdersGateway
       this.sessionMiddleware(
         client.request as Parameters<RequestHandler>[0],
         {} as Parameters<RequestHandler>[1],
-        (err?: unknown) => (err ? reject(err) : resolve()),
+        (err?: unknown) =>
+          err
+            ? reject(
+                err instanceof Error
+                  ? err
+                  : new Error('Session middleware error'),
+              )
+            : resolve(),
       ),
     );
 

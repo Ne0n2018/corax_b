@@ -19,7 +19,6 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import type { BePaidWebhookDto } from './dto/bepaid-webhook.dto';
 import {
   CreateOrderResponseDto,
   OrderResponseDto,
@@ -85,9 +84,14 @@ export class OrderController {
   @Get(':orderId/pay')
   @Authorization()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Получить ссылку для повторной оплаты (если PENDING)' })
+  @ApiOperation({
+    summary: 'Получить ссылку для повторной оплаты (если PENDING)',
+  })
   @ApiParam({ name: 'orderId', type: String })
-  @ApiResponse({ status: 200, schema: { properties: { redirectUrl: { type: 'string' } } } })
+  @ApiResponse({
+    status: 200,
+    schema: { properties: { redirectUrl: { type: 'string' } } },
+  })
   @HttpCode(HttpStatus.OK)
   async getPaymentUrl(
     @Authorized('id') userId: string,

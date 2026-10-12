@@ -8,16 +8,16 @@ import {
 } from 'class-validator';
 
 export enum DeliveryType {
-  PICKUP   = 'PICKUP',
+  PICKUP = 'PICKUP',
   DELIVERY = 'DELIVERY',
-  BELMAIL  = 'BELMAIL',
+  BELMAIL = 'BELMAIL',
   EUROMAIL = 'EUROMAIL',
 }
 
 export enum PaymentType {
   ONLINE = 'ONLINE',
-  CASH   = 'CASH',
-  CARD   = 'CARD',
+  CASH = 'CASH',
+  CARD = 'CARD',
 }
 
 /** Типы доставки, требующие указания адреса */
@@ -40,7 +40,9 @@ export class CreateOrderDto {
   })
   deliveryType: DeliveryType;
 
-  @ValidateIf((o) => ADDRESS_REQUIRED_TYPES.includes(o.deliveryType))
+  @ValidateIf((o: { deliveryType: DeliveryType }) =>
+    ADDRESS_REQUIRED_TYPES.includes(o.deliveryType),
+  )
   @IsString({ message: 'Адрес должен быть строкой' })
   @IsNotEmpty({ message: 'Адрес обязателен для выбранного типа доставки' })
   @IsOptional()

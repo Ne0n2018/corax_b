@@ -34,7 +34,11 @@ export class CartController {
 
   @Get()
   @ApiOperation({ summary: 'Получить корзину текущего пользователя' })
-  @ApiResponse({ status: 200, description: 'Корзина пользователя', type: CartResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Корзина пользователя',
+    type: CartResponse,
+  })
   @HttpCode(HttpStatus.OK)
   public async getCart(@Authorized('id') userId: string) {
     const cart = await this.cartService.getCart(userId);
@@ -42,7 +46,9 @@ export class CartController {
   }
 
   @Get('discount')
-  @ApiOperation({ summary: 'Рассчитать скидку для корзины текущего пользователя' })
+  @ApiOperation({
+    summary: 'Рассчитать скидку для корзины текущего пользователя',
+  })
   @HttpCode(HttpStatus.OK)
   public async getCartDiscount(@Authorized('id') userId: string) {
     return this.cartService.getCartDiscount(userId);
@@ -50,7 +56,11 @@ export class CartController {
 
   @Post()
   @ApiOperation({ summary: 'Добавить товар в корзину' })
-  @ApiResponse({ status: 200, description: 'Корзина после добавления', type: CartResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Корзина после добавления',
+    type: CartResponse,
+  })
   @HttpCode(HttpStatus.OK)
   public async addToCart(
     @Authorized('id') userId: string,
@@ -62,8 +72,16 @@ export class CartController {
 
   @Patch(':cartItemId')
   @ApiOperation({ summary: 'Изменить количество позиции в корзине' })
-  @ApiParam({ name: 'cartItemId', type: String, description: 'ID позиции корзины' })
-  @ApiResponse({ status: 200, description: 'Корзина после обновления', type: CartResponse })
+  @ApiParam({
+    name: 'cartItemId',
+    type: String,
+    description: 'ID позиции корзины',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Корзина после обновления',
+    type: CartResponse,
+  })
   @HttpCode(HttpStatus.OK)
   public async updateCartItem(
     @Authorized('id') userId: string,
@@ -76,7 +94,11 @@ export class CartController {
 
   @Delete('clear')
   @ApiOperation({ summary: 'Очистить корзину' })
-  @ApiResponse({ status: 200, description: 'Пустая корзина', type: CartResponse })
+  @ApiResponse({
+    status: 200,
+    description: 'Пустая корзина',
+    type: CartResponse,
+  })
   @HttpCode(HttpStatus.OK)
   public async clearCart(@Authorized('id') userId: string) {
     const cart = await this.cartService.clearCart(userId);
@@ -85,8 +107,16 @@ export class CartController {
 
   @Delete(':cartItemId')
   @ApiOperation({ summary: 'Удалить позицию из корзины' })
-  @ApiParam({ name: 'cartItemId', type: String, description: 'ID позиции корзины' })
-  @ApiResponse({ status: 200, description: 'Корзина после удаления', type: CartResponse })
+  @ApiParam({
+    name: 'cartItemId',
+    type: String,
+    description: 'ID позиции корзины',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Корзина после удаления',
+    type: CartResponse,
+  })
   @HttpCode(HttpStatus.OK)
   public async removeFromCart(
     @Authorized('id') userId: string,

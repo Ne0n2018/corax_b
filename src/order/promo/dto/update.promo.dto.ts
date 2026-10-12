@@ -3,7 +3,6 @@ import {
   IsDate,
   IsEnum,
   IsInt,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -59,7 +58,7 @@ export class UpdatePromoDto {
     type: Date,
     required: false,
     description: 'дата начала действия промокода ',
-    example: `${new Date()}`,
+    example: new Date().toISOString(),
   })
   validFrom?: Date;
   @IsOptional()
@@ -68,7 +67,7 @@ export class UpdatePromoDto {
     type: Date,
     required: true,
     description: 'дата окончания действия промокода',
-    example: `${new Date()}`,
+    example: new Date().toISOString(),
   })
   validUntil?: Date;
   @IsOptional()

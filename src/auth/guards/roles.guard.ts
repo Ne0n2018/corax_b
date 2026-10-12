@@ -18,7 +18,9 @@ export class RolesGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
     if (!requiredRoles) return true;
-    const { user } = context.switchToHttp().getRequest();
+    const { user } = context
+      .switchToHttp()
+      .getRequest<{ user: { role: UserRole } }>();
     if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException(
         'Недостаточно прав. У вас нет прав доступа к этому ресурсу',

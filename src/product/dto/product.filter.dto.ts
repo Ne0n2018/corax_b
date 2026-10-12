@@ -1,5 +1,4 @@
-import { IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class ProductFilterDto {
   @IsOptional()

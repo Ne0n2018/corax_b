@@ -4,9 +4,11 @@ import {
   ExecutionContext,
   CallHandler,
   Logger,
+  HttpException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import type { Request, Response } from 'express';
 import { MetricsService } from '../../metrics/metrics.service';
 
 @Injectable()
@@ -16,7 +18,7 @@ export class LoggingInterceptor implements NestInterceptor {
   constructor(private readonly metricsService: MetricsService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const req = context.switchToHttp().getRequest();
+    const req = context.switchToHttp().getRequest<Request>();
     const { ip, method, url } = req;
     const start = Date.now();
 
@@ -29,12 +31,12 @@ export class LoggingInterceptor implements NestInterceptor {
 
     // Шаблон маршрута (например, /product/:id) вместо сырого URL,
     // чтобы метка route не разрасталась из-за динамических сегментов.
-    const route = req.route?.path || path;
+    const route = (req.route?.path as string | undefined) || path;
 
     return next.handle().pipe(
       tap({
         next: (data) => {
-          const res = context.switchToHttp().getResponse();
+          const res = context.switchToHttp().getResponse<Response>();
           const { statusCode } = res;
           const time = Date.now() - start;
 
@@ -46,11 +48,10 @@ export class LoggingInterceptor implements NestInterceptor {
             { response: data, userId: req.session?.userId || 'unauth' },
           );
         },
-        error: (err) => {
+        error: (err: unknown) => {
           // Ошибочные запросы уже логирует HttpExceptionFilter,
           // здесь только учитываем их в метрике статусов.
-          const status =
-            typeof err?.getStatus === 'function' ? err.getStatus() : 500;
+          const status = err instanceof HttpException ? err.getStatus() : 500;
           this.metricsService.observeHttpRequest(method, route, status);
         },
       }),

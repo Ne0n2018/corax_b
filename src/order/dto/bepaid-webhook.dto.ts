@@ -5,7 +5,7 @@ export interface BePaidWebhookDto {
     status: 'successful' | 'failed' | 'incomplete' | 'expired';
     type: string;
     tracking_id: string; // наш orderId
-    amount: number;      // в копейках
+    amount: number; // в копейках
     currency: string;
     message?: string;
     test: boolean;

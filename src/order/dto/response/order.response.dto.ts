@@ -5,7 +5,10 @@ class OrderItemResponseDto {
   @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ type: String, description: 'Название товара на момент заказа' })
+  @ApiProperty({
+    type: String,
+    description: 'Название товара на момент заказа',
+  })
   productName: string;
 
   @ApiProperty({ type: String })
@@ -40,7 +43,10 @@ export class OrderResponseDto {
   @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ type: Number, description: '6-значный код заказа для быстрого поиска' })
+  @ApiProperty({
+    type: Number,
+    description: '6-значный код заказа для быстрого поиска',
+  })
   orderCode: number;
 
   @ApiProperty({ enum: ['PICKUP', 'DELIVERY', 'BELMAIL', 'EUROMAIL'] })
@@ -52,7 +58,16 @@ export class OrderResponseDto {
   @ApiProperty({ enum: ['ONLINE', 'CASH', 'CARD'] })
   paymentType: string;
 
-  @ApiProperty({ enum: ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'] })
+  @ApiProperty({
+    enum: [
+      'PENDING',
+      'PAID',
+      'PROCESSING',
+      'SHIPPED',
+      'DELIVERED',
+      'CANCELLED',
+    ],
+  })
   status: string;
 
   @ApiProperty({ type: Number })

@@ -96,9 +96,11 @@ export class ProductCreateDto {
     example: [{ name: 'XL', price: 1590 }],
   })
   size: SizeCreateDto[];
-  @Transform(({ value }) => {
-    if (value === 'false' || value === false || value === 0 || value === '0') return false;
-    if (value === 'true' || value === true || value === 1 || value === '1') return true;
+  @Transform(({ value }: { value: unknown }) => {
+    if (value === 'false' || value === false || value === 0 || value === '0')
+      return false;
+    if (value === 'true' || value === true || value === 1 || value === '1')
+      return true;
     return value;
   })
   @IsBoolean({ message: 'Маркер одежды должен быть булевым значением' })

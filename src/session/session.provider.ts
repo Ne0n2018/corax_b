@@ -14,7 +14,6 @@ export const sessionProvider: Provider = {
   provide: SESSION_MIDDLEWARE,
   inject: [ConfigService, REDIS_CLIENT],
   useFactory: (config: ConfigService, redisClient: Redis): RequestHandler => {
-    const isProd = config.get('NODE_ENV') === 'production';
     return session({
       secret: config.getOrThrow<string>('SESSION_SECRET'),
       name: config.getOrThrow<string>('SESSION_NAME'),

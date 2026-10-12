@@ -24,7 +24,7 @@ export class NotificationsGateway {
   // Подключение пользователя
   @SubscribeMessage('join')
   handleJoin(@MessageBody() userId: string, @ConnectedSocket() client: Socket) {
-    client.join(`user-${userId}`);
+    void client.join(`user-${userId}`);
     console.log(`User ${userId} joined notifications`);
   }
 }

@@ -152,7 +152,9 @@ export class ProductService {
           isClothes: String(isClothes) === 'true',
 
           characteristic: {
-            create: this.parseArray(characteristic)
+            create: this.parseArray<{ name?: string; value?: string }>(
+              characteristic,
+            )
               .map((char) => ({
                 name: char?.name?.trim(),
                 value: char?.value?.trim(),
@@ -161,7 +163,9 @@ export class ProductService {
           },
 
           Taste: {
-            create: this.parseArray(taste)
+            create: this.parseArray<{ name?: string; price?: number | string }>(
+              taste,
+            )
               .map((t) => ({
                 name: t?.name?.trim(),
 
@@ -171,7 +175,9 @@ export class ProductService {
           },
 
           Size: {
-            create: this.parseArray(size)
+            create: this.parseArray<{ name?: string; price?: number | string }>(
+              size,
+            )
               .map((s) => ({
                 name: s?.name?.trim(),
                 price: Number(s?.price),
@@ -185,7 +191,7 @@ export class ProductService {
       await this.cacheService.clearProductCache(product.id);
 
       return { message: 'Продукт успешно создан', productId: product.id };
-    } catch (error: unknown) {
+    } catch {
       await this.s3Service.deleteByUrl(imageUrl);
       throw new InternalServerErrorException(
         'Не удалось создать продукт. Файл удален из хранилища.',
@@ -193,15 +199,18 @@ export class ProductService {
     }
   }
 
-  private parseArray(data: any): any[] {
+  private parseArray<T = any>(data: unknown): T[] {
     if (typeof data === 'string') {
       try {
-        return JSON.parse(data);
+        return JSON.parse(data) as T[];
       } catch {
         return [];
       }
     }
-    return Array.isArray(data) ? data.flat() : [];
+    if (Array.isArray(data)) {
+      return (data as T[]).flat() as unknown as T[];
+    }
+    return [];
   }
 
   public async getAll(dto: ProductFilterDto) {

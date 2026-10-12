@@ -1,6 +1,6 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { INestApplication } from '@nestjs/common';
-import { ServerOptions } from 'socket.io';
+import { ServerOptions, Server } from 'socket.io';
 import type { RequestHandler } from 'express';
 
 /**
@@ -21,14 +21,14 @@ export class SessionIoAdapter extends IoAdapter {
   }
 
   createIOServer(port: number, options?: ServerOptions) {
-    const server = super.createIOServer(port, options);
+    const server = super.createIOServer(port, options) as Server;
 
     // Применяем session middleware ко всем входящим WS-соединениям
     server.use((socket, next) => {
       this.sessionMiddleware(
         socket.request as Parameters<RequestHandler>[0],
         {} as Parameters<RequestHandler>[1],
-        next,
+        next as unknown as Parameters<RequestHandler>[2],
       );
     });
 

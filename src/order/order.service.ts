@@ -135,7 +135,7 @@ export class OrderService {
 
     // 4. Считаем скидки по акциям (promotion service)
     const promotionResult = await this.promotionService.calculateDiscount(
-      cart as any,
+      cart,
       { id: userId },
     );
     const promotionsDiscount = promotionResult.totalDiscount || 0;
@@ -436,7 +436,7 @@ export class OrderService {
         item.size,
         item.quantity,
       );
-      this.topService.incrementSales(item.productId, item.quantity);
+      void this.topService.incrementSales(item.productId, item.quantity);
     }
   }
 

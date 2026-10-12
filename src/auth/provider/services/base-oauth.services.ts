@@ -13,11 +13,11 @@ export class BaseOAuthService {
 
   constructor(protected readonly options: TypeBaseProviderOptions) {}
 
-  protected async extractUserInfo(data: any): Promise<TypeUserInfo> {
+  protected extractUserInfo(data: any): TypeUserInfo {
     return {
       ...data,
       provider: this.options.name,
-    };
+    } as TypeUserInfo;
   }
 
   public getAuthUrl(): string {
@@ -42,7 +42,11 @@ export class BaseOAuthService {
       grant_type: 'authorization_code',
     });
 
-    let tokens;
+    let tokens: {
+      access_token?: string;
+      refresh_token?: string;
+      expires_in?: number;
+    };
     try {
       const tokenRequest = await fetch(this.options.access_url, {
         method: 'POST',
@@ -101,7 +105,7 @@ export class BaseOAuthService {
       );
     }
 
-    const userData = await this.extractUserInfo(user);
+    const userData = this.extractUserInfo(user);
 
     const expiresIn = tokens.expires_in;
 

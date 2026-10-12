@@ -5,10 +5,15 @@ import { CharacteristicUpdateDto } from './characteristic.update.dto';
 import { TasteUpdateDto } from './taste.update.dto';
 import { SizeUpdateDto } from './size.update.dto';
 
-const transformOptionalString = ({ value }: { value: any }) => {
+const transformOptionalString = ({ value }: { value: unknown }) => {
   if (typeof value === 'string') {
     const trimmed = value.trim();
-    if (!trimmed || trimmed === 'string' || trimmed === 'null' || trimmed === 'undefined') {
+    if (
+      !trimmed ||
+      trimmed === 'string' ||
+      trimmed === 'null' ||
+      trimmed === 'undefined'
+    ) {
       return undefined;
     }
     return trimmed;
@@ -20,7 +25,14 @@ export class ProductUpdateDto {
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => {
-    if (value === undefined || value === null || value === '' || value === 'undefined' || value === 'null' || value === 'string') {
+    if (
+      value === undefined ||
+      value === null ||
+      value === '' ||
+      value === 'undefined' ||
+      value === 'null' ||
+      value === 'string'
+    ) {
       return undefined;
     }
     if (value === 'false' || value === false || value === 0 || value === '0') {
@@ -73,7 +85,13 @@ export class ProductUpdateDto {
   @IsOptional()
   @IsNumber()
   @Transform(({ value }) => {
-    if (value === undefined || value === null || value === '' || value === 'string' || value === 'undefined') {
+    if (
+      value === undefined ||
+      value === null ||
+      value === '' ||
+      value === 'string' ||
+      value === 'undefined'
+    ) {
       return undefined;
     }
     const num = Number(value);

@@ -98,9 +98,7 @@ export class ComparisonService {
                 updatedAt: true,
               },
             },
-            characteristic: {
-
-            },
+            characteristic: {},
           },
           omit: {
             providerId: true,

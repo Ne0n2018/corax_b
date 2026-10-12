@@ -11,7 +11,6 @@ import { EmailConfirmationModule } from './email-confirmation/email-confirmation
 import { MailService } from '../libs/mail/mail.service';
 import { AdminModule } from '../admin/admin.module';
 import { SessionModule } from '../session/session.module';
-import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [

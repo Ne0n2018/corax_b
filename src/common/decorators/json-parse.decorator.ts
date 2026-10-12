@@ -6,7 +6,7 @@ export function JsonParse() {
     if (!value) return [];
 
     // Если уже массив — возвращаем как есть
-    if (Array.isArray(value)) return value;
+    if (Array.isArray(value)) return value as unknown[];
 
     if (typeof value !== 'string') return [];
 
@@ -17,12 +17,12 @@ export function JsonParse() {
       const parsed = JSON.parse(trimmed);
 
       if (Array.isArray(parsed)) {
-        return parsed;
+        return parsed as unknown[];
       }
 
       // Если пришёл один объект — оборачиваем в массив
       if (typeof parsed === 'object' && parsed !== null) {
-        return [parsed];
+        return [parsed] as unknown[];
       }
 
       return [];

@@ -127,7 +127,7 @@ export class AdminService {
         name: update.displayName,
       };
 
-      this.mailService.sendMail(
+      await this.mailService.sendMail(
         update.email,
         'Ваша учетная запись заблокирована',
         UserBlockedTemplate(mail),

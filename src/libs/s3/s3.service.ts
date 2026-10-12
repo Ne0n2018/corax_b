@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  OnModuleInit,
+  Logger,
+} from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { S3 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
@@ -26,7 +31,10 @@ export class S3Service implements OnModuleInit {
       try {
         await this.s3.headBucket({ Bucket: this.bucket });
       } catch (error: any) {
-        if (error.statusCode === 404 || error.$metadata?.httpStatusCode === 404) {
+        if (
+          error.statusCode === 404 ||
+          error.$metadata?.httpStatusCode === 404
+        ) {
           await this.s3.createBucket({ Bucket: this.bucket });
         }
       }
@@ -50,7 +58,9 @@ export class S3Service implements OnModuleInit {
       });
       this.logger.log(`S3 bucket "${this.bucket}" configured successfully`);
     } catch (error: any) {
-      this.logger.warn(`S3 bucket initialization warning: ${error?.message || error}`);
+      this.logger.warn(
+        `S3 bucket initialization warning: ${error?.message || error}`,
+      );
     }
   }
 

@@ -1,4 +1,11 @@
-import { IsBooleanString, IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsBooleanString,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { PromotionType } from '../../generated/prisma/enums';
 

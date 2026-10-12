@@ -17,7 +17,6 @@ export class PrismaService
       throw new Error('POSTGRES_URI is not defined in environment variables');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
     const pool = new Pool({ connectionString });
     const adapter = new PrismaPg(pool);
 
@@ -26,7 +25,6 @@ export class PrismaService
       log: ['query', 'info', 'warn', 'error'],
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.pool = pool;
   }
 
@@ -36,7 +34,7 @@ export class PrismaService
 
   async onModuleDestroy(): Promise<void> {
     await this.$disconnect();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+
     await this.pool.end();
   }
 }

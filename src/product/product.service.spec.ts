@@ -5,7 +5,10 @@ import { S3Service } from '../libs/s3/s3.service';
 import { ProviderService } from '../provider/provider.service';
 import { CategoryService } from '../category/category.service';
 import { AppCacheService } from '../libs/cache/cache.service';
-import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ProductCreateDto } from './dto/product.create.dto';
 import { ProductUpdateDto } from './dto/product.update.dto';
 
@@ -18,6 +21,9 @@ describe('ProductService (create, update, delete)', () => {
       update: jest.Mock;
       delete: jest.Mock;
       findMany: jest.Mock;
+    };
+    orderItem: {
+      findFirst: jest.Mock;
     };
   };
   let s3Service: {
@@ -52,19 +58,28 @@ describe('ProductService (create, update, delete)', () => {
         delete: jest.fn(),
         findMany: jest.fn(),
       },
+      orderItem: {
+        findFirst: jest.fn().mockResolvedValue(null),
+      },
     };
 
     s3Service = {
-      uploadImage: jest.fn().mockResolvedValue('https://s3.example.com/test-product.png'),
+      uploadImage: jest
+        .fn()
+        .mockResolvedValue('https://s3.example.com/test-product.png'),
       deleteByUrl: jest.fn().mockResolvedValue(true),
     };
 
     providerService = {
-      findById: jest.fn().mockResolvedValue({ id: 'provider-1', name: 'Test Provider' }),
+      findById: jest
+        .fn()
+        .mockResolvedValue({ id: 'provider-1', name: 'Test Provider' }),
     };
 
     categoryService = {
-      findByIdSubCategory: jest.fn().mockResolvedValue({ id: 'subcat-1', name: 'Proteins' }),
+      findByIdSubCategory: jest
+        .fn()
+        .mockResolvedValue({ id: 'subcat-1', name: 'Proteins' }),
     };
 
     cacheService = {
@@ -119,7 +134,9 @@ describe('ProductService (create, update, delete)', () => {
       const result = await service.create(mockImage, createDto);
 
       expect(providerService.findById).toHaveBeenCalledWith('provider-1');
-      expect(categoryService.findByIdSubCategory).toHaveBeenCalledWith('subcat-1');
+      expect(categoryService.findByIdSubCategory).toHaveBeenCalledWith(
+        'subcat-1',
+      );
       expect(s3Service.uploadImage).toHaveBeenCalledWith(
         mockImage.originalname,
         mockImage.buffer,
@@ -136,7 +153,9 @@ describe('ProductService (create, update, delete)', () => {
           }),
         }),
       );
-      expect(cacheService.clearProductCache).toHaveBeenCalledWith('product-new-id');
+      expect(cacheService.clearProductCache).toHaveBeenCalledWith(
+        'product-new-id',
+      );
       expect(result).toEqual({
         message: 'Продукт успешно создан',
         productId: 'product-new-id',
@@ -144,7 +163,9 @@ describe('ProductService (create, update, delete)', () => {
     });
 
     it('должен удалить картинку из S3 и выбросить исключение, если создание в БД упало', async () => {
-      prismaService.product.create.mockRejectedValue(new Error('DB Connection lost'));
+      prismaService.product.create.mockRejectedValue(
+        new Error('DB Connection lost'),
+      );
 
       await expect(service.create(mockImage, createDto)).rejects.toThrow(
         InternalServerErrorException,
@@ -180,7 +201,11 @@ describe('ProductService (create, update, delete)', () => {
         ...updateDto,
       });
 
-      const result = await service.update('product-existing-id', undefined, updateDto);
+      const result = await service.update(
+        'product-existing-id',
+        undefined,
+        updateDto,
+      );
 
       expect(prismaService.product.findUnique).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -197,13 +222,17 @@ describe('ProductService (create, update, delete)', () => {
           }),
         }),
       );
-      expect(cacheService.clearProductCache).toHaveBeenCalledWith('product-existing-id');
+      expect(cacheService.clearProductCache).toHaveBeenCalledWith(
+        'product-existing-id',
+      );
       expect(result).toEqual({ message: 'Продукт успешно обновлен' });
     });
 
     it('должен заменить картинку в S3 (удалить старую, загрузить новую) при передаче нового файла', async () => {
       prismaService.product.findUnique.mockResolvedValue(existingProduct);
-      s3Service.uploadImage.mockResolvedValue('https://s3.example.com/new-image.png');
+      s3Service.uploadImage.mockResolvedValue(
+        'https://s3.example.com/new-image.png',
+      );
       prismaService.product.update.mockResolvedValue({
         ...existingProduct,
         imageUrl: 'https://s3.example.com/new-image.png',
@@ -211,7 +240,9 @@ describe('ProductService (create, update, delete)', () => {
 
       await service.update('product-existing-id', mockImage, updateDto);
 
-      expect(s3Service.deleteByUrl).toHaveBeenCalledWith(existingProduct.imageUrl);
+      expect(s3Service.deleteByUrl).toHaveBeenCalledWith(
+        existingProduct.imageUrl,
+      );
       expect(s3Service.uploadImage).toHaveBeenCalledWith(
         mockImage.originalname,
         mockImage.buffer,
@@ -225,7 +256,9 @@ describe('ProductService (create, update, delete)', () => {
           }),
         }),
       );
-      expect(cacheService.clearProductCache).toHaveBeenCalledWith('product-existing-id');
+      expect(cacheService.clearProductCache).toHaveBeenCalledWith(
+        'product-existing-id',
+      );
     });
 
     it('должен выбросить NotFoundException, если обновляемый продукт не существует', async () => {
@@ -289,11 +322,15 @@ describe('ProductService (create, update, delete)', () => {
           where: { id: 'product-to-delete' },
         }),
       );
-      expect(s3Service.deleteByUrl).toHaveBeenCalledWith(existingProduct.imageUrl);
+      expect(s3Service.deleteByUrl).toHaveBeenCalledWith(
+        existingProduct.imageUrl,
+      );
       expect(prismaService.product.delete).toHaveBeenCalledWith({
         where: { id: 'product-to-delete' },
       });
-      expect(cacheService.clearProductCache).toHaveBeenCalledWith('product-to-delete');
+      expect(cacheService.clearProductCache).toHaveBeenCalledWith(
+        'product-to-delete',
+      );
       expect(result).toEqual({ message: 'Продукт успешно удален' });
     });
 
@@ -303,7 +340,9 @@ describe('ProductService (create, update, delete)', () => {
         name: 'No Image Product',
         imageUrl: null,
       });
-      prismaService.product.delete.mockResolvedValue({ id: 'product-without-image' });
+      prismaService.product.delete.mockResolvedValue({
+        id: 'product-without-image',
+      });
 
       const result = await service.delete('product-without-image');
 
@@ -311,14 +350,18 @@ describe('ProductService (create, update, delete)', () => {
       expect(prismaService.product.delete).toHaveBeenCalledWith({
         where: { id: 'product-without-image' },
       });
-      expect(cacheService.clearProductCache).toHaveBeenCalledWith('product-without-image');
+      expect(cacheService.clearProductCache).toHaveBeenCalledWith(
+        'product-without-image',
+      );
       expect(result).toEqual({ message: 'Продукт успешно удален' });
     });
 
     it('должен выбросить NotFoundException, если удаляемый продукт не найден', async () => {
       prismaService.product.findUnique.mockResolvedValue(null);
 
-      await expect(service.delete('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.delete('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
 
       expect(s3Service.deleteByUrl).not.toHaveBeenCalled();
       expect(prismaService.product.delete).not.toHaveBeenCalled();

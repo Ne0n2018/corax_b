@@ -34,7 +34,7 @@ export class GoogleProvider extends BaseOAuthService {
     });
   }
 
-  protected async extractUserInfo(data: GoogleProfile): Promise<TypeUserInfo> {
+  protected extractUserInfo(data: GoogleProfile): TypeUserInfo {
     return {
       id: data.sub, // Map Google's 'sub' to 'id'
       email: data.email,

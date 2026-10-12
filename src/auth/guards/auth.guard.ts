@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../../user/user.service';
 import { Redis } from 'ioredis';
+import type { Request } from 'express';
+import type { User } from '../../generated/prisma/client';
 import { REDIS_CLIENT } from '../../session/redis.provider';
 
 @Injectable()
@@ -17,7 +19,9 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { user?: User }>();
     if (!request.session?.userId) {
       throw new UnauthorizedException(
         'Пользователь не авторизован пожалуйста войдите в систему,чтобы получить доступ к этому ресурсу',

@@ -140,7 +140,7 @@ export class AuthService {
       profile.email,
       '',
       profile.name,
-      AuthMetod[profile.provider.toUpperCase()],
+      AuthMetod[profile.provider.toUpperCase() as keyof typeof AuthMetod],
       true,
     );
 

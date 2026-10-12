@@ -35,6 +35,16 @@ import { createKeyv } from '@keyv/redis';
 import { AppCacheModule } from './libs/cache/cache.module';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
+/**
+ * Приводит произвольное значение из лога winston к строке, не полагаясь
+ * на неявную строковую интерполяцию объектов (иначе получим "[object Object]").
+ */
+const toText = (value: unknown): string => {
+  if (value === undefined || value === null) return '';
+  if (typeof value === 'string') return value;
+  return JSON.stringify(value) ?? '';
+};
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -43,19 +53,18 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     }),
     WinstonModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async () => {
+      useFactory: () => {
         return {
           transports: [
             new winston.transports.Console({
               format: winston.format.combine(
                 winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
                 winston.format.colorize({ all: true }),
-                winston.format.printf(
-                  ({ timestamp, level, message, context, ...meta }) => {
-                    const ctx = context ? `[${context}]` : '';
-                    return `${timestamp}  ${level.toUpperCase()} ${ctx} ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
-                  },
-                ),
+                winston.format.printf((info) => {
+                  const { timestamp, level, message, context, ...meta } = info;
+                  const ctx = context ? `[${toText(context)}]` : '';
+                  return `${toText(timestamp)}  ${level.toUpperCase()} ${ctx} ${toText(message)} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+                }),
               ),
               level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
             }),
@@ -80,16 +89,16 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
               format: winston.format.combine(
                 winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
                 winston.format.errors({ stack: true }),
-                winston.format.printf(
-                  ({ timestamp, level, message, context, stack, ...meta }) => {
-                    const ctx = context ? `[${context}]` : '';
-                    const metaStr = Object.keys(meta).length
-                      ? ` | meta: ${JSON.stringify(meta)}`
-                      : '';
-                    const stackStr = stack ? `\n${stack}` : '';
-                    return `${timestamp} [${level.toUpperCase()}] ${ctx} ${message}${metaStr}${stackStr}`;
-                  },
-                ),
+                winston.format.printf((info) => {
+                  const { timestamp, level, message, context, stack, ...meta } =
+                    info;
+                  const ctx = context ? `[${toText(context)}]` : '';
+                  const metaStr = Object.keys(meta).length
+                    ? ` | meta: ${JSON.stringify(meta)}`
+                    : '';
+                  const stackStr = stack ? `\n${toText(stack)}` : '';
+                  return `${toText(timestamp)} [${level.toUpperCase()}] ${ctx} ${toText(message)}${metaStr}${stackStr}`;
+                }),
               ),
               level: 'error',
             }),
@@ -101,10 +110,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
       isGlobal: true,
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        stores: [
-          createKeyv(configService.getOrThrow<string>('REDIS_URI')),
-        ],
+      useFactory: (configService: ConfigService) => ({
+        stores: [createKeyv(configService.getOrThrow<string>('REDIS_URI'))],
       }),
     }),
     AppCacheModule,

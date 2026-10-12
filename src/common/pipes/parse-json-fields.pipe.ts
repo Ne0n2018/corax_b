@@ -5,17 +5,22 @@ import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 export class ParseJsonFieldsPipe implements PipeTransform {
   constructor(private readonly fields: string[] = []) {}
 
-  transform(value: any) {
+  transform(value: unknown) {
     if (!value || typeof value !== 'object') return value;
 
-    const result = { ...value };
+    const result = { ...(value as Record<string, unknown>) };
 
     for (const field of this.fields) {
-      let raw = result[field];
+      const raw = result[field];
 
       if (typeof raw === 'string') {
         const trimmed = raw.trim();
-        if (!trimmed || trimmed === 'string' || trimmed === 'null' || trimmed === 'undefined') {
+        if (
+          !trimmed ||
+          trimmed === 'string' ||
+          trimmed === 'null' ||
+          trimmed === 'undefined'
+        ) {
           delete result[field];
           continue;
         }
@@ -26,7 +31,7 @@ export class ParseJsonFieldsPipe implements PipeTransform {
         }
 
         try {
-          let parsed = JSON.parse(trimmed);
+          let parsed: unknown = JSON.parse(trimmed);
 
           // Гарантируем, что это всегда массив
           if (!Array.isArray(parsed)) {
@@ -34,19 +39,20 @@ export class ParseJsonFieldsPipe implements PipeTransform {
           }
 
           // Очищаем от обёрток типа { "0": {...} }
-          parsed = parsed.map((item: any) => {
+          parsed = (parsed as unknown[]).map((item) => {
             if (item && typeof item === 'object' && !Array.isArray(item)) {
+              const obj = item as Record<string, unknown>;
               // Если есть ключ "0" — берём значение из него
-              if (item['0'] && typeof item['0'] === 'object') {
-                return { ...item['0'] };
+              if (obj['0'] && typeof obj['0'] === 'object') {
+                return { ...(obj['0'] as Record<string, unknown>) };
               }
-              return { ...item }; // обычный объект
+              return { ...obj }; // обычный объект
             }
             return item;
           });
 
           result[field] = parsed;
-        } catch (e) {
+        } catch {
           throw new BadRequestException(
             `Поле "${field}" содержит некорректный JSON`,
           );
@@ -81,7 +87,12 @@ export class ParseJsonFieldsPipe implements PipeTransform {
           result.isClothes = false;
         } else if (val === 'true' || val === '1') {
           result.isClothes = true;
-        } else if (val === '' || val === 'null' || val === 'undefined' || val === 'string') {
+        } else if (
+          val === '' ||
+          val === 'null' ||
+          val === 'undefined' ||
+          val === 'string'
+        ) {
           delete result.isClothes;
         }
       }

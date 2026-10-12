@@ -68,7 +68,7 @@ async function bootstrap() {
 
   await app.listen(config.getOrThrow<number>('APPLICATION_PORT'));
 
-  const appUrl = config.getOrThrow('APPLICATION_URL');
+  const appUrl = config.getOrThrow<string>('APPLICATION_URL');
   Logger.log(`сервер запущен по адресу ${appUrl}`);
   Logger.log(`сваггер запущен по адресу ${appUrl}/swagger`);
   // Construct Grafana URL by replacing port in APPLICATION_URL with GRAFANA_PORT
@@ -80,4 +80,4 @@ async function bootstrap() {
     `Grafana доступна по адресу ${grafanaUrl} (логин: ${process.env.GRAFANA_ADMIN_USER || 'admin'}, пароль: ${process.env.GRAFANA_ADMIN_PASSWORD || 'admin'})`,
   );
 }
-bootstrap();
+void bootstrap();

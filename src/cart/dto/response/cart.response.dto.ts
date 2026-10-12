@@ -130,13 +130,26 @@ export class CartResponse {
   @ApiProperty({ type: Number, description: 'Итоговая сумма корзины' })
   totalAmount: number;
 
-  @ApiProperty({ type: Number, description: 'Сумма скидки', required: false, default: 0 })
+  @ApiProperty({
+    type: Number,
+    description: 'Сумма скидки',
+    required: false,
+    default: 0,
+  })
   discountAmount?: number;
 
-  @ApiProperty({ type: Number, description: 'Сумма к оплате со скидкой', required: false })
+  @ApiProperty({
+    type: Number,
+    description: 'Сумма к оплате со скидкой',
+    required: false,
+  })
   finalAmount?: number;
 
-  @ApiProperty({ type: () => [Object], description: 'Примененные акции', required: false })
+  @ApiProperty({
+    type: () => [Object],
+    description: 'Примененные акции',
+    required: false,
+  })
   appliedPromotions?: any[];
 
   @Exclude()

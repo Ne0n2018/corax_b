@@ -100,12 +100,12 @@ export class CartService {
     if (cart.CartItem && cart.CartItem.length > 0) {
       try {
         const discountResult = await this.promotionService.calculateDiscount(
-          cart as any,
+          cart,
           { id: userId },
         );
         discountAmount = discountResult.totalDiscount || 0;
         appliedPromotions = discountResult.breakdown || [];
-      } catch (e) {
+      } catch {
         // Если расчет скидок выдал ошибку, скидка 0
       }
     }

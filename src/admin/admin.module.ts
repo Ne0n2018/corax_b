@@ -10,7 +10,6 @@ import { AdminOrdersService } from './orders/admin-orders.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../libs/mail/mail.module';
 import { PromotionModule } from '../promotion/promotion.module';
-import { PromoCodeService } from '../order/promo/promo-code.service';
 import { OrderModule } from '../order/order.module';
 
 @Module({

@@ -43,7 +43,10 @@ export class AppCacheService {
   public async del(key: string): Promise<void> {
     try {
       await this.cacheManager.del(key);
-    } catch {}
+    } catch {
+      // Игнорируем: удаление через cache-manager не критично,
+      // ниже ключ всё равно удаляется напрямую из Redis.
+    }
 
     try {
       await this.redisClient.del(key);
@@ -62,10 +65,15 @@ export class AppCacheService {
       const keys = await this.redisClient.keys(searchPattern);
       if (keys.length > 0) {
         await this.redisClient.del(...keys);
-        this.logger.debug(`Сброшено ${keys.length} ключей по шаблону "${searchPattern}"`);
+        this.logger.debug(
+          `Сброшено ${keys.length} ключей по шаблону "${searchPattern}"`,
+        );
       }
     } catch (error) {
-      this.logger.error(`Ошибка при удалении ключей по шаблону [${pattern}]:`, error);
+      this.logger.error(
+        `Ошибка при удалении ключей по шаблону [${pattern}]:`,
+        error,
+      );
     }
   }
 
