@@ -15,6 +15,8 @@ import UserBlockedTemplate from '../libs/mail/templates/user.blocked.template';
 import { REDIS_CLIENT } from '../session/redis.provider';
 import { Redis } from 'ioredis';
 import { UserRole } from '../generated/prisma/enums';
+import { NotificationBus } from '../notifications/notifications.bus';
+import { NotificationEvent } from '../notifications/events/notification-events';
 
 @Injectable()
 export class AdminService {
@@ -22,6 +24,7 @@ export class AdminService {
     private readonly userService: UserService,
     private readonly prismaService: PrismaService,
     private readonly mailService: MailService,
+    private readonly notificationBus: NotificationBus,
     @Inject(REDIS_CLIENT) private readonly redisClient: Redis,
   ) {}
   public async updateUser(id: string, role: UserRole) {
@@ -132,6 +135,12 @@ export class AdminService {
         'Ваша учетная запись заблокирована',
         UserBlockedTemplate(mail),
       );
+
+      // Уведомляем пользователя через WebSocket
+      this.notificationBus.publish(NotificationEvent.ACCOUNT_BLOCKED, {
+        userId: id,
+        vars: { reason: message },
+      });
     } else {
       // Пользователь разблокирован: удаляем флаг из Redis
       await this.redisClient.del(`blocked_user:${id}`);

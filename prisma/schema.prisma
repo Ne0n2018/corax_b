@@ -331,7 +331,15 @@ model Notification {
   id      String           @id @default(uuid())
   message String
   type    NotificationType
-  read    Boolean
+  read    Boolean          @default(false)
+
+  // Событие-шаблон (NotificationEvent), из которого собрано уведомление
+  event String?
+  // Дополнительные данные события (передаются клиенту как есть)
+  meta Json?
+
+  // Мягкое удаление: пользователь скрывает уведомление у себя
+  deletedAt DateTime? @map("deleted_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -340,6 +348,7 @@ model Notification {
 
   @@index([userId])
   @@index([userId, read])
+  @@index([userId, deletedAt])
 }
 
 model Favorite {
@@ -434,4 +443,5 @@ enum NotificationType {
   PROMO
   ORDER_DECORATED
   ORDER_RECEIVED
+  ACCOUNT
 }

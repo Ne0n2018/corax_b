@@ -22,10 +22,10 @@ import { SessionModule } from './session/session.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { NotificationsGateway } from './notifications/notifications.gateway';
 import { ComparisonModule } from './comparison/comparison.module';
 import { TopProductsModule } from './top-products/top-products.module';
 import { TwoFactorModule } from './two-factor/two-factor.module';
+import { CallbackModule } from './callback/callback.module';
 import 'winston-daily-rotate-file';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
@@ -137,6 +137,7 @@ const toText = (value: unknown): string => {
     ComparisonModule,
     TopProductsModule,
     TwoFactorModule,
+    CallbackModule,
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -154,7 +155,6 @@ const toText = (value: unknown): string => {
     }),
   ],
   providers: [
-    NotificationsGateway,
     LoggingInterceptor,
     {
       provide: APP_GUARD,

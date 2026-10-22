@@ -11,6 +11,7 @@ import { EmailConfirmationModule } from './email-confirmation/email-confirmation
 import { MailService } from '../libs/mail/mail.service';
 import { AdminModule } from '../admin/admin.module';
 import { SessionModule } from '../session/session.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SessionModule } from '../session/session.module';
     forwardRef(() => EmailConfirmationModule),
     AdminModule,
     SessionModule,
+    NotificationsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UserService, MailService],

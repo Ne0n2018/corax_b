@@ -11,6 +11,8 @@ import { PromotionFilterDto } from './dto/promotion.filter.dto';
 import { DiscountMethod, PromotionType } from '../generated/prisma/enums';
 import type { Prisma, Promotion } from '../generated/prisma/client';
 import { AppCacheService } from '../libs/cache/cache.service';
+import { NotificationBus } from '../notifications/notifications.bus';
+import { NotificationEvent } from '../notifications/events/notification-events';
 
 export interface AppliedPromotion {
   promotionId: string;
@@ -42,6 +44,7 @@ export class PromotionService {
     private readonly s3Service: S3Service,
     private readonly prismaService: PrismaService,
     private readonly cacheService: AppCacheService,
+    private readonly notificationBus: NotificationBus,
   ) {}
 
   /**
@@ -80,6 +83,26 @@ export class PromotionService {
     });
 
     await this.clearCache();
+
+    // Рассылаем уведомление о новой акции всем пользователям
+    if (dto.active !== 'false') {
+      const discountLabel =
+        dto.discountMethod === DiscountMethod.PERCENT
+          ? `${dto.discountValue}%`
+          : `${dto.discountValue} BYN`;
+      const until = dto.expiresAt
+        ? new Date(dto.expiresAt).toLocaleDateString('ru-RU')
+        : 'конца акции';
+
+      this.notificationBus.publish(NotificationEvent.DISCOUNT_CATEGORY, {
+        vars: {
+          discount: discountLabel,
+          category: dto.name,
+          until,
+        },
+        meta: { promotionName: dto.name },
+      });
+    }
 
     return { message: 'Скидка успешно создана' };
   }

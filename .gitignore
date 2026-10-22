@@ -73,3 +73,23 @@ prisma/generated/
 # Docker local overrides
 docker-compose.override.yml
 certs-local/
+
+# Certificates and private keys (никогда не коммитим секреты)
+certs/
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+
+# Docker runtime data (создаются при запуске контейнеров)
+postgres_data/
+redis_data/
+prometheus_data/
+grafana_data/
+app_logs/
+
+# AI assistant folders
+.claude/
+.koda/
+.agents/

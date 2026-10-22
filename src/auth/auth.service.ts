@@ -21,6 +21,8 @@ import { EmailConfirmationService } from './email-confirmation/email-confirmatio
 import { REDIS_CLIENT } from '../session/redis.provider';
 import { Redis } from 'ioredis';
 import { AdminService } from '../admin/admin.service';
+import { NotificationBus } from '../notifications/notifications.bus';
+import { NotificationEvent } from '../notifications/events/notification-events';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +33,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly confirmationService: EmailConfirmationService,
     private readonly adminService: AdminService,
+    private readonly notificationBus: NotificationBus,
     @Inject(REDIS_CLIENT) private readonly redisClient: Redis,
   ) {}
   private logger = new Logger('AuthService');
@@ -51,6 +54,12 @@ export class AuthService {
     );
 
     await this.confirmationService.sendVerificationToken(newUser);
+
+    // Приветственное уведомление новому пользователю
+    this.notificationBus.publish(NotificationEvent.WELCOME, {
+      userId: newUser.id,
+      vars: { club: 'CORAX', discount: '10%', promo: 'START10' },
+    });
 
     return {
       message:

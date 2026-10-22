@@ -11,6 +11,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { MailModule } from '../libs/mail/mail.module';
 import { PromotionModule } from '../promotion/promotion.module';
 import { OrderModule } from '../order/order.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { OrderModule } from '../order/order.module';
     MailModule,
     PromotionModule,
     OrderModule,
+    NotificationsModule,
   ],
   controllers: [AdminController],
   providers: [AdminService, AdminOrdersGateway, AdminOrdersService],
