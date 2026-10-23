@@ -124,7 +124,12 @@ export class BaseOAuthService {
   }
 
   public getRedirectUrl(): string {
-    return `${this.BASE_URL}api//auth/oauth/callback/${this.options.name}`;
+    // BASE_URL задаётся через APPLICATION_URL и уже содержит префикс /api,
+    // если бэкенд опубликован за nginx. Хвостовые слеши убираем, чтобы
+    // не получить двойной слэш в redirect_uri (провайдеры его не принимают).
+    const baseUrl = (this.BASE_URL ?? '').replace(/\/+$/, '');
+
+    return `${baseUrl}/auth/oauth/callback/${this.options.name}`;
   }
 
   set baseUrl(value: string) {
