@@ -9,6 +9,7 @@ Dockerfile
 npmrc
 dist
 coverage
+src/generated
 logs
 *.log
 postgres_data

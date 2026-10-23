@@ -22,11 +22,12 @@ COPY prisma ./prisma/
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
-# Генерируем Prisma Client
-RUN pnpm exec prisma generate
-
 # Копируем остальной код и собираем NestJS
 COPY . .
+
+# Генерируем Prisma Client после копирования кода, иначе закоммиченная
+# версия src/generated перезапишет свежий клиент и сборка упадёт на типах
+RUN pnpm exec prisma generate
 RUN pnpm run build
 
 # Удаляем devDependencies (Prisma Client останется)
