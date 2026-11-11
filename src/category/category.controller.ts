@@ -27,7 +27,6 @@ export class CategoryController {
   })
   @ApiOperation({ summary: 'получение всех категорий вместе с подкатегориями' })
   @ApiQuery({ name: 'name', type: String, required: false })
-  @ApiQuery({ name: 'page', type: Number, example: 1 })
   public async findAll(@Query() filterDto: CategoryFilterDto) {
     const categories = await this.categoryService.getAll(filterDto);
 
