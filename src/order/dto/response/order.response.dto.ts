@@ -70,11 +70,24 @@ export class OrderResponseDto {
   })
   status: string;
 
-  @ApiProperty({ type: Number })
-  totalAmount: number;
+  @ApiProperty({ type: Number, description: 'Стоимость товаров без скидок' })
+  subtotalAmount: number;
 
   @ApiProperty({ type: Number, description: 'Сумма применённой скидки' })
   discountAmount: number;
+
+  @ApiProperty({
+    type: Number,
+    description:
+      'Стоимость доставки по тарифу (серверный расчёт): курьер — 15 BYN, самовывоз и почта — 0',
+  })
+  deliveryCost: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Итог к оплате: товары - скидки + доставка',
+  })
+  totalAmount: number;
 
   @Exclude()
   appliedPromotions: unknown;
@@ -83,10 +96,10 @@ export class OrderResponseDto {
   userId: string;
 
   @Exclude()
-  bepaidToken: string | null;
+  paymentOrderId: string | null;
 
   @Exclude()
-  bepaidUid: string | null;
+  paymentOrderNumber: string | null;
 
   @Exclude()
   updatedAt: Date;
@@ -108,7 +121,8 @@ export class CreateOrderResponseDto {
   @ApiProperty({
     type: String,
     nullable: true,
-    description: 'URL страницы оплаты bePaid (только для paymentType = ONLINE)',
+    description:
+      'URL платёжной страницы Альфа-Банка (только для paymentType = ONLINE)',
   })
   redirectUrl: string | null;
 }

@@ -73,7 +73,11 @@ class ProductItemDto {
   @ApiProperty({ type: String })
   id: string;
 
-  @ApiProperty({ type: Number, description: 'Цена выбранного варианта' })
+  @ApiProperty({
+    type: Number,
+    description:
+      'Цена выбранного варианта, рассчитанная сервером (базовая цена + наценки опций)',
+  })
   price: number;
 
   @ApiProperty({ type: String, description: 'Вкус' })
@@ -127,7 +131,11 @@ export class CartResponse {
   @ApiProperty({ type: String })
   userId: string;
 
-  @ApiProperty({ type: Number, description: 'Итоговая сумма корзины' })
+  @ApiProperty({
+    type: Number,
+    description:
+      'Итоговая сумма корзины, рассчитанная сервером по прайсу (клиентские цены не принимаются)',
+  })
   totalAmount: number;
 
   @ApiProperty({

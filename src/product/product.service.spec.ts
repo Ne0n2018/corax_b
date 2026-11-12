@@ -25,6 +25,12 @@ describe('ProductService (create, update, delete)', () => {
     orderItem: {
       findFirst: jest.Mock;
     };
+    taste: {
+      findMany: jest.Mock;
+    };
+    size: {
+      findMany: jest.Mock;
+    };
   };
   let s3Service: {
     uploadImage: jest.Mock;
@@ -60,6 +66,12 @@ describe('ProductService (create, update, delete)', () => {
       },
       orderItem: {
         findFirst: jest.fn().mockResolvedValue(null),
+      },
+      taste: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+      size: {
+        findMany: jest.fn().mockResolvedValue([]),
       },
     };
 
@@ -366,6 +378,78 @@ describe('ProductService (create, update, delete)', () => {
       expect(s3Service.deleteByUrl).not.toHaveBeenCalled();
       expect(prismaService.product.delete).not.toHaveBeenCalled();
       expect(cacheService.clearProductCache).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getVariantPrices (серверный расчёт цены варианта)', () => {
+    it('складывает базовую цену товара и наценки вкуса и размера', async () => {
+      // Связка из рабочих данных: 88 + 5 + 7 = 100
+      prismaService.product.findMany.mockResolvedValue([
+        { id: 'product-1', defaultPrice: 88 },
+      ]);
+      prismaService.taste.findMany.mockResolvedValue([
+        { productId: 'product-1', name: 'Ананас-манго', price: 5 },
+      ]);
+      prismaService.size.findMany.mockResolvedValue([
+        { productId: 'product-1', name: 'большой', price: 7 },
+      ]);
+
+      const prices = await service.getVariantPrices([
+        { productId: 'product-1', taste: 'Ананас-манго', size: 'большой' },
+      ]);
+
+      expect(prices.get('product-1||Ананас-манго||большой')).toBe(100);
+    });
+
+    it('не берёт наценку чужого товара: опции сопоставляются по productId', async () => {
+      prismaService.product.findMany.mockResolvedValue([
+        { id: 'product-1', defaultPrice: 50 },
+      ]);
+      prismaService.taste.findMany.mockResolvedValue([
+        { productId: 'other-product', name: 'Шоколад', price: 100 },
+      ]);
+      prismaService.size.findMany.mockResolvedValue([
+        { productId: 'other-product', name: 'XL', price: 100 },
+      ]);
+
+      const prices = await service.getVariantPrices([
+        { productId: 'product-1', taste: 'Шоколад', size: 'XL' },
+      ]);
+
+      expect(prices.get('product-1||Шоколад||XL')).toBe(50);
+    });
+
+    it('не выдаёт цену для несуществующего товара', async () => {
+      prismaService.product.findMany.mockResolvedValue([]);
+
+      const prices = await service.getVariantPrices([
+        { productId: 'missing', taste: 'Шоколад', size: 'XL' },
+      ]);
+
+      expect(prices.has('missing||Шоколад||XL')).toBe(false);
+    });
+
+    it('округляет итог до копеек', async () => {
+      prismaService.product.findMany.mockResolvedValue([
+        { id: 'product-1', defaultPrice: 10.005 },
+      ]);
+      prismaService.taste.findMany.mockResolvedValue([
+        { productId: 'product-1', name: 'Ваниль', price: 0.004 },
+      ]);
+      prismaService.size.findMany.mockResolvedValue([]);
+
+      const prices = await service.getVariantPrices([
+        { productId: 'product-1', taste: 'Ваниль', size: '' },
+      ]);
+
+      expect(prices.get('product-1||Ваниль||')).toBe(10.01);
+    });
+
+    it('для пустого списка обращений к БД не делает', async () => {
+      const prices = await service.getVariantPrices([]);
+
+      expect(prices.size).toBe(0);
+      expect(prismaService.product.findMany).not.toHaveBeenCalled();
     });
   });
 });

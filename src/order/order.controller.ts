@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -100,6 +101,31 @@ export class OrderController {
     return this.orderService.getPaymentUrl(userId, orderId);
   }
 
+  @Post(':orderId/confirm-payment')
+  @Authorization()
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Проверить оплату в шлюзе после возврата на returnUrl (редиректу не доверяем)',
+  })
+  @ApiParam({ name: 'orderId', type: String })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      properties: {
+        status: { type: 'string' },
+        orderStatus: { type: 'number' },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  async confirmPayment(
+    @Authorized('id') userId: string,
+    @Param('orderId', ParseUUIDPipe) orderId: string,
+  ) {
+    return this.orderService.confirmPayment(userId, orderId);
+  }
+
   @Patch(':orderId/cancel')
   @Authorization()
   @ApiBearerAuth()
@@ -115,14 +141,31 @@ export class OrderController {
     return plainToInstance(OrderResponseDto, order);
   }
 
-  // ─── Публичный маршрут: webhook от bePaid ──────────────────────────────────
+  // ─── Публичные маршруты: callback от платёжного шлюза Альфа-Банка ──────────
 
-  @Post('webhook/bepaid')
-  @ApiOperation({ summary: '[bePaid] Webhook-уведомление об оплате' })
+  @Post('webhook/alfa-bank')
+  @ApiOperation({
+    summary:
+      '[Alfa-Bank] Callback-уведомление об оплате (параметры приходят в query string или теле)',
+  })
+  @ApiResponse({ status: 200, description: 'Шлюз ждёт именно 200 OK' })
+  @HttpCode(HttpStatus.OK)
+  async alfaBankCallback(
+    @Query() query: Record<string, unknown>,
+    @Body() body: Record<string, unknown>,
+  ) {
+    await this.orderService.handleAlfaBankCallback({ ...query, ...body });
+    return { ok: true };
+  }
+
+  // Шлюз настраивается на HTTPS-URL с параметрами в строке запроса —
+  // поддерживаем и GET, чтобы не зависеть от способа доставки
+  @Get('webhook/alfa-bank')
+  @ApiOperation({ summary: '[Alfa-Bank] Callback-уведомление (GET-вариант)' })
   @ApiResponse({ status: 200 })
   @HttpCode(HttpStatus.OK)
-  async bepaidWebhook(@Body() body: Record<string, unknown>) {
-    await this.orderService.handleBePaidWebhook(body);
+  async alfaBankCallbackGet(@Query() query: Record<string, unknown>) {
+    await this.orderService.handleAlfaBankCallback(query);
     return { ok: true };
   }
 }

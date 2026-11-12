@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AddCartDto {
@@ -6,15 +6,6 @@ export class AddCartDto {
   @IsUUID()
   @ApiProperty({ type: String, description: 'айди продукта' })
   productId: string;
-
-  @IsNotEmpty({ message: 'Цена не должна быть пустой' })
-  @IsNumber({}, { message: 'Цена должна быть числом' })
-  @ApiProperty({
-    type: Number,
-    description: 'Цена выбранного товара вместе с опциями',
-    example: 10,
-  })
-  price: number;
 
   @IsNotEmpty({ message: 'Вкус не должен быть пустым' })
   @IsString({ message: 'Вкус должен быть строкой' })

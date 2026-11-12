@@ -62,7 +62,7 @@ export class CreateOrderDto {
   @ApiProperty({
     enum: PaymentType,
     description:
-      'Тип оплаты: онлайн через bePaid (ONLINE), наличные при получении (CASH), картой при получении (CARD)',
+      'Тип оплаты: онлайн на платёжной странице Альфа-Банка (ONLINE), наличные при получении (CASH), картой при получении (CARD)',
     example: PaymentType.ONLINE,
   })
   paymentType: PaymentType;

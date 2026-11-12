@@ -5,10 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Cron } from '@nestjs/schedule';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
 import { UserService } from '../user/user.service';
-import { BePaidService } from './bepaid/bepaid.service';
+import { AlfaBankService } from './alfa-bank/alfa-bank.service';
 import { MailService } from '../libs/mail/mail.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PromoCodeService } from './promo/promo-code.service';
@@ -19,10 +21,17 @@ import {
   DeliveryType,
   PaymentType,
 } from './dto/create-order.dto';
-import type { BePaidWebhookDto } from './dto/bepaid-webhook.dto';
 import * as React from 'react';
 import OrderConfirmTemplate from '../libs/mail/templates/order.confirm.template';
 import { TopProductsService } from '../top-products/top-products.service';
+import { getDeliveryCost } from './delivery-cost';
+
+/** Длительность платёжной сессии в шлюзе по умолчанию (sessionTimeoutSecs = 1200) */
+const PAYMENT_SESSION_TTL_MS = 20 * 60 * 1000;
+/** Заказ ещё может быть оплачен — не трогаем свежие заказы в cron-синхронизации */
+const PAYMENT_SYNC_MIN_AGE_MS = 60 * 1000;
+/** Заказы старше этого срока считаем безвозвратно просроченными */
+const PAYMENT_SYNC_MAX_AGE_MS = 48 * 60 * 60 * 1000;
 
 @Injectable()
 export class OrderService {
@@ -32,7 +41,7 @@ export class OrderService {
     private readonly prismaService: PrismaService,
     private readonly cartService: CartService,
     private readonly userService: UserService,
-    private readonly bepaidService: BePaidService,
+    private readonly alfaBankService: AlfaBankService,
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
     private readonly metricsService: MetricsService,
@@ -53,6 +62,12 @@ export class OrderService {
 
   /**
    * Создать заказ из текущей корзины пользователя.
+   *
+   * Итоговая сумма рассчитывается только на сервере: стоимость товаров берётся из
+   * прайса (products.default_price + наценки опций), стоимость доставки — из
+   * тарифной сетки по deliveryType. Клиент передаёт тип доставки и, при
+   * необходимости, адрес.
+   *
    * Возвращает заказ и URL оплаты (только для ONLINE).
    */
   async createOrder(userId: string, dto: CreateOrderDto) {
@@ -171,7 +186,10 @@ export class OrderService {
     const totalDiscount = round2(
       Math.min(subtotalAmount, promotionsDiscount + promoDiscount),
     );
-    const totalAmount = Math.max(0, round2(subtotalAmount - totalDiscount));
+    // Скидка уменьшает только стоимость товаров, доставка начисляется сверху
+    const itemsTotal = Math.max(0, round2(subtotalAmount - totalDiscount));
+    const deliveryCost = getDeliveryCost(deliveryType);
+    const totalAmount = round2(itemsTotal + deliveryCost);
 
     // 6. Генерируем уникальный 6-значный цифровой код заказа
     const orderCode = await this.generateUniqueOrderCode();
@@ -186,6 +204,7 @@ export class OrderService {
         paymentType,
         subtotalAmount,
         discountAmount: totalDiscount,
+        deliveryCost,
         totalAmount,
         promoCode: appliedPromoCode,
         appliedPromotions:
@@ -228,24 +247,18 @@ export class OrderService {
       this.recordProductSales(orderWithItems);
     }
 
-    // 11. Для онлайн-оплаты — создаём платёжную сессию bePaid
+    // 11. Для онлайн-оплаты — регистрируем платёж в шлюзе Альфа-Банка
     let redirectUrl: string | null = null;
 
     if (paymentType === PaymentType.ONLINE) {
-      const checkout = await this.bepaidService.createCheckout(
-        order.id,
-        order.totalAmount,
+      redirectUrl = await this.registerGatewayPayment(
+        {
+          id: order.id,
+          orderCode,
+          totalAmount,
+        },
         user.email,
-        `Заказ #${order.id.slice(0, 8).toUpperCase()}`,
       );
-
-      // Сохраняем токен bePaid в заказе
-      await this.prismaService.order.update({
-        where: { id: order.id },
-        data: { bepaidToken: checkout.token },
-      });
-
-      redirectUrl = checkout.redirectUrl;
     }
 
     return { order, redirectUrl };
@@ -279,7 +292,10 @@ export class OrderService {
   }
 
   /**
-   * Получить новую ссылку для оплаты (если пользователь закрыл страницу bePaid).
+   * Получить новую ссылку для оплаты (если пользователь закрыл платёжную страницу).
+   *
+   * Шлюз отклоняет повторную регистрацию того же orderNumber, поэтому для каждой
+   * попытки оплаты генерируется новый номер, а прежняя регистрация отменяется.
    */
   async getPaymentUrl(userId: string, orderId: string) {
     const order = await this.getOrderById(userId, orderId);
@@ -294,19 +310,42 @@ export class OrderService {
 
     const user = await this.userService.findById(userId);
 
-    const checkout = await this.bepaidService.createCheckout(
-      order.id,
-      order.totalAmount,
+    if (order.paymentOrderId && order.paymentOrderNumber) {
+      // Оплата могла пройти, пока callback не дошёл — сверяемся с шлюзом
+      const gatewayStatus = await this.alfaBankService
+        .getOrderStatus(order.paymentOrderId, order.paymentOrderNumber)
+        .catch((err) => {
+          this.logger.warn(
+            `Не удалось проверить статус заказа ${order.id} в шлюзе: ${err.message}`,
+          );
+          return null;
+        });
+
+      if (
+        gatewayStatus &&
+        isPaidOrderStatus(Number(gatewayStatus.orderStatus))
+      ) {
+        await this.applyPaymentStatus(order.id, 'PAID', 'repeat-pay check');
+        throw new BadRequestException('Заказ уже оплачен');
+      }
+
+      // Снимаем прежнюю регистрацию, чтобы в шлюзе не осталось «висячего» заказа
+      await this.alfaBankService.cancelOrder(
+        order.paymentOrderId,
+        order.paymentOrderNumber,
+      );
+    }
+
+    const formUrl = await this.registerGatewayPayment(
+      {
+        id: order.id,
+        orderCode: order.orderCode,
+        totalAmount: order.totalAmount,
+      },
       user.email,
-      `Заказ #${order.id.slice(0, 8).toUpperCase()}`,
     );
 
-    await this.prismaService.order.update({
-      where: { id: order.id },
-      data: { bepaidToken: checkout.token },
-    });
-
-    return { redirectUrl: checkout.redirectUrl };
+    return { redirectUrl: formUrl };
   }
 
   /**
@@ -321,6 +360,18 @@ export class OrderService {
       );
     }
 
+    // Для неоплаченного ONLINE-заказа снимаем регистрацию и в платёжном шлюзе
+    if (
+      order.status === 'PENDING' &&
+      order.paymentOrderId &&
+      order.paymentOrderNumber
+    ) {
+      await this.alfaBankService.cancelOrder(
+        order.paymentOrderId,
+        order.paymentOrderNumber,
+      );
+    }
+
     return this.prismaService.order.update({
       where: { id: order.id },
       data: { status: 'CANCELLED' },
@@ -329,71 +380,276 @@ export class OrderService {
   }
 
   /**
-   * Обработать webhook-уведомление от bePaid.
-   * Публичный метод — без проверки авторизации.
+   * Подтверждение оплаты после возврата покупателя на returnUrl.
+   *
+   * Самому редиректу не доверяем: статус запрашивается у шлюза через
+   * getOrderStatusExtended.do (шаг 10 схемы redirect-интеграции).
    */
-  async handleBePaidWebhook(body: Record<string, unknown>) {
-    const { transaction } = body as unknown as BePaidWebhookDto;
+  async confirmPayment(userId: string, orderId: string) {
+    const order = await this.getOrderById(userId, orderId);
 
-    if (!transaction?.tracking_id) {
-      this.logger.warn('bePaid webhook: missing tracking_id');
+    if (order.paymentType !== 'ONLINE') {
+      throw new BadRequestException('Этот заказ не предполагает онлайн-оплату');
+    }
+
+    if (order.status !== 'PENDING') {
+      return { status: order.status };
+    }
+
+    if (!order.paymentOrderId || !order.paymentOrderNumber) {
+      throw new BadRequestException('Платёжная сессия для заказа не найдена');
+    }
+
+    const gatewayStatus = await this.alfaBankService.getOrderStatus(
+      order.paymentOrderId,
+      order.paymentOrderNumber,
+    );
+
+    if (isPaidOrderStatus(gatewayStatus.orderStatus)) {
+      this.assertAmountMatches(order, gatewayStatus.amount, 'returnUrl');
+      await this.applyPaymentStatus(order.id, 'PAID', 'returnUrl');
+      return {
+        status: 'PAID' as const,
+        orderStatus: gatewayStatus.orderStatus,
+      };
+    }
+
+    return { status: order.status, orderStatus: gatewayStatus.orderStatus };
+  }
+
+  /**
+   * Обработать callback-уведомление от платёжного шлюза Альфа-Банка.
+   * Публичный метод — вызывается без авторизации, подлинность по checksum.
+   */
+  async handleAlfaBankCallback(raw: Record<string, unknown>) {
+    const params = toStringParams(raw);
+
+    if (!params.orderNumber) {
+      this.logger.warn('alfa-bank callback: отсутствует orderNumber');
+      return;
+    }
+
+    // Без контрольной суммы уведомление не принимается: его мог прислать кто угодно
+    if (!params.checksum) {
+      this.logger.warn(
+        `alfa-bank callback: отсутствует checksum для ${params.orderNumber}`,
+      );
+      return;
+    }
+
+    if (!this.alfaBankService.verifyCallback(params, params.checksum)) {
+      this.logger.warn(
+        `alfa-bank callback: неверная контрольная сумма для ${params.orderNumber}`,
+      );
       return;
     }
 
     const order = await this.prismaService.order.findUnique({
-      where: { id: transaction.tracking_id },
-      include: { items: true, user: true },
+      where: { paymentOrderNumber: params.orderNumber },
+      select: { id: true, status: true },
     });
 
     if (!order) {
       this.logger.warn(
-        `bePaid webhook: order not found [${transaction.tracking_id}]`,
+        `alfa-bank callback: заказ не найден [${params.orderNumber}]`,
       );
       return;
     }
 
-    // Не обрабатываем тестовые транзакции в продакшене и наоборот
-    const isProduction = this.configService.get('NODE_ENV') === 'production';
-    if (isProduction && transaction.test) {
-      this.logger.warn(
-        'bePaid webhook: ignoring test transaction in production',
-      );
-      return;
-    }
+    const successful = params.status === '1';
+    let targetStatus: 'PAID' | 'CANCELLED' | null = null;
 
-    let newStatus = order.status;
-
-    if (transaction.status === 'successful') {
-      newStatus = 'PAID';
-    } else if (
-      transaction.status === 'failed' ||
-      transaction.status === 'expired'
-    ) {
-      newStatus = 'CANCELLED';
-    }
-
-    if (newStatus !== order.status) {
-      await this.prismaService.order.update({
-        where: { id: order.id },
-        data: {
-          status: newStatus,
-          bepaidUid: transaction.uid,
-        },
-      });
-
-      this.logger.log(
-        `Order ${order.id}: ${order.status} → ${newStatus} (bePaid uid: ${transaction.uid})`,
-      );
-
-      // После успешной оплаты отправляем подтверждение заказа и учитываем продажу
-      if (newStatus === 'PAID') {
-        this.sendOrderConfirmEmail(order.user, order).catch((err) =>
-          this.logger.error(
-            `Не удалось отправить письмо после оплаты заказа ${order.id}: ${err.message}`,
-          ),
+    switch (params.operation) {
+      case 'approved':
+      case 'deposited':
+        targetStatus = successful ? 'PAID' : 'CANCELLED';
+        break;
+      case 'reversed':
+      case 'refunded':
+      case 'declinedByTimeout':
+      case 'declinedCardPresent':
+        targetStatus = 'CANCELLED';
+        break;
+      default:
+        // События связок (bindingCreated и т. п.) нас не интересуют
+        this.logger.log(
+          `alfa-bank callback: операция ${params.operation} проигнорирована`,
         );
-        this.recordProductSales(order);
+        return;
+    }
+
+    await this.applyPaymentStatus(
+      order.id,
+      targetStatus,
+      `callback ${params.operation}/${params.status}`,
+    );
+  }
+
+  /**
+   * Страховка от потери callback или редиректа: периодически опрашивает шлюз
+   * по неоплаченным ONLINE-заказам и приводит статус в соответствие.
+   */
+  @Cron('*/5 * * * *')
+  async syncPendingOnlinePayments() {
+    const now = Date.now();
+
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        status: 'PENDING',
+        paymentType: 'ONLINE',
+        paymentOrderId: { not: null },
+        createdAt: {
+          lt: new Date(now - PAYMENT_SYNC_MIN_AGE_MS),
+          gt: new Date(now - PAYMENT_SYNC_MAX_AGE_MS),
+        },
+      },
+      select: {
+        id: true,
+        totalAmount: true,
+        paymentOrderId: true,
+        paymentOrderNumber: true,
+        createdAt: true,
+      },
+      take: 100,
+    });
+
+    if (orders.length === 0) return;
+
+    this.logger.log(
+      `Синхронизация статусов оплаты: проверено заказов ${orders.length}`,
+    );
+
+    for (const order of orders) {
+      if (!order.paymentOrderId || !order.paymentOrderNumber) continue;
+
+      try {
+        const gatewayStatus = await this.alfaBankService.getOrderStatus(
+          order.paymentOrderId,
+          order.paymentOrderNumber,
+        );
+
+        if (isPaidOrderStatus(gatewayStatus.orderStatus)) {
+          this.assertAmountMatches(order, gatewayStatus.amount, 'cron sync');
+          await this.applyPaymentStatus(order.id, 'PAID', 'cron sync');
+          continue;
+        }
+
+        // Платёжная сессия истекла, а оплаты так и не было — закрываем заказ
+        if (now > order.createdAt.getTime() + PAYMENT_SESSION_TTL_MS) {
+          await this.applyPaymentStatus(
+            order.id,
+            'CANCELLED',
+            'cron sync (session expired)',
+          );
+        }
+      } catch (err) {
+        this.logger.warn(
+          `cron sync: не удалось проверить заказ ${order.id}: ${(err as Error).message}`,
+        );
       }
+    }
+  }
+
+  // ─── Работа с платёжным шлюзом ──────────────────────────────────────────────
+
+  /**
+   * Регистрирует платёж в шлюзе Альфа-Банка и сохраняет его реквизиты на заказе.
+   * Возвращает formUrl — адрес платёжной страницы для редиректа покупателя.
+   */
+  private async registerGatewayPayment(
+    order: { id: string; orderCode: number; totalAmount: number },
+    email: string,
+  ): Promise<string> {
+    const clientUrl = this.configService.getOrThrow<string>('ALLOWED_ORIGIN');
+    const currency = this.configService.get<string>('ALFA_CURRENCY') ?? '933';
+
+    // orderNumber уникален для каждой попытки оплаты: повторная регистрация
+    // того же номера шлюзом отклоняется
+    const orderNumber = randomUUID();
+
+    const result = await this.alfaBankService.registerOrder({
+      orderNumber,
+      amount: toCents(order.totalAmount),
+      returnUrl: `${clientUrl}/orders/${order.id}/success`,
+      failUrl: `${clientUrl}/orders/${order.id}/fail`,
+      description: `Corax order ${order.orderCode}`,
+      currency,
+      email,
+      language: 'ru',
+    });
+
+    await this.prismaService.order.update({
+      where: { id: order.id },
+      data: {
+        paymentOrderId: result.orderId,
+        paymentOrderNumber: orderNumber,
+      },
+    });
+
+    return result.formUrl;
+  }
+
+  /**
+   * Идемпотентно применяет статус оплаты к заказу.
+   *
+   * Переход разрешён только из PENDING, поэтому повторные callback-уведомления
+   * и параллельная cron-синхронизация не приводят к двойному письму и учёту продаж.
+   */
+  private async applyPaymentStatus(
+    orderId: string,
+    targetStatus: 'PAID' | 'CANCELLED',
+    source: string,
+  ) {
+    const order = await this.prismaService.order.findUnique({
+      where: { id: orderId },
+      include: { items: true, user: true },
+    });
+
+    if (!order) {
+      this.logger.warn(`applyPaymentStatus: заказ ${orderId} не найден`);
+      return;
+    }
+
+    if (order.status === targetStatus) return;
+
+    if (order.status !== 'PENDING') {
+      this.logger.warn(
+        `Заказ ${order.id}: переход ${order.status} → ${targetStatus} (${source}) пропущен`,
+      );
+      return;
+    }
+
+    await this.prismaService.order.update({
+      where: { id: order.id },
+      data: { status: targetStatus },
+    });
+
+    this.logger.log(
+      `Заказ ${order.id}: ${order.status} → ${targetStatus} (${source})`,
+    );
+
+    // После успешной оплаты отправляем подтверждение заказа и учитываем продажу
+    if (targetStatus === 'PAID') {
+      this.sendOrderConfirmEmail(order.user, order).catch((err) =>
+        this.logger.error(
+          `Не удалось отправить письмо после оплаты заказа ${order.id}: ${err.message}`,
+        ),
+      );
+      this.recordProductSales(order);
+    }
+  }
+
+  /** Сумма в заказе и в шлюзе должны совпадать — расхождение всегда подозрительно. */
+  private assertAmountMatches(
+    order: { id: string; totalAmount: number },
+    gatewayAmount: number,
+    source: string,
+  ) {
+    const expected = toCents(order.totalAmount);
+    if (expected !== gatewayAmount) {
+      this.logger.error(
+        `Заказ ${order.id} (${source}): сумма в шлюзе ${gatewayAmount} не совпадает с ожидаемой ${expected}`,
+      );
     }
   }
 
@@ -461,6 +717,31 @@ export class OrderService {
 /** Округление до копеек, чтобы избежать накопления float-погрешности. */
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+/** Сумма в минимальных единицах валюты (копейках) — формат параметра amount. */
+function toCents(value: number): number {
+  return Math.round(value * 100);
+}
+
+/**
+ * Заказ считается оплаченным только при orderStatus 1 (авторизован)
+ * или 2 (авторизован и завершён) — по документации платёжного шлюза.
+ */
+function isPaidOrderStatus(orderStatus: number): boolean {
+  return orderStatus === 1 || orderStatus === 2;
+}
+
+/** Приводит параметры уведомления (query string или form-urlencoded) к строкам. */
+function toStringParams(raw: Record<string, unknown>): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (typeof value === 'string') result[key] = value;
+    else if (typeof value === 'number' || typeof value === 'boolean') {
+      result[key] = String(value);
+    }
+  }
+  return result;
 }
 
 /**

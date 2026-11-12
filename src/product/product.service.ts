@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CategoryService } from '../category/category.service';
@@ -14,9 +15,13 @@ import { ProductFilterDto } from './dto/product.filter.dto';
 import { OrderStatus, Prisma, Product } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppCacheService } from '../libs/cache/cache.service';
+import { VariantPriceRef, variantPriceKey } from './variant-price';
+import { round2 } from '../common/utils/money.util';
 
 @Injectable()
 export class ProductService {
+  private readonly logger = new Logger(ProductService.name);
+
   public constructor(
     private readonly categoryService: CategoryService,
     private readonly s3Service: S3Service,
@@ -99,6 +104,75 @@ export class ProductService {
 
     // 4. Сохраняем в кэш на 2 минуты (120 000 мс)
     await this.cacheService.set(cacheKey, result, 120000);
+
+    return result;
+  }
+
+  /**
+   * Каноническая цена варианта товара: базовая цена + наценка вкуса + наценка размера.
+   *
+   * Единственный допустимый источник значений для денежных расчётов: значения берутся
+   * из БД, а не из запроса клиента. Клиентские цены на цену варианта влиять не должны.
+   *
+   * Ключ результата — `${productId}||${taste}||${size}` (см. variantPriceKey).
+   */
+  public async getVariantPrices(
+    refs: VariantPriceRef[],
+  ): Promise<Map<string, number>> {
+    const result = new Map<string, number>();
+    if (refs.length === 0) return result;
+
+    const productIds = [...new Set(refs.map((ref) => ref.productId))];
+
+    const [products, tastes, sizes] = await Promise.all([
+      this.prismaService.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, defaultPrice: true },
+      }),
+      this.prismaService.taste.findMany({
+        where: { productId: { in: productIds } },
+        select: { productId: true, name: true, price: true },
+      }),
+      this.prismaService.size.findMany({
+        where: { productId: { in: productIds } },
+        select: { productId: true, name: true, price: true },
+      }),
+    ]);
+
+    const baseByProduct = new Map(products.map((p) => [p.id, p.defaultPrice]));
+    const tastePrice = new Map(
+      tastes.map((t) => [`${t.productId}||${t.name}`, t.price]),
+    );
+    const sizePrice = new Map(
+      sizes.map((s) => [`${s.productId}||${s.name}`, s.price]),
+    );
+
+    for (const ref of refs) {
+      const key = variantPriceKey(ref);
+      if (result.has(key)) continue;
+
+      const base = baseByProduct.get(ref.productId);
+      // Товара нет в базе — цену не выдумываем, ключ остаётся отсутствующим
+      if (base === undefined) continue;
+
+      const tasteAdd = tastePrice.get(`${ref.productId}||${ref.taste}`);
+      const sizeAdd = sizePrice.get(`${ref.productId}||${ref.size}`);
+
+      // Наценка не заведена у товара — считаем её нулевой и сигнализируем:
+      // иначе админ не узнает, что у варианта потерялись опции
+      if (tasteAdd === undefined) {
+        this.logger.warn(
+          `Товар ${ref.productId}: вкус "${ref.taste}" не найден среди опций товара, наценка не учтена`,
+        );
+      }
+      if (sizeAdd === undefined) {
+        this.logger.warn(
+          `Товар ${ref.productId}: размер "${ref.size}" не найден среди опций товара, наценка не учтена`,
+        );
+      }
+
+      result.set(key, round2(base + (tasteAdd ?? 0) + (sizeAdd ?? 0)));
+    }
 
     return result;
   }

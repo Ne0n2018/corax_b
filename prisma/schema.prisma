@@ -267,12 +267,14 @@ model Order {
   subtotalAmount Float @map("subtotal_amount")
   discountAmount Float @default(0) @map("discount_amount")
   totalAmount    Float @map("total_amount")
+  deliveryCost   Float @default(0) @map("delivery_cost")
 
   promoCode         String? @map("promo_code") // Используемый промокод
   appliedPromotions Json?   @map("applied_promotions")
 
-  bepaidToken String? @map("bepaid_token")
-  bepaidUid   String? @map("bepaid_uid")
+  // Платёжный шлюз Альфа-Банка (redirect-интеграция)
+  paymentOrderId     String?  @map("payment_order_id") // orderId, присвоенный шлюзом
+  paymentOrderNumber String?  @unique @map("payment_order_number") // orderNumber, переданный в шлюз (уникален на попытку оплаты)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")

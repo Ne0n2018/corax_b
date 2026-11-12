@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
-import { BePaidService } from './bepaid/bepaid.service';
+import { AlfaBankService } from './alfa-bank/alfa-bank.service';
 import { PromoCodeService } from './promo/promo-code.service';
 import { PromoCodeController } from './promo/promo-code.controller';
 import { CartModule } from '../cart/cart.module';
@@ -19,7 +19,7 @@ import { TopProductsModule } from '../top-products/top-products.module';
     TopProductsModule,
   ],
   controllers: [OrderController, PromoCodeController],
-  providers: [OrderService, BePaidService, PromoCodeService],
+  providers: [OrderService, AlfaBankService, PromoCodeService],
   exports: [PromoCodeService],
 })
 export class OrderModule {}

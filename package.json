@@ -120,12 +120,13 @@
     "moduleFileExtensions": [
       "js",
       "json",
-      "ts"
+      "ts",
+      "tsx"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*[.]spec[.]ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+[.](t|j)sx?$": "ts-jest"
     },
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
